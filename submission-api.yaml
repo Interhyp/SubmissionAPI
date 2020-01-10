@@ -18,29 +18,29 @@ info:
     + **Tolerant Reader** Be tolerant with unknown fields in the payload. This is required to avoid new API versions if new fields were added, i.e. ignore new fields but do not eliminate them from payload if needed for subsequent *PUT* requests
     + Be prepared to handle HTTP status codes not explicitly specified in endpoint definitions.
 servers:
-  - url: https://api-test.interhyp.de/submission
-    description: Test-Staging
-  - url: https://api.interhyp.de/submission
-    description: Production
+- url: https://api-test.interhyp.de/submission
+  description: Test-Staging
+- url: https://api.interhyp.de/submission
+  description: Production
 tags:
-  - name: documents
-    description: access to submission documents
-  - name: document-categories
-    description: access to document categories associated to submission process
-  - name: protocol
-    description: access to submission protocol
+- name: documents
+  description: access to submission documents
+- name: document-categories
+  description: access to document categories associated to submission process
+- name: protocol
+  description: access to submission protocol
 paths:
   /v2/submissions/{submissionId}/documents/metadata:
     get:
       tags:
-        - documents
+      - documents
       summary: Delievers all submission relevant documents metadata
       operationId: getDocumentsMetadata
       description: Retrieve all submission relevant documents in the requested format.
         <p>
       parameters:
-        - $ref: '#/components/parameters/submission-id'
-        - $ref: '#/components/parameters/embed'
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/embed'
       responses:
         '200':
           description: Submission documents matching provided criteria in the requested
@@ -86,21 +86,21 @@ paths:
   /v2/submissions/{submissionId}/documents/binaries:
     get:
       tags:
-        - documents
+      - documents
       summary: Delievers all submission relevant documents as binary format.
       operationId: getDocumentsBinary
       description: 'Retrieve all submission relevant documents in the requested format.
         <p /> *PossibleTypes* are `PDF` and `ZIP`<p /> Note: retries following a 202
         *must* provide the If-Match header.'
       parameters:
-        - in: header
-          name: If-Match
-          schema:
-            type: string
-            format: etag
-          required: false
-        - $ref: '#/components/parameters/submission-id'
-        - $ref: '#/components/parameters/document-category-name-filter'
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+          format: etag
+        required: false
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/document-category-name-filter'
       responses:
         '200':
           description: Submission documents matching provided criteria in the requested
@@ -154,21 +154,21 @@ paths:
   /v2/submissions/{submissionId}/documents/{documentId}/binaries:
     get:
       tags:
-        - documents
+      - documents
       summary: Delievers specific submission document in `pdf` format
       operationId: getDocumentBinary
       description: 'Retrieve specific submission document based on an identifier in
         `pdf` format<p /> Note: retries following a 202 *must* provide the If-Match
         header.'
       parameters:
-        - in: header
-          name: If-Match
-          schema:
-            type: string
-            format: etag
-          required: false
-        - $ref: '#/components/parameters/submission-id'
-        - $ref: '#/components/parameters/document-id'
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+          format: etag
+        required: false
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/document-id'
       responses:
         '200':
           description: Requested submission document is returned
@@ -225,13 +225,13 @@ paths:
   /v2/documents/categories:
     get:
       tags:
-        - document-categories
+      - document-categories
       summary: Delievers document categories
       operationId: getDocumentCategories
       description: Retrieve information about possible document categories associated
         with submission process.
       parameters:
-        - $ref: '#/components/parameters/document-category-name-filter'
+      - $ref: '#/components/parameters/document-category-name-filter'
       responses:
         '200':
           description: Document categories associated with submission process are
@@ -272,15 +272,15 @@ paths:
         last, self)*.
       operationId: getSubmissionsProtocol
       tags:
-        - protocol
+      - protocol
       parameters:
-        - $ref: '#/components/parameters/since'
-        - $ref: '#/components/parameters/until'
-        - $ref: '#/components/parameters/protocol-type-filter'
-        - $ref: '#/components/parameters/sbms-protocol-limit'
-        - $ref: '#/components/parameters/cursor-after'
-        - $ref: '#/components/parameters/cursor-before'
-        - $ref: '#/components/parameters/embed'
+      - $ref: '#/components/parameters/since'
+      - $ref: '#/components/parameters/until'
+      - $ref: '#/components/parameters/protocol-type-filter'
+      - $ref: '#/components/parameters/sbms-protocol-limit'
+      - $ref: '#/components/parameters/cursor-after'
+      - $ref: '#/components/parameters/cursor-before'
+      - $ref: '#/components/parameters/embed'
       responses:
         '200':
           description: A paged array of submissions protocol
@@ -306,8 +306,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/protocol:
+    get:
+      summary: Get protocol for a specific submission
+      description: Delivers detailed information about protocol associated with a
+        specific submission. By default the result will be sorted based on createdAt
+        ascending.
+      operationId: getProtocolBySubmissionId
+      tags:
+      - protocol
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/protocol-type-filter'
+      - $ref: '#/components/parameters/sbms-protocol-sort'
+      responses:
+        '200':
+          description: Submission protocol are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Protocol'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
 security:
-  - BearerAuth: []
+- BearerAuth: []
 components:
   securitySchemes:
     BearerAuth:
@@ -315,1336 +360,35 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    FinancingExpectation:
-      type: object
-      description: client financing expectations
-      properties:
-        repayment:
-          $ref: '#/components/schemas/LoanRepayment'
-        freeAllocation:
-          type: integer
-          format: int32
-          description: requested free commitment duration in months
-        promotionLoan:
-          type: boolean
-          description: flag indicates whether Promotion Loan *kfw* is requested
-        totalAmount:
-          $ref: '#/components/schemas/EuroAmount'
-        payout:
-          $ref: '#/components/schemas/PayoutFinancingExpectation'
-    LoanRepayment:
-      type: object
-      required:
-        - method
-      properties:
-        method:
-          type: string
-          description: loan repayment method
-          oneOf:
-            - enum:
-                - MATURITY_EXCEEDING
-                - FULL_REPAYMENT
-        maturity:
-          description: Requested maturity in years
-          $ref: '#/components/schemas/InterestMaturity'
-        specialPayment:
-          $ref: '#/components/schemas/ExpectedSpecialPayment'
-        alterBurden:
-          $ref: '#/components/schemas/Importance'
-          description: flag indicates whether repayment burden adjustement is requested
-      discriminator:
-        propertyName: method
-        mapping:
-          MATURITY_EXCEEDING: '#/components/schemas/MaturityExceedingPayment'
-          FULL_REPAYMENT: '#/components/schemas/FullRepayment'
-    InterestMaturity:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          $ref: '#/components/schemas/InterestMaturityType'
-      discriminator:
-        propertyName: type
-        mapping:
-          VARIABLE: '#/components/schemas/VariableInterestMaturity'
-          FIXED_PERIOD: '#/components/schemas/FixedInterestMaturity'
-    ExpectedSpecialPayment:
-      type: object
-      properties:
-        amount:
-          description: requested annually special payment amount
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        percentage:
-          description: requested annually special payment percentage
-          $ref: '#/components/schemas/PeriodicalPercentage'
-    PeriodicalEuroAmount:
-      type: object
-      required:
-        - amount
-        - cycle
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        cycle:
-          $ref: '#/components/schemas/Cycle'
-    PeriodicalPercentage:
-      type: object
-      required:
-        - percentage
-        - cycle
-      properties:
-        percentage:
-          $ref: '#/components/schemas/Percentage'
-        cycle:
-          $ref: '#/components/schemas/Cycle'
-    Importance:
-      type: string
-      enum:
-        - IMPORTANT
-        - UNIMPORTANT
-        - UNSPECIFIED
-    MaturityExceedingPayment:
-      allOf:
-        - $ref: '#/components/schemas/LoanRepayment'
-        - type: object
-          properties:
-            burden:
-              description: requested monthly loan rate
-              $ref: '#/components/schemas/PeriodicalEuroAmount'
-            amortisation:
-              description: Requested annual amortisation percent
-              $ref: '#/components/schemas/PeriodicalPercentage'
-    FullRepayment:
-      allOf:
-        - $ref: '#/components/schemas/LoanRepayment'
-        - type: object
-          properties:
-            until:
-              description: requested full repayment date
-              $ref: '#/components/schemas/Date'
-    Date:
-      description: date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6"/>
-      type: string
-      format: date
-      example: 2019-12-29T00:00:00Z
-    EuroAmount:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: number
-          format: double
-    PayoutFinancingExpectation:
-      type: object
-      properties:
-        multiple:
-          type: boolean
-        count:
-          type: integer
-          format: int32
-          default: 1
-    FinancingExpectationItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/FinancingExpectation'
     ResourceRef:
       required:
-        - href
+      - href
       properties:
         href:
           type: string
           description: Link to retrieve a specific resource
           example: http://some-domain/some/link/to/somewhere
-    AbstractLoan:
-      type: object
-      description: Common Financial Loan object information
-      properties:
-        type:
-          $ref: '#/components/schemas/LoanType'
-        id:
-          $ref: '#/components/schemas/LoanId'
-        amount:
-          description: Loan Amount
-          $ref: '#/components/schemas/EuroAmount'
-        interestRate:
-          description: Interest rate
-          $ref: '#/components/schemas/InterestRate'
-        amortisationRate:
-          description: Annual amortisation percent
-          $ref: '#/components/schemas/PeriodicalPercentage'
-    LoanType:
-      description: Loan type
-      type: string
-      allOf:
-        - enum:
-            - MAIN_LOAN
-            - AUXILIARY_LOAN
-            - KFW_PROMOTION_LOAN
-    LoanId:
-      description: Loan identifier
-      type: integer
-      format: int32
-    InterestRate:
-      type: object
-      properties:
-        nominal:
-          description: Annual nominal interest percent
-          $ref: '#/components/schemas/PeriodicalPercentage'
-        effective:
-          description: Annual effective interest percent
-          $ref: '#/components/schemas/PeriodicalPercentage'
-    Advisor:
-      type: object
-      description: Information about advisor
-      required:
-        - advisorType
-      properties:
-        advisorType:
-          $ref: '#/components/schemas/AdvisorType'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        address:
-          $ref: '#/components/schemas/Address'
-      discriminator:
-        propertyName: advisorType
-        mapping:
-          COMPANY_SUBMITTER: '#/components/schemas/CompanyAdvisor'
-          CONSULTANT: '#/components/schemas/PersonAdvisor'
-          EXECUTIVE_SUBMITTER: '#/components/schemas/PersonAdvisor'
-          REGULATORY_ADDRESS: '#/components/schemas/CompanyAdvisor'
-          REGULATORY_ADDRESS_BROKER: '#/components/schemas/CompanyAdvisor'
-          REGULATORY_ADDRESS_SUBMITTER: '#/components/schemas/CompanyAdvisor'
-          SUBMITTER: '#/components/schemas/PersonAdvisor'
-    AdvisorType:
-      type: string
-      description: The type of the advisor
-      oneOf:
-        - enum:
-            - COMPANY_SUBMITTER
-            - CONSULTANT
-            - EXECUTIVE_SUBMITTER
-            - REGULATORY_ADDRESS
-            - REGULATORY_ADDRESS_BROKER
-            - REGULATORY_ADDRESS_SUBMITTER
-            - SUBMITTER
-    Contact:
-      type: object
-      properties:
-        phone:
-          type: string
-          example: +49 89 123456
-        mobilePhone:
-          type: string
-          example: +49 160 123456
-        email:
-          type: string
-          format: email
-          example: primary@example.com
-        fax:
-          type: string
-          example: +49 89 1234567
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-          example: Mainsteet
-          description: The street of the address
-        houseNumber:
-          type: string
-          example: 42
-          description: The house numbering of the address
-        apartmentNumber:
-          type: string
-          example: 3
-          description: The apartment number within the building
-        poBox:
-          type: string
-          example: 14 43 63
-          description: The post office box number
-        postalCode:
-          type: string
-          example: 80807
-          description: The postal code of the address
-        city:
-          type: string
-          example: Munich
-          description: The city of the address
-        federalState:
-          type: string
-          example: DE_BY
-          description: The federal state of the address in ISO_3166-2:alpha-2_country_code
-            format
-        country:
-          type: string
-          example: DE
-          description: The official alpha-2 country code of the address
-    CompanyAdvisor:
-      allOf:
-        - $ref: '#/components/schemas/Advisor'
-        - type: object
-          properties:
-            company:
-              type: string
-              description: The name of the advisors company
-            url:
-              type: string
-              description: The Website of the company
-    PersonAdvisor:
-      allOf:
-        - $ref: '#/components/schemas/Advisor'
-        - type: object
-          properties:
-            externalId:
-              type: string
-              description: The External ID of the Advisor
-            person:
-              $ref: '#/components/schemas/Person'
-    Person:
-      type: object
-      properties:
-        gender:
-          type: string
-          enum:
-            - M
-            - F
-            - D
-        title:
-          type: string
-          anyOf:
-            - enum:
-                - DIPL_ING
-                - DR
-                - DR_DR
-                - DR_ING
-                - PH_D
-                - PD_DR
-                - PROF
-                - PROF_DR
-        firstName:
-          type: string
-          description: The first name of the person
-        lastName:
-          type: string
-          description: The last name of the person
-        maidenName:
-          type: string
-          description: The maiden name of the person, if any
-        birthDate:
-          $ref: '#/components/schemas/Date'
-    AdditionalInfo:
-      type: object
-      description: Additional Information as key-value pairs
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-    Estates:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/EstateItem'
-    EstateItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          required:
-            - id
-            - role
-          properties:
-            id:
-              type: string
-              description: Estate Id
-            role:
-              $ref: '#/components/schemas/EstateRole'
-            type:
-              $ref: '#/components/schemas/EstateType'
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Estate'
-    EstateRole:
-      description: Role of the real estate
-      type: string
-      anyOf:
-        - enum:
-            - MAIN
-            - ADD
-    EstateType:
-      type: string
-      description: Estate type details
-      anyOf:
-        - enum:
-            - APARTMENT
-            - DETACHED_HOUSE
-            - SEMIDETACHED_HOUSE
-            - DUPLEX_HOUSE
-            - TOWNHOUSE_CORNER
-            - TOWNHOUSE_CENTER
-            - APARTMENT_HOUSE
-            - RES_OFFICE_HOUSE
-            - PLOT
-    Estate:
-      type: object
-      discriminator:
-        propertyName: type
-        mapping:
-          APARTMENT: '#/components/schemas/Apartment'
-          DETACHED_HOUSE: '#/components/schemas/House'
-          SEMIDETACHED_HOUSE: '#/components/schemas/House'
-          DUPLEX_HOUSE: '#/components/schemas/House'
-          TOWNHOUSE_CORNER: '#/components/schemas/House'
-          TOWNHOUSE_CENTER: '#/components/schemas/House'
-          APARTMENT_HOUSE: '#/components/schemas/House'
-          RES_OFFICE_HOUSE: '#/components/schemas/House'
-          PLOT: '#/components/schemas/Plot'
-      required:
-        - type
-        - id
-      properties:
-        id:
-          type: string
-          description: id of the estate
-        type:
-          $ref: '#/components/schemas/EstateType'
-        role:
-          $ref: '#/components/schemas/EstateRole'
-        estateRegister:
-          $ref: '#/components/schemas/EstateRegister'
-        estateVendor:
-          $ref: '#/components/schemas/EstateVendor'
-        saleInfo:
-          $ref: '#/components/schemas/SaleInformation'
-        address:
-          $ref: '#/components/schemas/EstateAddress'
-        parcelSize:
-          description: Parcel size (parcel of land size)
-          $ref: '#/components/schemas/SquareMeter'
-        leaseInfo:
-          $ref: '#/components/schemas/LeaseInfo'
-        utilization:
-          $ref: '#/components/schemas/Utilization'
-        estateBurden:
-          $ref: '#/components/schemas/EstateBurden'
-        additionalInfos:
-          type: array
-          description: Additional Information to the estate
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    Apartment:
-      allOf:
-        - $ref: '#/components/schemas/RealEstate'
-        - type: object
-          properties:
-            numberOfApartmentsPerResidence:
-              description: Total number of apartments within the whole residence building
-              type: integer
-              format: int32
-            apartmentsPerEntrance:
-              description: Apartments per building entrance (staircase)
-              type: integer
-              format: int32
-            apartmentsPerBuilding:
-              description: Apartments per building
-              type: integer
-              format: int32
-            apartmentsPerDivision:
-              description: Apartments per apartment division
-              type: integer
-              format: int32
-            apartmentFloor:
-              $ref: '#/components/schemas/ApartmentFloor'
-    RealEstate:
-      allOf:
-        - $ref: '#/components/schemas/Estate'
-        - type: object
-          properties:
-            rating:
-              $ref: '#/components/schemas/EstateRating'
-            building:
-              $ref: '#/components/schemas/Building'
-            modernisation:
-              $ref: '#/components/schemas/Modernisation'
-            area:
-              $ref: '#/components/schemas/AreaInfo'
-            rent:
-              $ref: '#/components/schemas/RentInfo'
-            otherCosts:
-              $ref: '#/components/schemas/OtherCosts'
-    EstateRating:
-      description: Rating of the estate
-      type: object
-      properties:
-        condition:
-          $ref: '#/components/schemas/EstateCondition'
-        attic:
-          $ref: '#/components/schemas/AtticDetail'
-        basement:
-          $ref: '#/components/schemas/Basement'
-        furnishing:
-          $ref: '#/components/schemas/Furnishing'
-        careProperty:
-          description: Assisted living
-          type: boolean
-        holidayProp:
-          description: Holiday property
-          type: boolean
-        luxury:
-          description: Luxury estate
-          type: boolean
-        subOrdination:
-          description: Subordination (Waiver of priority)
-          type: boolean
-        garageInfo:
-          $ref: '#/components/schemas/GarageAndParkingInfo'
-        modernisationCostCompletion:
-          description: Modernisation costs since completion
-          $ref: '#/components/schemas/EuroAmount'
-        negInfDesc:
-          description: Description of negative influence factor
-          type: string
-        negativeInfluence:
-          description: Negative influence factor
-          type: boolean
-        parkingSpace:
-          description: Existing parking space
-          type: boolean
-        marketValueEvaluation:
-          $ref: '#/components/schemas/MarketValueEvaluation'
-        landValueEvaluation:
-          $ref: '#/components/schemas/LandValueEvaluation'
-        yearOfReconstruction:
-          description: Year of complete refurbishment
-          type: integer
-          format: int32
-        additionalInfos:
-          description: Additional Information to the rating of the estate
-          type: array
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    EstateCondition:
-      type: string
-      description: General condition of the estate
-      anyOf:
-        - enum:
-            - EC_UNKNOWN
-            - EC_RUIN
-            - EC_BAD
-            - EC_RENOVATION
-            - EC_MODERNISATION
-            - EC_GOOD
-            - EC_NEW
-    AtticDetail:
-      type: string
-      description: Attic details
-      anyOf:
-        - enum:
-            - DEVELOPED
-            - PARTIALY_DEVELOPED
-            - UPGRADEABLE
-            - NOT_UPGRADEABLE
-    Basement:
-      type: object
-      description: Information about building basement
-      properties:
-        basementDetail:
-          $ref: '#/components/schemas/BasementDetail'
-        basementArea:
-          description: Basement space
-          $ref: '#/components/schemas/SquareMeter'
-    BasementDetail:
-      type: string
-      description: Basement details
-      anyOf:
-        - enum:
-            - DEVELOPED
-            - PARTIALY_DEVELOPED
-            - NONE
-    Furnishing:
-      type: string
-      description: Estate configuration (furnishing) details
-      anyOf:
-        - enum:
-            - SIMPLE
-            - GOOD
-            - VERY_GOOD
-    GarageAndParkingInfo:
-      type: object
-      description: Information about existing garages
-      properties:
-        carportGarages:
-          description: Number of carports
-          type: integer
-          format: int32
-        carportGaragesNr:
-          description: Carport number
-          type: string
-        doubleGarages:
-          description: Number of double garages
-          type: integer
-          format: int32
-        doubleGaragesNr:
-          description: Double garage number
-          type: string
-        duplexGarages:
-          description: Number of duplex garages
-          type: integer
-          format: int32
-        duplexGaragesNr:
-          description: Duplex garage number
-          type: string
-        extGarageRent:
-          description: Possible rental income for parking area
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        separateGarages:
-          description: Number of separate garages
-          type: integer
-          format: int32
-        separateGaragesNr:
-          description: Separate Garage number
-          type: string
-        parkingSpaces:
-          description: Number of parking spaces
-          type: integer
-          format: int32
-        parkingSpacesNr:
-          description: Parking space number
-          type: string
-        undergroundGarages:
-          description: Number of underground parking spaces
-          type: integer
-          format: int32
-        undergroundGaragesNr:
-          description: Underground parking space number
-          type: string
-    MarketValueEvaluation:
-      type: object
-      description: Information about external market value evaluation
-      properties:
-        extMVContact:
-          description: Contact person for current market value
-          type: string
-        extMVDate:
-          description: Date of the market value evaluation
-          $ref: '#/components/schemas/Date'
-        extMVPhone:
-          description: Phone number of the contact person for current market value
-          type: string
-        extMVSource:
-          $ref: '#/components/schemas/StatSource'
-        extMarketValue:
-          description: Current market value according to information source
-          $ref: '#/components/schemas/EuroAmount'
-    StatSource:
-      type: string
-      description: Source for the current market or land value evaluation
-      anyOf:
-        - enum:
-            - DB_LOCAL
-            - MAP
-            - GSD
-            - EXPERT
-            - HVB
-            - IMMOSCOUT
-            - IMMOPOOL
-            - LBS_LOCAL
-            - PLOETZ
-            - IVD_SPIEGEL
-            - RDM_SPIEGEL
-            - BANK_LOCAL
-            - IMMODATA
-            - CITY
-            - OTHER
-            - SPGNET
-            - SPGNET5_C
-            - DOB
-            - REPORT
-    LandValueEvaluation:
-      type: object
-      description: Information about land value evaluation
-      properties:
-        stdGVDate:
-          description: Date of the land value evaluation
-          $ref: '#/components/schemas/Date'
-        stdGVPhone:
-          description: Phone number of the contact person for land value
-          type: string
-        stdGVSource:
-          $ref: '#/components/schemas/StatSource'
-        stdGroundValue:
-          description: Land value (per square meter)
-          $ref: '#/components/schemas/EuroAmount'
-    Building:
-      type: object
-      description: Building properties
-      properties:
-        construction:
-          $ref: '#/components/schemas/Construction'
-        yearOfConstruction:
-          description: Year of construction
-          type: integer
-          format: int32
-        monumentProtection:
-          description: Estate under monument protection
-          type: boolean
-        salesAllowance:
-          description: Pre-emption right
-          type: boolean
-        lift:
-          description: Existing elevator
-          type: boolean
-        stories:
-          description: Number of floors without basement/attic
-          type: number
-          format: integer
-        buildingVolume:
-          description: Gross building room volume
-          $ref: '#/components/schemas/CubicMeter'
-        prefabrication:
-          $ref: '#/components/schemas/Prefabrication'
-    Construction:
-      type: string
-      description: Construction of the estate
-      anyOf:
-        - enum:
-            - MASSIVE
-            - PREFABRICATED
-            - WOOD_FRAME
-            - WOOD
-            - HALF_TIMBERED
-            - LOG_BUILDING
-            - LOAM
-            - OTHER
-    CubicMeter:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: number
-          format: double
-    Prefabrication:
-      type: string
-      description: Special construction design
-      anyOf:
-        - enum:
-            - NORMAL
-            - PREFABRICATED
-            - BAREBONES_HOUSE
-            - CONSTRUCTION_KIT
-    Modernisation:
-      type: object
-      description: Complete information about existing and planned modernisation
-      properties:
-        modernisationCost:
-          $ref: '#/components/schemas/ModernisationCost'
-        existingModernisation:
-          $ref: '#/components/schemas/ExistingModernisation'
-        plannedModernisations:
-          description: Planned modernization of the estate
-          type: array
-          items:
-            $ref: '#/components/schemas/PlannedModernisation'
-    ModernisationCost:
-      type: object
-      description: Information about the modernisation
-      properties:
-        modernisationTotal:
-          description: Modernization costs - total
-          $ref: '#/components/schemas/EuroAmount'
-        modValueAdding:
-          description: Modernization costs- increase in value
-          $ref: '#/components/schemas/EuroAmount'
-    ExistingModernisation:
-      description: Modernisations since completion
-      type: object
-      properties:
-        modernisationType:
-          $ref: '#/components/schemas/ModernisationType'
-        year:
-          description: Year of modernisation
-          type: integer
-          format: int32
-        modernisationScope:
-          $ref: '#/components/schemas/ModernisationScope'
-    ModernisationType:
-      description: Type of modernisation
-      type: string
-      anyOf:
-        - enum:
-            - ELECTRIC
-            - FASSADE
-            - FLOOR_PLAN
-            - FLOORING
-            - HEATING
-            - INSTALLATION
-            - INSULATION
-            - ROOF
-            - SANITARY
-            - WINDOW
-            - OTHER
-    ModernisationScope:
-      description: Scope of the modernisation
-      type: string
-      anyOf:
-        - enum:
-            - COMPLETE
-            - PARTIAL
-            - UNKNOWN
-    PlannedModernisation:
-      type: object
-      properties:
-        modernisationType:
-          $ref: '#/components/schemas/ModernisationType'
-        planedCosts:
-          description: Planed costs for modernisation
-          $ref: '#/components/schemas/EuroAmount'
-        modernisationScope:
-          $ref: '#/components/schemas/ModernisationScope'
-    AreaInfo:
-      type: object
-      description: Complete Information about the estate area
-      properties:
-        areaRented:
-          description: Rented space of living space
-          $ref: '#/components/schemas/SquareMeter'
-        areaTotal:
-          description: Total living space
-          $ref: '#/components/schemas/SquareMeter'
-        commercialArea:
-          description: Commercial based space
-          $ref: '#/components/schemas/SquareMeter'
-        commercialAreaForOwnUse:
-          description: Commercial based space for own use
-          $ref: '#/components/schemas/SquareMeter'
-    RentInfo:
-      type: object
-      description: Rent information
-      properties:
-        groundRent:
-          description: Building lease rent
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        expectedRent:
-          description: Net cold rent
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        expectedRentCommercial:
-          description: Commercial net cold rent
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        expectedRentResidential:
-          description: Residential net cold rent
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    OtherCosts:
-      description: Additional estate Costs
-      type: object
-      properties:
-        costsBuilding:
-          description: Building costs
-          $ref: '#/components/schemas/EuroAmount'
-        costsBuildingAuxiliary:
-          description: Auxiliary building costs
-          $ref: '#/components/schemas/EuroAmount'
-        costsOutside:
-          description: Building costs- outside arrangements
-          $ref: '#/components/schemas/EuroAmount'
-        externalBuildingCosts:
-          $ref: '#/components/schemas/ExternalBuildingCosts'
-    ExternalBuildingCosts:
-      type: object
-      description: External building costs
-      properties:
-        perSM:
-          description: External building costs per square meter
-          $ref: '#/components/schemas/EuroAmount'
-        perCM:
-          description: External building costs per cubic meter
-          $ref: '#/components/schemas/EuroAmount'
-    ApartmentFloor:
-      type: string
-      description: Position of the apartment in the building
-      anyOf:
-        - enum:
-            - BASEMENT
-            - GROUND_FLOOR
-            - UPPER_FLOOR
-            - SECOND_FLOOR
-            - THIRD_FLOOR
-            - FOURTH_FLOOR
-            - FIFTH_FLOOR
-            - SIXTH_FLOOR_OR_HIGHER
-    House:
-      allOf:
-        - $ref: '#/components/schemas/RealEstate'
-        - type: object
-          properties:
-            farm:
-              description: Farm
-              type: boolean
-            separatedByWEG:
-              description: Separated based on the WEG law
-              type: boolean
-    Plot:
-      allOf:
-        - $ref: '#/components/schemas/Estate'
-        - type: object
-    EstateRegister:
-      type: object
-      properties:
-        estateRegisterCharges2a:
-          $ref: '#/components/schemas/EstateRegisterCharges2a'
-        estateRegisterInventories:
-          description: Inventory of the land register
-          type: array
-          items:
-            $ref: '#/components/schemas/EstateRegisterInventory'
-        estateRegisterLiableParcels:
-          description: Joining liable parcel of the estate
-          type: array
-          items:
-            $ref: '#/components/schemas/EstateRegisterLiableParcel'
-        estateRegisterInfo:
-          $ref: '#/components/schemas/EstateRegisterInfo'
-        additionalInfos:
-          type: array
-          description: Additional Information to the land register
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    EstateRegisterCharges2a:
-      description: Information about prior charges in section II of the land register
-      type: object
-      properties:
-        charges2aDesc:
-          description: Description of prior charges
-          type: string
-        hasCharges2a:
-          description: Prior charge in section II of the land register
-          type: boolean
-        regSubOrd:
-          description: Prior charge in subordination
-          type: boolean
-    EstateRegisterInventory:
-      description: Inventory of the land register
-      type: object
-      properties:
-        commonPropertyShare:
-          description: Co-ownership share (proportion)
-          $ref: '#/components/schemas/EuroAmount'
-        commonPropertyTotal:
-          description: Co-ownership share (total)
-          $ref: '#/components/schemas/EuroAmount'
-        parcel:
-          description: Cadastral district
-          type: string
-        parcelDesc:
-          description: Cadastral unit description
-          type: string
-        parcelSize:
-          description: Cadastral unit size
-          $ref: '#/components/schemas/SquareMeter'
-        usageRights:
-          description: Special usage rights
-          type: boolean
-        inventoryUnitProperties:
-          description: Special property of inventory of land register infromation
-          type: array
-          items:
-            $ref: '#/components/schemas/EstateRegisterInventoryUnitProperty'
-    EstateRegisterInventoryUnitProperty:
-      type: object
-      properties:
-        number:
-          description: Number
-          type: string
-        unitProperty:
-          $ref: '#/components/schemas/UnitProperty'
-    UnitProperty:
-      type: string
-      description: Unit Property details
-      anyOf:
-        - enum:
-            - BASEMENT
-            - HOBY
-            - DRYING_ROOM
-            - ATTIC
-            - OFFICE
-            - APARTMENT
-            - ALL_ROOMS
-            - GARAGE
-            - OUT_PARK
-            - UG_PARK
-            - DUPLEX_PARK
-            - GROUND
-            - TOWNHOUSE_CORNER
-            - TOWNHOUSE_CENTER
-            - SEMIDETACHED_HOUSE
-    EstateRegisterLiableParcel:
-      type: object
-      properties:
-        estateRegisterCharges2a:
-          $ref: '#/components/schemas/EstateRegisterCharges2a'
-        registerInfo:
-          $ref: '#/components/schemas/EstateRegisterInfo'
-    EstateRegisterInfo:
-      type: object
-      properties:
-        newOwnerName:
-          description: Owner name
-          type: string
-        estateOwner:
-          $ref: '#/components/schemas/EstateOwner'
-        registerCity:
-          description: City of land register
-          type: string
-        registerCourt:
-          description: Land registery/local court
-          type: string
-        registerPage:
-          description: Page in the register
-          type: string
-        registerVolume:
-          description: Tome of the register
-          type: string
-    EstateOwner:
-      type: string
-      description: Owner of the property
-      anyOf:
-        - enum:
-            - BOTH
-            - MAIN
-            - ADDITIONAL
-            - THIRD
-            - BOTHTHIRD
-    EstateVendor:
-      description: Information about the estate vendor
-      type: object
-      required:
-        - vendorType
-      properties:
-        vendorType:
-          type: string
-          description: The type of the vendor
-          oneOf:
-            - enum:
-                - PERSON
-                - COMPANY
-        contact:
-          $ref: '#/components/schemas/Contact'
-        address:
-          $ref: '#/components/schemas/Address'
-      discriminator:
-        propertyName: vendorType
-        mapping:
-          PERSON: '#/components/schemas/PersonVendor'
-          COMPANY: '#/components/schemas/CompanyVendor'
-    PersonVendor:
-      allOf:
-        - $ref: '#/components/schemas/EstateVendor'
-        - type: object
-          properties:
-            person:
-              $ref: '#/components/schemas/Person'
-    CompanyVendor:
-      allOf:
-        - $ref: '#/components/schemas/EstateVendor'
-        - type: object
-          properties:
-            company:
-              type: string
-              description: The name of the estate vendor company
-    SaleInformation:
-      type: object
-      description: Sales information for an object
-      properties:
-        familySale:
-          description: Sold within family
-          type: boolean
-        forcedSale:
-          $ref: '#/components/schemas/ForeclosureSale'
-    ForeclosureSale:
-      description: Foreclosure sale
-      type: object
-      properties:
-        previousOwner:
-          $ref: '#/components/schemas/PreviousOwner'
-        estimatedValue:
-          description: Estimated market value (expert report)
-          $ref: '#/components/schemas/EuroAmount'
-        auction:
-          $ref: '#/components/schemas/AuctionInfo'
-    PreviousOwner:
-      type: string
-      description: Previous owner of the estate
-      anyOf:
-        - enum:
-            - THIRD_PERSON
-            - FAMILY_MEMBER
-    AuctionInfo:
-      type: object
-      description: Information about the estate auction
-      properties:
-        auctionDate:
-          description: Auction date
-          $ref: '#/components/schemas/Date'
-        auctionMaxBid:
-          description: Planned maximum auction bid of the customer
-          $ref: '#/components/schemas/EuroAmount'
-        bidAccepted:
-          description: Auction bid already accepted
-          type: boolean
-    EstateAddress:
-      description: Estate Address information
-      type: object
-      properties:
-        address:
-          $ref: '#/components/schemas/Address'
-        neighbourhood:
-          $ref: '#/components/schemas/Neighbourhood'
-        locationInhabitants:
-          description: Number of inhabitants in the city (<=)
-          $ref: '#/components/schemas/Inhabitants'
-    Neighbourhood:
-      type: string
-      description: Neighbourhood details
-      anyOf:
-        - enum:
-            - RESIDENTIAL_COMPLETE
-            - RESIDENTIAL_MAINLY
-            - MIXED
-            - INDUSTRIAL
-            - OUTSIDE_CITY
-    Inhabitants:
-      type: string
-      anyOf:
-        - enum:
-            - LT_1000
-            - LT_10000
-            - LT_50000
-            - LT_100000
-            - LT_200000
-            - LT_500000
-            - LT_1000000
-            - GT_10000000
-    SquareMeter:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: number
-          format: double
-    LeaseInfo:
-      type: object
-      description: Estate lease informantion
-      properties:
-        leasehold:
-          description: Leasehold
-          type: boolean
-        leaseholdEndingDate:
-          description: End date of the leasehold
-          $ref: '#/components/schemas/Date'
-        leaseholdStandstill:
-          description: Leasehold Stand-still agreement
-          type: boolean
-        lessorType:
-          $ref: '#/components/schemas/LessorType'
-    LessorType:
-      type: string
-      description: Building lease owner
-      anyOf:
-        - enum:
-            - CHURCH
-            - CITY
-            - INDIVIDUAL
-            - COMPANY
-            - OTHER
-    Utilization:
-      type: string
-      description: Utilization of the property
-      anyOf:
-        - enum:
-            - OWN_USE
-            - MIXED
-            - USED_BY_OTHERS
-    EstateBurden:
-      type: object
-      properties:
-        claims:
-          description: Information about section III of the land register
-          type: array
-          items:
-            $ref: '#/components/schemas/Claim'
-        existingLoans:
-          description: Existing loans
-          type: array
-          items:
-            $ref: '#/components/schemas/EstateExistingLoan'
-    Claim:
-      description: Information about section III of the land register
-      type: object
-      properties:
-        serial:
-          description: Serial Number for the claim
-          type: string
-        rank:
-          description: Claim rank
-          type: string
-        creditor:
-          description: Creditor
-          type: string
-        nominalAmount:
-          description: Nominal amount
-          $ref: '#/components/schemas/EuroAmount'
-        interest:
-          description: Real interest rate
-          $ref: '#/components/schemas/PeriodicalPercentage'
-        auxiliary:
-          description: Auxiliary (incidental) Services
-          $ref: '#/components/schemas/Percentage'
-        priorChargeClaim:
-          $ref: '#/components/schemas/PriorChargeClaim'
-        cessionClaim:
-          $ref: '#/components/schemas/CessionClaim'
-    Percentage:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: number
-          format: double
-    PriorChargeClaim:
-      type: object
-      description: Claim with prior charge
-      properties:
-        priorCharge:
-          description: Prior charge
-          type: boolean
-        residualDebt:
-          description: Residual debt
-          $ref: '#/components/schemas/EuroAmount'
-        nonRecurringLoanUndertaking:
-          description: Non-recurring loan undertaking
-          type: boolean
-    CessionClaim:
-      type: object
-      description: Additional information about cession
-      properties:
-        cession:
-          description: Cession
-          type: boolean
-        cessionType:
-          $ref: '#/components/schemas/CessionType'
-        execSubmission:
-          description: Paragraph 800 ZPO (paragraph 800 in code of civil procedure)
-          type: boolean
-        allCustomersLiable:
-          description: Liability of all credit takers (customers)
-          type: boolean
-        newRank:
-          description: New claim rank
-          type: string
-        cessionAmount:
-          description: Amount of cession
-          $ref: '#/components/schemas/EuroAmount'
-    CessionType:
-      description: Type of section III of the land register
-      type: string
-      anyOf:
-        - enum:
-            - LETTER
-            - BOOK
-    EstateExistingLoan:
-      description: Existing loan of the estate
-      type: object
-      properties:
-        contractNumber:
-          description: Loan number
-          type: string
-        rankRegister:
-          description: Rank
-          type: integer
-          format: int32
-        debitorBic:
-          description: BIC code of loaner
-          type: string
-        promotionalLoan:
-          description: Promotional loan
-          type: boolean
-        originalDebt:
-          description: Original loan amount
-          $ref: '#/components/schemas/EuroAmount'
-        currentBurden:
-          description: Loan rate
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        interestFixDate:
-          description: Expire date for interest rate
-          $ref: '#/components/schemas/Date'
-        forward:
-          description: Loan should be released
-          type: boolean
-        forwardDate:
-          description: Start date of the follow-up financing
-          $ref: '#/components/schemas/Date'
-        residualDebt:
-          description: Residual debt at follow-up financing date
-          $ref: '#/components/schemas/EuroAmount'
-        seq:
-          description: Sequence
-          type: integer
-          format: int32
-        collateral:
-          description: Collateral
-          type: string
-        debitor:
-          description: Debitor
-          type: string
-    AnnuityProduct:
-      type: object
-      properties:
-        specialRepayment:
-          $ref: '#/components/schemas/SpecialRepayment'
-    SpecialRepayment:
-      type: object
-      description: Special repayment information
-      properties:
-        description:
-          description: Special repayment description
-          type: string
-        percent:
-          description: Special repayment per period
-          $ref: '#/components/schemas/PeriodicalPercentage'
     NotFound:
       allOf:
-        - $ref: '#/components/schemas/ClientError'
+      - $ref: '#/components/schemas/ClientError'
     ClientError:
       allOf:
-        - $ref: '#/components/schemas/UnexpectedError'
-        - type: object
-          required:
-            - rootCause
-          properties:
-            message:
-              type: string
-            exception:
-              type: string
+      - $ref: '#/components/schemas/UnexpectedError'
+      - type: object
+        required:
+        - rootCause
+        properties:
+          message:
+            type: string
+          exception:
+            type: string
     UnexpectedError:
       required:
-        - status
-        - message
-        - timestamp
-        - path
-        - traceId
+      - status
+      - message
+      - timestamp
+      - path
+      - traceId
       properties:
         timestamp:
           type: string
@@ -1661,1417 +405,10 @@ components:
         errorCode:
           type: integer
           format: int32
-    Credit:
-      type: object
-      properties:
-        sendContractDate:
-          $ref: '#/components/schemas/Date'
-        signContractDate:
-          $ref: '#/components/schemas/Date'
-        cancelContractDate:
-          $ref: '#/components/schemas/Date'
-        loans:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreditLoan'
-    CreditLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/AbstractLoan'
-        - properties:
-            originLoanId:
-              $ref: '#/components/schemas/LoanId'
-            creditNumber:
-              type: string
-              description: Loan number/contract number
-            commission:
-              description: Commission in euro
-              $ref: '#/components/schemas/EuroAmount'
-            fixedUntil:
-              type: string
-              format: date-time
-              description: A UTC date-time indicates the document creation date.
-              example: 2019-12-29T10:22:50Z'
-      discriminator:
-        propertyName: type
-        mapping:
-          ANNUITY_LOAN: '#/components/schemas/AnnuityCreditLoan'
-          KFW_PROMOTION_LOAN: '#/components/schemas/KfwPromotionCreditLoan'
-          AUXILIARY_LOAN: '#/components/schemas/AuxiliaryCreditLoan'
-    AnnuityCreditLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/CreditLoan'
-        - properties:
-            product:
-              $ref: '#/components/schemas/AnnuityProduct'
-    KfwPromotionCreditLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/CreditLoan'
-        - properties:
-            kfwProgram:
-              $ref: '#/components/schemas/KfwProgram'
-    KfwProgram:
-      type: string
-      description: Possible Programs for Kfw
-      anyOf:
-        - enum:
-            - Wohneigen
-            - Wohn159
-            - Energie153-40
-            - Energie151
-            - Energie152
-            - Energie167
-    AuxiliaryCreditLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/CreditLoan'
-        - properties:
-            specialPayment:
-              $ref: '#/components/schemas/SpecialRepayment'
-    FinancingVenture:
-      type: object
-      description: Operational (venture) assets used in the financing process
-      properties:
-        cash:
-          $ref: '#/components/schemas/EuroAmount'
-        mortgageSaving:
-          $ref: '#/components/schemas/EuroAmount'
-        otherEstates:
-          $ref: '#/components/schemas/EuroAmount'
-        personalContribution:
-          $ref: '#/components/schemas/EuroAmount'
-        stock:
-          $ref: '#/components/schemas/EuroAmount'
-        depositPaidInAdvance:
-          $ref: '#/components/schemas/EuroAmount'
-        landPaidInAdvance:
-          $ref: '#/components/schemas/EuroAmount'
-    CorrespondenceItem:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/SubmissionCorrespondenceType'
-        id:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        author:
-          type: string
-      discriminator:
-        propertyName: type
-        mapping:
-          MESSAGE: '#/components/schemas/SubmissionMessage'
-          NOTE: '#/components/schemas/SubmissionNote'
-    SubmissionCorrespondenceType:
-      type: string
-      anyOf:
-        - enum:
-            - MESSAGE
-            - NOTE
-    SubmissionMessage:
-      type: object
-      description: Holds messages related to a specific submission. messages target
-        a certain recipient
-      allOf:
-        - $ref: '#/components/schemas/CorrespondenceItem'
-        - properties:
-            to:
-              type: string
-            text:
-              type: string
-    SubmissionNote:
-      type: object
-      description: Holds notes related to a specific submission.
-      allOf:
-        - $ref: '#/components/schemas/CorrespondenceItem'
-        - properties:
-            category:
-              type: string
-            text:
-              type: string
-    PaymentTime:
-      description: Possible payment time types
-      type: string
-      oneOf:
-        - enum:
-            - ADVANCE
-            - ARREARS
-    SubmissionProtocol:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubmissionProtocolItem'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SubmissionProtocolItem:
-      type: object
-      properties:
-        submission:
-          $ref: '#/components/schemas/SubmissionProtocolRefItem'
-        protocol:
-          $ref: '#/components/schemas/SubmissionProtocolRef'
-    SubmissionProtocolRefItem:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/SubmissionRef'
-        - type: object
-          properties:
-            legacyId:
-              description: Legacy submission id
-              type: string
-    SubmissionRef:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            id:
-              type: string
-              description: Submission id
-    SubmissionProtocolRef:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/EmbeddedSubmissionProtocol'
-    EmbeddedSubmissionProtocol:
-      type: object
-      properties:
-        protocol:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProtocolItem'
-    ProtocolItem:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/ProtocolItemType'
-        id:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        author:
-          type: string
-      discriminator:
-        propertyName: type
-        mapping:
-          DOCUMENT: '#/components/schemas/SubmissionDocumentUpdate'
-          DATA: '#/components/schemas/SubmissionDataUpdate'
-          STATUS: '#/components/schemas/SubmissionStatusUpdate'
-          NEW_SUBMISSION: '#/components/schemas/NewSubmission'
-    ProtocolItemType:
-      type: string
-      anyOf:
-        - enum:
-            - DOCUMENT
-            - DATA
-            - STATUS
-            - NEW_SUBMISSION
-    SubmissionDocumentUpdate:
-      type: object
-      description: Holds submission document related updates which may require action
-        to be taken
-      allOf:
-        - $ref: '#/components/schemas/ProtocolItem'
-        - properties:
-            action:
-              type: string
-              anyOf:
-                - enum:
-                    - ADDED
-                    - REMOVED
-                    - CHANGED
-            document:
-              $ref: '#/components/schemas/ResourceRef'
-    SubmissionDataUpdate:
-      type: object
-      description: Holds submission data related state transitions and updates
-      allOf:
-        - $ref: '#/components/schemas/ProtocolItem'
-        - properties:
-            field:
-              type: string
-            change:
-              $ref: '#/components/schemas/StateTransitionValue'
-            reason:
-              type: string
-            remark:
-              type: string
-    StateTransitionValue:
-      type: object
-      properties:
-        old:
-          type: string
-        new:
-          type: string
-    SubmissionStatusUpdate:
-      type: object
-      description: Holds submission status related updates which require actions to
-        be taken, or show state transition
-      allOf:
-        - $ref: '#/components/schemas/SubmissionDataUpdate'
-    NewSubmission:
-      type: object
-      description: Holds information when the new submission was created
-      allOf:
-        - $ref: '#/components/schemas/ProtocolItem'
-        - properties:
-            documents:
-              description: Link to access document for this submission
-              $ref: '#/components/schemas/SubmissionRef'
-    Paging:
-      properties:
-        cursor:
-          $ref: '#/components/schemas/Cursor'
-        previous:
-          type: string
-          format: uri
-        next:
-          type: string
-          format: uri
-        first:
-          type: string
-          format: uri
-        last:
-          type: string
-          format: uri
-        self:
-          type: string
-          format: uri
-    Informer:
-      type: object
-      description: Information about informer
-      properties:
-        id:
-          type: string
-          description: Informer id
-        externalId:
-          type: string
-          description: External Informer-ID
-        person:
-          $ref: '#/components/schemas/Person'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        address:
-          $ref: '#/components/schemas/Address'
-        company:
-          type: string
-          description: Company
-        additionalInfos:
-          type: array
-          description: Additional information to the informer
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    Customer:
-      type: object
-      description: Personal information of the customer
-      properties:
-        externalId:
-          type: string
-          description: External customer number
-        person:
-          $ref: '#/components/schemas/Person'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        address:
-          $ref: '#/components/schemas/Address'
-        previousAddress:
-          $ref: '#/components/schemas/Address'
-        birthPlace:
-          type: string
-          example: London
-          description: The birth place of the customer
-        nationality:
-          type: string
-          example: DE
-          description: The official alpha-2 code of the country
-        maritalStatus:
-          $ref: '#/components/schemas/MaritalStatus'
-        maritalPropertyStatus:
-          $ref: '#/components/schemas/MaritalPropertyStatus'
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/Child'
-        creditWorthiness:
-          $ref: '#/components/schemas/CreditWorthiness'
-        employment:
-          $ref: '#/components/schemas/Employment'
-        taxId:
-          type: string
-          description: Tax identification number
-        bankAccount:
-          $ref: '#/components/schemas/BankAccount'
-        sameHoushold:
-          type: boolean
-          description: True if there are additional customers in the same household
-        additionalInfos:
-          type: array
-          description: Additional information to the customer
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    MaritalStatus:
-      type: string
-      description: Values for the marital status
-      anyOf:
-        - enum:
-            - SINGLE
-            - MARRIED
-            - REGISTERED_PARTNERSHIP
-            - LIVING_TOGETHER
-            - WIDOWED
-            - DIVORCED
-            - SEPARATED
-    MaritalPropertyStatus:
-      type: string
-      description: Values for the matrimonial property
-      anyOf:
-        - enum:
-            - UNKNOWN
-            - JOINT_OWNERSHIP
-            - SEPARATION_OF_PROPERTY
-            - COMMUNITY_OF_PROPERTY
-    Child:
-      type: object
-      description: Information about a child
-      properties:
-        firstName:
-          type: string
-          example: Jim
-        birthDate:
-          $ref: '#/components/schemas/Date'
-    CreditWorthiness:
-      type: object
-      description: Informations regarding credit worthiness (like Schufa)
-      properties:
-        negativeWorthiness:
-          type: boolean
-          description: Used if there is a negative credit worthiness
-        worthinessRating:
-          type: string
-          description: Contains a rating value of the credit worthiness if any
-          anyOf:
-            - enum:
-                - A
-                - B
-                - C
-                - D
-                - E
-                - F
-                - G
-                - H
-                - I
-                - J
-                - K
-                - L
-                - M
-        worthinessScore:
-          type: integer
-          format: int32
-          description: Contains a score value of the credit worthiness if any
-    Employment:
-      type: object
-      description: Informations regarding employment data
-      properties:
-        name:
-          type: string
-          description: The description/name of the employment
-        type:
-          $ref: '#/components/schemas/EmploymentType'
-        employer:
-          type: string
-          description: The name of the employer
-        startDate:
-          description: Date when the employment was started
-          $ref: '#/components/schemas/Date'
-        businessLine:
-          $ref: '#/components/schemas/BusinessLine'
-        freelancerJob:
-          $ref: '#/components/schemas/FreeLancerJobType'
-        retirementDate:
-          description: Date of the retirement
-          $ref: '#/components/schemas/Date'
-        shareHolding:
-          type: number
-          format: double
-          description: Shareholding quota
-        crosser:
-          type: boolean
-          description: True for cross-border commuter
-        fixedTermEndDate:
-          description: In case of the fixed-term contract, this field is set with
-            the end date of the contract
-          $ref: '#/components/schemas/Date'
-    EmploymentType:
-      type: string
-      description: Values for the employment types
-      anyOf:
-        - enum:
-            - EMPLOYED
-            - WORKER
-            - UNEMPLOYED
-            - PUBLIC_OFFICIAL
-            - PARENTAL_LEAVE
-            - FREELANCER
-            - MINI_JOB
-            - CEO
-            - HOUSE_MAN_WOMAN
-            - PRIVATE_MEANS
-            - SELF_EMPLOYED_WITH_ACCOUNTING
-            - SELF_EMPLOYED_WITHOUT_ACCOUNTING
-            - PENSIONER
-            - STUDENT
-            - SOLDIER
-            - BOARD_MEMBER
-    BusinessLine:
-      type: string
-      description: Values for the business line
-      anyOf:
-        - enum:
-            - AGRICULTURE
-            - CAR_DEALER
-            - CAR_REPAIR
-            - CHURCH
-            - CONSTRUCTION_INDUSTRY
-            - COURIER_SERVICE
-            - DATING_SERVICE
-            - EDUCATION
-            - ENERGY
-            - EROTIC_INDUSTRY
-            - FINANCES
-            - FINANCIAL_SERVICES
-            - FITNESS
-            - GAS_STATION
-            - GASTRONOMY
-            - HANDCRAFT
-            - HEALTH_SERVICE
-            - HOTEL_INDUSTRY
-            - IT_CONSULTING
-            - KIOSK
-            - OTHER
-            - PRODUCTION_AND_INDUSTRY
-            - PUBLIC_SERVICE
-            - REAL_ESTATE
-            - TAXI
-            - TRANSPORT
-            - TRAVEL_AGENCY
-            - WHOLE_AND_RETAIL_SALE
-    FreeLancerJobType:
-      type: string
-      description: Values for the freelancer job types
-      anyOf:
-        - enum:
-            - CARER
-            - AMBORDERLY
-            - ADVOCATE
-            - APOTHECARY
-            - ARCHITECT
-            - PHYSICIAN
-            - UNDERTAKER
-            - ACCOUNTANT
-            - REVISOR
-            - FED_DP_COMMISSIONER
-            - DECORATOR
-            - DIETICIAN
-            - INTERPRET
-            - ERGOTHERAPIST
-            - NUTRITIONIST
-            - GEOGRAPHER
-            - CONSULTANT
-            - IT_CONSULT
-            - FINANCSERV
-            - PHOTOGRAPH
-            - DESIGNER
-            - MIDWIFE
-            - HEALERMASSEUR
-            - HEALER
-            - HISTORIAN
-            - COMPUTER_SPEC
-            - ENGINEER
-            - INSOLVENCY_ADMIN
-            - JOURNALIST
-            - PHYSIOTHER
-            - ORDERLY
-            - NURSE
-            - MUSICIAN
-            - CONSTRUCTOR
-            - THERAPIST
-            - MASSEUR
-            - PARAMEDIC
-            - NOTARY
-            - OPTICIAN
-            - OPERA_SINGER
-            - HR_ADVISR
-            - PSYCHOLOG
-            - PSYCHOTHER
-            - PHYSTHERAP
-            - INTER_DECORATOR
-            - RADIO_ANNOUNCER
-            - EXPERT
-            - TOWN_PLANER
-            - STRUCT_ENG
-            - TAX_ADVISR
-            - TAX_AGENT
-            - VETERINARY
-            - TRANSLATOR
-            - UNDER_ADVISR
-            - AUDITOR
-            - DENTAL_TECH
-            - DENTIST
-            - OTHER
-    BankAccount:
-      type: object
-      description: Bank account data
-      properties:
-        iban:
-          type: string
-          description: The International Bank Account Number
-        bic:
-          type: string
-          description: The Business Identifier Code
-        accountOwner:
-          type: string
-          description: The name of the account owner
-        bank:
-          type: string
-          description: The name of the bank
-        useForIncomingPayments:
-          type: boolean
-          description: True, if the bank account is used for incoming payments
-        useForOutgoingPayments:
-          type: boolean
-          description: True, if the bank account is used for outgoing payments
-    Cycle:
-      type: string
-      anyOf:
-        - enum:
-            - MONTHLY
-            - QUARTERLY
-            - HALF_YEARLY
-            - ANNUAL
-    FinancialStandings:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/FinancialStandingItem'
-    FinancialStandingItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/FinancialStanding'
-    FinancialStanding:
-      type: object
-      properties:
-        type:
-          type: string
-          anyOf:
-            - enum:
-                - EQUITY
-                - DEBT
-                - INCOME
-                - EXPENSE
-      discriminator:
-        propertyName: type
-        mapping:
-          EQUITY: '#/components/schemas/FinancialEquity'
-          DEBT: '#/components/schemas/FinancialDebt'
-          INCOME: '#/components/schemas/Income'
-          EXPENSE: '#/components/schemas/Expense'
-    FinancialEquity:
-      allOf:
-        - $ref: '#/components/schemas/FinancialStanding'
-        - type: object
-          description: Financial equity information before the financing process
-          properties:
-            cash:
-              description: Available equity cash
-              $ref: '#/components/schemas/EquityWithGuarantee'
-            stock:
-              $ref: '#/components/schemas/StockEquity'
-            mortgageSaving:
-              description: Available equity associated to mortgage saving plan
-              $ref: '#/components/schemas/EquityWithGuarantee'
-            insurance:
-              $ref: '#/components/schemas/InsuranceEquity'
-            realEstate:
-              $ref: '#/components/schemas/RealEstateEquity'
-            other:
-              description: Other available equities
-              $ref: '#/components/schemas/EuroAmount'
-    EquityWithGuarantee:
-      description: Available equity
-      type: object
-      properties:
-        total:
-          $ref: '#/components/schemas/EuroAmount'
-        guarantee:
-          $ref: '#/components/schemas/EuroAmount'
-    StockEquity:
-      type: object
-      description: Stock assets information before the financing process
-      properties:
-        equity:
-          description: Stock assets value
-          $ref: '#/components/schemas/EuroAmount'
-        details:
-          $ref: '#/components/schemas/StockEquityDetails'
-    StockEquityDetails:
-      type: object
-      description: Details about stock assets information
-      properties:
-        shares:
-          $ref: '#/components/schemas/StockEquityShares'
-        bonds:
-          $ref: '#/components/schemas/StockEquityBonds'
-        funds:
-          $ref: '#/components/schemas/EquityFunds'
-    StockEquityShares:
-      type: object
-      description: Stock shares information
-      properties:
-        equity:
-          description: Stock shares value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/StockEquitySharesGuarantees'
-    StockEquitySharesGuarantees:
-      type: object
-      description: Details about stock shares guarantees
-      properties:
-        bluechip:
-          description: Details about Bluechip stock shares assigned as guarantee
-          $ref: '#/components/schemas/Stock'
-        secondTier:
-          description: Details about second-tier (*Nebenwerte*) stock shares assigned
-            as guarantee
-          $ref: '#/components/schemas/Stock'
-    Stock:
-      type: object
-      properties:
-        german:
-          description: German Stock asset
-          $ref: '#/components/schemas/EuroAmount'
-        euro:
-          description: European Stock asset
-          $ref: '#/components/schemas/EuroAmount'
-        international:
-          description: International Stock asset
-          $ref: '#/components/schemas/EuroAmount'
-    StockEquityBonds:
-      type: object
-      description: Stock bonds information
-      properties:
-        equity:
-          description: Stock bonds value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/StockEquityBondsGuarantees'
-    StockEquityBondsGuarantees:
-      type: object
-      description: Details about stock bonds guarantees
-      properties:
-        euro:
-          description: European stock bonds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-        international:
-          description: International stock bonds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-        highYield:
-          description: High-yield stock bonds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-    EquityFunds:
-      type: object
-      description: Funds information
-      properties:
-        stock:
-          $ref: '#/components/schemas/EquityFundsStock'
-        bond:
-          $ref: '#/components/schemas/EquityFundsBond'
-        mixed:
-          $ref: '#/components/schemas/EquityFundsMixed'
-        realEstate:
-          $ref: '#/components/schemas/EquityFundsRealEstate'
-    EquityFundsStock:
-      type: object
-      description: Stock funds information
-      properties:
-        equity:
-          description: Stock funds value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/EquityFundsStockGuarantees'
-    EquityFundsStockGuarantees:
-      type: object
-      description: Details about stock funds guarantees
-      properties:
-        bluechip:
-          description: Details about Bluechip stock funds assigned as guarantee
-          $ref: '#/components/schemas/Stock'
-        secondTier:
-          description: Details about second-tier (*Nebenwerte*) stock funds assigned
-            as guarantee
-          $ref: '#/components/schemas/Stock'
-        selectedFonds:
-          description: Details about sector-specific / industry stock funds assigned
-            as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-    EquityFundsBond:
-      type: object
-      description: Bond-/Pension funds information
-      properties:
-        equity:
-          description: Bond-/Pension funds value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/EquityFundsBondGuarantees'
-    EquityFundsBondGuarantees:
-      type: object
-      description: Details about bond-/pension funds guarantees
-      properties:
-        international:
-          description: International bond-/pension funds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-        euro:
-          description: European bond-/pension funds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-        highYield:
-          description: High-yield bond-/pension funds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-    EquityFundsMixed:
-      type: object
-      description: Mixed funds information
-      properties:
-        equity:
-          description: Mixed funds value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/EquityFundsMixedGuarantees'
-    EquityFundsMixedGuarantees:
-      type: object
-      description: Details about mixed funds guarantees
-      properties:
-        amount:
-          description: Mixed funds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-    EquityFundsRealEstate:
-      type: object
-      description: Real Estate funds information
-      properties:
-        equity:
-          description: Real Estate funds value
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/EquityFundsRealEstateGuarantees'
-    EquityFundsRealEstateGuarantees:
-      type: object
-      description: Details about real estate funds guarantees
-      properties:
-        amount:
-          description: Real Estate funds assigned as guarantee
-          $ref: '#/components/schemas/EuroAmount'
-    InsuranceEquity:
-      description: Surrender value life-/pension insurance equity
-      type: object
-      properties:
-        total:
-          description: Total amout of life-/pension insurance equity
-          $ref: '#/components/schemas/EuroAmount'
-        guarantees:
-          $ref: '#/components/schemas/InsuranceEquityGuarantees'
-    InsuranceEquityGuarantees:
-      type: object
-      description: Details about life-/pension insurance guarantees
-      properties:
-        german:
-          description: Details about german life-/pension insurance assets assigned
-            as guarantee
-          $ref: '#/components/schemas/InsuranceInfo'
-        british:
-          description: Details about british life-/pension insurance assets  assigned
-            as guarantee
-          $ref: '#/components/schemas/InsuranceInfo'
-        fund:
-          description: Details about life-/pension insurance funds assigned as guarantee
-          $ref: '#/components/schemas/InsuranceInfo'
-    InsuranceInfo:
-      type: object
-      description: Insurance Information
-      properties:
-        life:
-          description: Life insurance
-          $ref: '#/components/schemas/EuroAmount'
-        pension:
-          description: Pension insurance
-          $ref: '#/components/schemas/EuroAmount'
-    RealEstateEquity:
-      type: object
-      description: Real estate equity
-      properties:
-        total:
-          $ref: '#/components/schemas/EuroAmount'
-        guarantee:
-          $ref: '#/components/schemas/EuroAmount'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/RealEstateEquityItem'
-    RealEstateEquityItem:
-      type: object
-      description: Details about a specific real estate equity
-      properties:
-        id:
-          type: string
-          description: Id of the real estate equity
-        description:
-          type: string
-        unit:
-          $ref: '#/components/schemas/RealEstateUnit'
-        equity:
-          $ref: '#/components/schemas/RealEstateEquityDetails'
-        guarantees:
-          $ref: '#/components/schemas/RealEstateGuarantees'
-    RealEstateUnit:
-      type: object
-      description: Detailed information about the real estate
-      properties:
-        type:
-          $ref: '#/components/schemas/EstateType'
-        areaTotal:
-          description: Total living space
-          $ref: '#/components/schemas/SquareMeter'
-        areaRented:
-          description: Rented space of living space
-          $ref: '#/components/schemas/SquareMeter'
-        utilization:
-          $ref: '#/components/schemas/Utilization'
-        address:
-          $ref: '#/components/schemas/Address'
-    RealEstateEquityDetails:
-      type: object
-      description: Details about equites associated to the real estate
-      properties:
-        rent:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        marketValue:
-          $ref: '#/components/schemas/MarketValueEvaluation'
-    RealEstateGuarantees:
-      type: object
-      description: Guarantees assocaited to the real estate
-      properties:
-        plannedSell:
-          description: Flag indicates whether the real estate to be sold before the
-            financing
-          type: boolean
-        secureFinancing:
-          description: Flag indicates whether the real estate to be used to secure
-            the financing
-          type: boolean
-    FinancialDebt:
-      allOf:
-        - $ref: '#/components/schemas/FinancialStanding'
-        - type: object
-          description: Financial debts information before the financing process
-          properties:
-            liability:
-              $ref: '#/components/schemas/LiabilityDebt'
-            solvencyCredits:
-              type: array
-              description: Set of current installment and leasing credits
-              items:
-                $ref: '#/components/schemas/SolvencyCreditDebt'
-            existingLoans:
-              type: array
-              description: Set of current loans debts
-              items:
-                $ref: '#/components/schemas/ExistingLoanDebt'
-            bridgingLoan:
-              $ref: '#/components/schemas/BridgingLoanDebt'
-            other:
-              description: Other (additional) debt
-              $ref: '#/components/schemas/EuroAmount'
-    LiabilityDebt:
-      type: object
-      description: Liability obligations before the financing process
-      properties:
-        guarantee:
-          description: Debts associated with guarantee obligations
-          $ref: '#/components/schemas/EuroAmount'
-        other:
-          description: Debts associated with other obligations
-          $ref: '#/components/schemas/EuroAmount'
-    SolvencyCreditDebt:
-      type: object
-      description: Installment and leasing credits
-      properties:
-        debt:
-          description: Total debt amount
-          $ref: '#/components/schemas/EuroAmount'
-        burden:
-          description: Debt monthly burden
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        residualDebt:
-          description: Remaining debt
-          $ref: '#/components/schemas/EuroAmount'
-        repay:
-          description: Flag indicates taking over the credit before the financing
-          type: boolean
-        until:
-          description: Expiry date of debit dues
-          $ref: '#/components/schemas/Date'
-    ExistingLoanDebt:
-      type: object
-      description: Existing loan debt
-      properties:
-        type:
-          type: string
-          anyOf:
-            - enum:
-                - EMPLOYMENT
-                - PRIVATE
-                - MORTGAGE_SAVING_PLAN
-                - PUBLIC
-                - OTHER
-                - EXISTING_REAL_ESTATE
-        debt:
-          description: Debt total amount
-          $ref: '#/components/schemas/EuroAmount'
-        burden:
-          description: Debt monthly burden
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        until:
-          description: Expiry date of debit dues
-          $ref: '#/components/schemas/Date'
-      discriminator:
-        propertyName: type
-        mapping:
-          EMPLOYMENT: '#/components/schemas/CommonLoanDebt'
-          PRIVATE: '#/components/schemas/CommonLoanDebt'
-          MORTGAGE_SAVING_PLAN: '#/components/schemas/CommonLoanDebt'
-          OTHER: '#/components/schemas/CommonLoanDebt'
-          PUBLIC: '#/components/schemas/PublicLoanDebt'
-          EXISTING_REAL_ESTATE: '#/components/schemas/ExistingRealEstateDebt'
-    CommonLoanDebt:
-      description: Information about existing debts
-      allOf:
-        - $ref: '#/components/schemas/ExistingLoanDebt'
-    PublicLoanDebt:
-      description: Information about existing debts provided by public sector
-      allOf:
-        - $ref: '#/components/schemas/ExistingLoanDebt'
-        - type: object
-          properties:
-            description:
-              description: Description of the provided public debt
-              type: string
-    ExistingRealEstateDebt:
-      allOf:
-        - $ref: '#/components/schemas/ExistingLoanDebt'
-        - type: object
-          properties:
-            realEstateEquityId:
-              type: string
-              description: Id of the real estate equity associated with this debt
-            maturityDate:
-              description: Maturity end date
-              $ref: '#/components/schemas/Date'
-            residualDebt:
-              description: Residual debt
-              $ref: '#/components/schemas/EuroAmount'
-            repay:
-              type: boolean
-              description: Flag indicates taking over the credit before the financing
-    BridgingLoanDebt:
-      type: object
-      description: Details about bridging loan debt
-      properties:
-        reason:
-          type: string
-          anyOf:
-            - enum:
-                - OPEN_PROPERTY_SALE
-                - CLOSED_PROPERTY_SALE
-                - UNAVAILABLE
-                - PUBLIC_PRE_FINANCE
-        amount:
-          description: Amount of the bridging loan debt
-          $ref: '#/components/schemas/EuroAmount'
-        equityAvailabilityDate:
-          description: Date in which the debt will be paid off
-          $ref: '#/components/schemas/Date'
-      discriminator:
-        propertyName: reason
-        mapping:
-          OPEN_PROPERTY_SALE: '#/components/schemas/OpenPropertySale'
-          CLOSED_PROPERTY_SALE: '#/components/schemas/ClosedPropertySale'
-          UNAVAILABLE: '#/components/schemas/UnavailableEquity'
-          PUBLIC_PRE_FINANCE: '#/components/schemas/PublicPreFinancing'
-    OpenPropertySale:
-      description: Bridging Debt associated to an open property sale
-      allOf:
-        - $ref: '#/components/schemas/PropertySale'
-    PropertySale:
-      description: Bridging Debt associated to property sale
-      allOf:
-        - $ref: '#/components/schemas/BridgingLoanDebt'
-        - type: object
-          properties:
-            landCharge:
-              description: Land debt
-              $ref: '#/components/schemas/EuroAmount'
-            burden:
-              description: Monthly burden
-              $ref: '#/components/schemas/PeriodicalEuroAmount'
-            residualDebt:
-              description: Remaining debt
-              $ref: '#/components/schemas/EuroAmount'
-    ClosedPropertySale:
-      description: Bridging Debt associated to a closed property sale
-      allOf:
-        - $ref: '#/components/schemas/BridgingLoanDebt'
-    UnavailableEquity:
-      description: Bridging Debt associated to unavailable equity
-      allOf:
-        - $ref: '#/components/schemas/BridgingLoanDebt'
-        - type: object
-          properties:
-            investmentType:
-              description: Type of the equity investment
-              type: string
-            investmentCompany:
-              description: Company in which the equity is invested with
-              type: string
-            investmentAmount:
-              description: Total invested amount
-              $ref: '#/components/schemas/EuroAmount'
-    PublicPreFinancing:
-      description: Bridging Debt associated to public pre financing
-      allOf:
-        - $ref: '#/components/schemas/BridgingLoanDebt'
-        - type: object
-          properties:
-            type:
-              description: Type of the public pre financing
-              type: string
-            company:
-              description: Company that provided the pre financing
-              type: string
-            amount:
-              description: Amount of the public pre financing
-              $ref: '#/components/schemas/EuroAmount'
-    Income:
-      allOf:
-        - $ref: '#/components/schemas/FinancialStanding'
-        - type: object
-          properties:
-            regularEmployment:
-              $ref: '#/components/schemas/RegularEmploymentIncome'
-            selfEmployment:
-              $ref: '#/components/schemas/SelfEmploymentIncome'
-            auxiliary:
-              $ref: '#/components/schemas/AuxiliaryIncome'
-            bonus:
-              $ref: '#/components/schemas/BonusIncome'
-            family:
-              $ref: '#/components/schemas/FamilyIncome'
-            pension:
-              $ref: '#/components/schemas/PensionIncome'
-            capital:
-              $ref: '#/components/schemas/CapitalIncome'
-            other:
-              $ref: '#/components/schemas/OtherIncome'
-    RegularEmploymentIncome:
-      description: Information about regular employment income
-      allOf:
-        - $ref: '#/components/schemas/EmploymentIncome'
-    EmploymentIncome:
-      type: object
-      description: Information about general Employment income
-      properties:
-        salary:
-          $ref: '#/components/schemas/Salary'
-          description: Salary Informations
-        variable:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Periodic variable income (net)
-        shift:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Shift allowance of periodic variable income (net)
-        overtime:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Overtime payments (net)
-        travelAllowance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Refund of travelling expenses of periodic variable income (net)
-        grossIncomePreviousYear:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Gross income of previous year
-    Salary:
-      type: object
-      description: Information regarding salary
-      properties:
-        gross:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Gross salary
-        net:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Net salary
-        numberOfPayments:
-          type: number
-          format: double
-          description: Number of payments
-        assuredNumber:
-          type: number
-          format: double
-          description: Annually secured number of salaries as per employment contract
-    SelfEmploymentIncome:
-      allOf:
-        - $ref: '#/components/schemas/EmploymentIncome'
-        - type: object
-          description: Information about self-employment Income
-          properties:
-            income:
-              $ref: '#/components/schemas/PeriodicalEuroAmount'
-              description: Average income from independent activities for the last 3
-                years (net)
-            details:
-              $ref: '#/components/schemas/SelfEmploymentIncomeDetails'
-    SelfEmploymentIncomeDetails:
-      type: object
-      description: Calculation of independent (self employment) income
-      properties:
-        method:
-          type: string
-          description: Method for profit calculation
-          anyOf:
-            - enum:
-                - CUSTOMER_SPECIFICATION
-                - PROFIT_AND_LOSS_ACCOUNT
-                - NO_METHOD
-        description:
-          type: string
-          description: Note on the balance
-        averageNetProfit:
-          $ref: '#/components/schemas/EuroAmount'
-          description: The net profit
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/SelfEmploymentIncomeItem'
-    SelfEmploymentIncomeItem:
-      type: object
-      description: Describes the self employment income information for a year
-      properties:
-        year:
-          type: integer
-          format: int32
-          description: The balance year
-        netProfit:
-          description: Profit after taxes in the balance year
-          $ref: '#/components/schemas/EuroAmount'
-        surplus:
-          description: Surplus in the balance year
-          $ref: '#/components/schemas/EuroAmount'
-        deficit:
-          description: Deficit in the balance year
-          $ref: '#/components/schemas/EuroAmount'
-        taxes:
-          $ref: '#/components/schemas/EuroAmount'
-          description: Taxes in the balance year
-    AuxiliaryIncome:
-      description: Periodical auxiliary Income
-      type: object
-      properties:
-        income:
-          description: Auxiliary income
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        since:
-          description: Auxiliary income since
-          $ref: '#/components/schemas/Date'
-    BonusIncome:
-      description: Additional periodical bonus income
-      type: object
-      properties:
-        abroad:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Foreign assignment of periodic variable income (net)
-        performance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Bonus / performance-related payments (net)
-    FamilyIncome:
-      description: Additional periodical income for children / family
-      type: object
-      properties:
-        alimony:
-          $ref: '#/components/schemas/AlimonyInfo'
-          description: Alimony income informations
-        childAllowance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Child allowance
-        parentalAllowance:
-          $ref: '#/components/schemas/ParentalAllowanceInfo'
-          description: Parental/Child-raising allowance
-    AlimonyInfo:
-      type: object
-      description: Information regarding alimony
-      properties:
-        alimony:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: The total amount of the alimony
-        maritalPart:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: The marital part of the alimony
-        childPart:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: The child part of the alimony
-    ParentalAllowanceInfo:
-      type: object
-      description: Informations regarding parental/child-raising allowance
-      properties:
-        parentalAllowance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Parental/Child-raising allowance
-        parentalAllowanceEndDate:
-          description: Parental/Child-raising allowance is paid until this date
-          $ref: '#/components/schemas/Date'
-    PensionIncome:
-      description: Additional periodical income from pension
-      type: object
-      properties:
-        pension:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Pension
-        claimState:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Claim of state-managed life/pension insurance contributions
-        claimInsurance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Claim of private life/pension insurance contributions
-    CapitalIncome:
-      description: Additional periodical income from capital
-      type: object
-      properties:
-        capitalYield:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Periodic investment income (like interests, dividends)
-        commission:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Commissions of periodic variable income (net)
-        profitSharing:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Profit sharing of periodic variable income (net)
-        stocksAndBondsIncome:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Periodic income of assets (like GmbH share)
-    OtherIncome:
-      description: Other periodical income
-      type: object
-      properties:
-        other:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Other income
-        external:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    Expense:
-      allOf:
-        - $ref: '#/components/schemas/FinancialStanding'
-        - type: object
-          properties:
-            housing:
-              $ref: '#/components/schemas/HousingExpense'
-            insurance:
-              $ref: '#/components/schemas/InsuranceExpense'
-            Alimony:
-              $ref: '#/components/schemas/AlimonyExpense'
-            other:
-              $ref: '#/components/schemas/OtherExpense'
-    HousingExpense:
-      type: object
-      description: Information regarding housing expenses
-      properties:
-        currentHousingSituation:
-          $ref: '#/components/schemas/HousingSituation'
-        cost:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Current housing costs
-        rentObsolete:
-          type: boolean
-          description: True if accommodation/housing costs are obsolete after financing
-    HousingSituation:
-      type: string
-      description: Values for the current housing/accomodation types
-      anyOf:
-        - enum:
-            - RENT
-            - RATE
-            - DEBT_FREE
-            - PARENTS
-            - OWN_PROPERTY
-            - FIRST_APPLICANT
-    InsuranceExpense:
-      type: object
-      description: Informations related insurance expences
-      properties:
-        healthInsurance:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Health insurance contributions (legal or voluntary)
-        lifeInsurance:
-          description: Life/pension insurance contribution
-          $ref: '#/components/schemas/InsuranceBurden'
-        accidentInsurance:
-          $ref: '#/components/schemas/InsuranceBurden'
-          description: Accident insurance contributions
-        disabilityInsurance:
-          $ref: '#/components/schemas/InsuranceBurden'
-          description: Disability insurance contributions
-    InsuranceBurden:
-      type: object
-      properties:
-        burden:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        minimum:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    AlimonyExpense:
-      description: Expenses for alimony
-      type: object
-      properties:
-        alimony:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-          description: Alimony payments
-    OtherExpense:
-      description: Other periodical expenses
-      type: object
-      properties:
-        value:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        additional:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    AdvisorItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Advisor'
     DocumentCategoriesDefinition:
       type: object
       required:
-        - data
+      - data
       properties:
         data:
           type: array
@@ -3105,349 +442,182 @@ components:
         name:
           type: string
           example: MIETAUSGANG
-    InterestMaturityType:
-      description: Type of the interest maturity
+    Unauthorized:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    Binary:
       type: string
-      anyOf:
-        - enum:
-            - FIXED_PERIOD
-            - VARIABLE
-    VariableInterestMaturity:
-      type: object
+      format: binary
+    Conflict:
       allOf:
-        - $ref: '#/components/schemas/InterestMaturity'
-    FixedInterestMaturity:
+      - $ref: '#/components/schemas/ClientError'
+    BadRequest:
       allOf:
-        - $ref: '#/components/schemas/InterestMaturity'
-        - type: object
-          properties:
-            period:
-              $ref: '#/components/schemas/MaturityYear'
-    MaturityYear:
-      type: object
-      properties:
-        years:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 40
-    FinancialVentureItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              type: string
-              description: Venture identifier
-            embedded:
-              $ref: '#/components/schemas/FinancingVenture'
-    Informers:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/InformerItem'
-    InformerItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Informer'
-    Correspondence:
+      - $ref: '#/components/schemas/ClientError'
+    SubmissionProtocol:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CorrespondenceItem'
-    Days:
+            $ref: '#/components/schemas/SubmissionProtocolItem'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SubmissionProtocolItem:
       type: object
       properties:
-        days:
-          type: integer
-          format: int32
-    AnnuityLoan:
+        submission:
+          $ref: '#/components/schemas/SubmissionProtocolRefItem'
+        protocol:
+          $ref: '#/components/schemas/SubmissionProtocolRef'
+    SubmissionProtocolRefItem:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Loan'
-        - properties:
-            product:
-              $ref: '#/components/schemas/AnnuityProductExtension'
-    Loan:
-      type: object
-      description: Financial Loan object information
-      required:
-        - type
+      - $ref: '#/components/schemas/SubmissionRef'
+      - type: object
+        properties:
+          legacyId:
+            description: Legacy submission id
+            type: string
+    SubmissionRef:
       allOf:
-        - $ref: '#/components/schemas/AbstractLoan'
-        - properties:
-            payment:
-              $ref: '#/components/schemas/RegularPayment'
-            duration:
-              description: Loan Duration in years
-              $ref: '#/components/schemas/Years'
-      discriminator:
-        propertyName: type
-        mapping:
-          ANNUITY_LOAN: '#/components/schemas/AnnuityLoan'
-          KFW_PROMOTION_LOAN: '#/components/schemas/KfwPromotionLoan'
-          AUXILIARY_LOAN: '#/components/schemas/AuxiliaryLoan'
-    AnnuityProductExtension:
+      - $ref: '#/components/schemas/ResourceRef'
+      - type: object
+        properties:
+          id:
+            type: string
+            description: Submission id
+    SubmissionProtocolRef:
       type: object
-      description: Annuity product information
-      required:
-        - type
       allOf:
-        - $ref: '#/components/schemas/AnnuityProduct'
-        - properties:
-            type:
-              $ref: '#/components/schemas/ProductType'
-            name:
-              description: Name of the loan product
-              type: string
-            maturity:
-              description: Maturity of the interest rate
-              $ref: '#/components/schemas/InterestMaturity'
-            fullRepayment:
-              type: boolean
-              description: Loan should be repayed completely within the duration period
-            payout:
-              $ref: '#/components/schemas/PayoutInfo'
-            additionalInfo:
-              $ref: '#/components/schemas/AnnuityLoanAdditionalInfo'
-            financedEstate:
-              description: Estate associated to the loan tranche
-              $ref: '#/components/schemas/EstateRole'
-      discriminator:
-        propertyName: type
-        mapping:
-          ANNUITAET: '#/components/schemas/RegularAnnuityProduct'
-          W_RIESTER: '#/components/schemas/RegularAnnuityProduct'
-          ZWIFI: '#/components/schemas/RegularAnnuityProduct'
-          FLEX_PLUS: '#/components/schemas/RegularAnnuityProduct'
-          FLEX: '#/components/schemas/RegularAnnuityProduct'
-          FORWARD: '#/components/schemas/RegularAnnuityProduct'
-          KOMBI: '#/components/schemas/RegularAnnuityProduct'
-          KONSTANT: '#/components/schemas/RegularAnnuityProduct'
-          KONST_KOMBI: '#/components/schemas/RegularAnnuityProduct'
-          VERSICHER: '#/components/schemas/SuspendedRepaymentAnnuityProduct'
-          VOLLTILGER: '#/components/schemas/RegularAnnuityProduct'
-          OTHER: '#/components/schemas/RegularAnnuityProduct'
-    ProductType:
-      type: string
-      description: Loan product type
-      anyOf:
-        - enum:
-            - ANNUITAET
-            - W_RIESTER
-            - ZWIFI
-            - FLEX_PLUS
-            - FLEX
-            - FORWARD
-            - KOMBI
-            - KONSTANT
-            - KONST_KOMBI
-            - VERSICHER
-            - VOLLTILGER
-            - OTHER
-    PayoutInfo:
-      type: object
-      description: Loan payout information
-      properties:
-        firstPayout:
-          description: Date of the first payout
-          $ref: '#/components/schemas/Date'
-        freeAllocationPeriod:
-          description: Months in which the creditor does not demand interest for allocated
-            but not withdrawn credit
-          $ref: '#/components/schemas/Months'
-        payoutRate:
-          description: Loan payout rate
-          $ref: '#/components/schemas/Percentage'
-    Months:
+      - $ref: '#/components/schemas/ResourceRef'
+      - properties:
+          embedded:
+            description: Optional field, only set when *embed* query parameter is
+              set to *True*
+            $ref: '#/components/schemas/EmbeddedSubmissionProtocol'
+    EmbeddedSubmissionProtocol:
       type: object
       properties:
-        months:
-          type: integer
-          format: int32
-    AnnuityLoanAdditionalInfo:
-      type: object
-      description: Additional informations for annuity loans
-      properties:
-        conditionDetails:
+        protocol:
           type: array
-          description: Additional condtion details for the main loan (key-value pairs)
           items:
-            $ref: '#/components/schemas/AdditionalInfo'
-        provisionDetails:
-          type: array
-          description: Additional commission (provision) details for the main loan
-            (key-value pairs)
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    RegularAnnuityProduct:
-      allOf:
-        - $ref: '#/components/schemas/AnnuityProduct'
-    SuspendedRepaymentAnnuityProduct:
-      type: object
-      description: Information about suspended repayment annuity product
-      allOf:
-        - $ref: '#/components/schemas/AnnuityProduct'
-        - type: object
-          properties:
-            product:
-              $ref: '#/components/schemas/SuspendedRepaymentProductType'
-            sum:
-              description: Total amount of the suspended repayment
-              $ref: '#/components/schemas/EuroAmount'
-            provider:
-              description: Suspended repayment provider
-              type: string
-            contractSignedWith:
-              description: Repayment suspension contract signee
-              $ref: '#/components/schemas/SuspendedProductApplicantRole'
-            contractDuration:
-              description: The duration of repayment suspension contract
-              $ref: '#/components/schemas/Years'
-            upcomingPayments:
-              $ref: '#/components/schemas/UpcomingPayments'
-            savingBurden:
-              description: Savings rate for the suspended repayment product
-              $ref: '#/components/schemas/EuroAmount'
-            depositValue:
-              description: Deposit value
-              $ref: '#/components/schemas/EuroAmount'
-    SuspendedRepaymentProductType:
-      type: string
-      description: Type of repayment suspension
-      anyOf:
-        - enum:
-            - DT_KAP_LV
-            - DT_KAP_RV
-            - BRIT_KAP_LV
-            - BRIT_KAP_RV
-            - FONDS_LV
-            - FONDS_RV
-            - FONDS_SPAR
-            - BAU_SPAR
-            - OTHER
-    SuspendedProductApplicantRole:
-      type: string
-      description: Person who signed the debt suspension
-      anyOf:
-        - enum:
-            - APL
-            - ADD
-    Years:
+            $ref: '#/components/schemas/ProtocolItem'
+    ProtocolItem:
       type: object
       properties:
-        years:
-          type: integer
-          format: int32
-    UpcomingPayments:
-      type: object
-      description: Upcoming payments for suspended repayment product
-      properties:
-        upcomingFees:
-          description: Recurring costs for a suspended repayment product
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        closingFee:
-          description: Acquisition fee for the suspended repayment product
-          type: number
-          format: double
-        paymentDuration:
-          description: Duration of payments for suspended suspension product
-          $ref: '#/components/schemas/Years'
-    FinancingApplicationItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/FinancingApplication'
-    FinancingApplication:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Application id
         type:
-          $ref: '#/components/schemas/ApplicationType'
-        subType:
-          $ref: '#/components/schemas/ApplicationSubType'
-        company:
-          description: Application originator company
+          $ref: '#/components/schemas/ProtocolItemType'
+        id:
           type: string
-        financingNeed:
-          $ref: '#/components/schemas/FinancingNeedItem'
-        partnership:
-          $ref: '#/components/schemas/ApplicationPartnership'
-        houshold:
-          $ref: '#/components/schemas/HouseholdItem'
-        estates:
-          $ref: '#/components/schemas/Estates'
-        financialStanding:
-          $ref: '#/components/schemas/FinancialStandings'
-        venture:
-          $ref: '#/components/schemas/FinancialVentureItem'
-    ApplicationType:
+        createdAt:
+          type: string
+          format: date-time
+        author:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          DOCUMENT: '#/components/schemas/SubmissionDocumentUpdate'
+          DATA: '#/components/schemas/SubmissionDataUpdate'
+          STATUS: '#/components/schemas/SubmissionStatusUpdate'
+          NEW_SUBMISSION: '#/components/schemas/NewSubmission'
+    ProtocolItemType:
       type: string
       anyOf:
-        - enum:
-            - MORTGAGE
-            - CONSUMER
-            - CST_LEAD
-            - MORTGAGE_SAVING
-    ApplicationSubType:
-      type: string
-      anyOf:
-        - enum:
-            - NEW_CUSTOMER
-            - PROLONGATION
-            - SUPPLEMENTARY_FINANCING
-    FinancingNeedItem:
+      - enum:
+        - DOCUMENT
+        - DATA
+        - STATUS
+        - NEW_SUBMISSION
+    SubmissionDocumentUpdate:
+      type: object
+      description: Holds submission document related updates which may require action
+        to be taken
       allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/FinancingNeed'
-    ApplicationPartnership:
-      type: string
-      anyOf:
-        - enum:
-            - NONE
-            - true
-            - WITH_MARRIAGE_PARTNER
-            - WITH_LIFE_PARTNER
-            - WITH_REGISTERED_PARTNER
-            - WITH_OTHERS
-    HouseholdItem:
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          action:
+            type: string
+            anyOf:
+            - enum:
+              - ADDED
+              - REMOVED
+              - CHANGED
+          document:
+            $ref: '#/components/schemas/ResourceRef'
+    SubmissionDataUpdate:
+      type: object
+      description: Holds submission data related state transitions and updates
       allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Household'
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          field:
+            type: string
+          change:
+            $ref: '#/components/schemas/StateTransitionValue'
+          reason:
+            type: string
+          remark:
+            type: string
+    StateTransitionValue:
+      type: object
+      properties:
+        old:
+          type: string
+        new:
+          type: string
+    SubmissionStatusUpdate:
+      type: object
+      description: Holds submission status related updates which require actions to
+        be taken, or show state transition
+      allOf:
+      - $ref: '#/components/schemas/SubmissionDataUpdate'
+    NewSubmission:
+      type: object
+      description: Holds information when the new submission was created
+      allOf:
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          documents:
+            description: Link to access document for this submission
+            $ref: '#/components/schemas/SubmissionRef'
+    Paging:
+      properties:
+        cursor:
+          $ref: '#/components/schemas/Cursor'
+        previous:
+          type: string
+          format: uri
+        next:
+          type: string
+          format: uri
+        first:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+        self:
+          type: string
+          format: uri
+    Cursor:
+      properties:
+        before:
+          type: string
+        after:
+          type: string
+    Protocol:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolItem'
     Documents:
       type: object
       required:
-        - data
+      - data
       properties:
         data:
           type: array
@@ -3456,9 +626,9 @@ components:
     DocumentItem:
       type: object
       required:
-        - id
-        - content
-        - category
+      - id
+      - content
+      - category
       properties:
         id:
           type: string
@@ -3475,15 +645,15 @@ components:
     DocumentValidity:
       type: object
       required:
-        - value
-        - resolution
+      - value
+      - resolution
       properties:
         resolution:
           type: string
           anyOf:
-            - enum:
-                - MONTH
-                - YEAR
+          - enum:
+            - MONTH
+            - YEAR
       discriminator:
         propertyName: resolution
         mapping:
@@ -3491,1004 +661,27 @@ components:
           YEAR: '#/components/schemas/YearlyResolution'
     MonthlyResolution:
       allOf:
-        - $ref: '#/components/schemas/DocumentValidity'
-        - type: object
-          description: Resolution based on monthly basis
-          properties:
-            value:
-              type: string
-              format: date-month
-              example: 12
-              description: date-month format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
+      - $ref: '#/components/schemas/DocumentValidity'
+      - type: object
+        description: Resolution based on monthly basis
+        properties:
+          value:
+            type: string
+            format: date-month
+            example: 12
+            description: date-month format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
     YearlyResolution:
       allOf:
-        - $ref: '#/components/schemas/DocumentValidity'
-        - type: object
-          description: Resolution based on yearly basis
-          properties:
-            value:
-              type: string
-              format: date-fullyear
-              example: 2019
-              description: date-fullyear format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
-    FinancingNeed:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        payoutDate:
-          $ref: '#/components/schemas/Date'
-        amortisationStartDate:
-          $ref: '#/components/schemas/Date'
-        details:
-          $ref: '#/components/schemas/FinancingNeedDetails'
-    FinancingNeedDetails:
-      type: object
-      required:
-        - reason
-      properties:
-        reason:
-          $ref: '#/components/schemas/FinancingApplicationReason'
-        estate:
-          $ref: '#/components/schemas/EstateItem'
-        additionalCosts:
-          $ref: '#/components/schemas/EstateAdditionalCosts'
-      discriminator:
-        propertyName: reason
-        mapping:
-          BUY_NEW: '#/components/schemas/BuyNewEstateFinancing'
-          BUY_EXISTING: '#/components/schemas/BuyExistingEstateFinancing'
-          CONSTRUCTION: '#/components/schemas/BuildEstateFinancing'
-          DEBT_RESCHEDULING: '#/components/schemas/DebtReschedulingFinancing'
-          RENOVATION: '#/components/schemas/RenovateEstateFinancing'
-          OTHER_CAPITAL_FINANCING: '#/components/schemas/OtherCapitalFinancing'
-    FinancingApplicationReason:
-      type: string
-      anyOf:
-        - enum:
-            - BUY_NEW
-            - BUY_EXISTING
-            - CONSTRUCTION
-            - DEBT_RESCHEDULING
-            - RENOVATION
-            - OTHER_CAPITAL_FINANCING
-    EstateAdditionalCosts:
-      type: object
-      properties:
-        inventoryCosts:
-          description: Inventory costs (furniture, kitchen, etc.)
-          $ref: '#/components/schemas/EuroAmount'
-        costsOther:
-          description: Other costs
-          $ref: '#/components/schemas/EuroAmount'
-    BuyNewEstateFinancing:
-      allOf:
-        - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-        - type: object
-          properties:
-            optionalEquipment:
-              description: Optional equipment value
-              $ref: '#/components/schemas/EuroAmount'
-            purchasePrice:
-              description: Purchase price
-              $ref: '#/components/schemas/EuroAmount'
-            priceDue:
-              description: Due date of purchase price
-              $ref: '#/components/schemas/Date'
-    ForeignEstateFinancingNeed:
-      allOf:
-        - $ref: '#/components/schemas/FinancingNeedDetails'
-        - type: object
-          properties:
-            estateAcquisitionCosts:
-              $ref: '#/components/schemas/EstateAcquisitionCosts'
-    EstateAcquisitionCosts:
-      type: object
-      description: Estate costs
-      properties:
-        brokerage:
-          $ref: '#/components/schemas/BrokerageFees'
-        costsNotary:
-          description: Notary / land register costs
-          $ref: '#/components/schemas/EuroAmount'
-        purchaseTax:
-          $ref: '#/components/schemas/PurchaseTaxCosts'
-    BrokerageFees:
-      type: object
-      description: Brokerage fees
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        percentage:
-          $ref: '#/components/schemas/Percentage'
-    PurchaseTaxCosts:
-      type: object
-      description: Real estate transfer tax
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        percentage:
-          $ref: '#/components/schemas/Percentage'
-    BuyExistingEstateFinancing:
-      allOf:
-        - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-        - type: object
-          properties:
-            renovationCosts:
-              description: Renovation costs
-              $ref: '#/components/schemas/EuroAmount'
-            purchasePrice:
-              description: Purchase price
-              $ref: '#/components/schemas/EuroAmount'
-            priceDue:
-              description: Due date of purchase price
-              $ref: '#/components/schemas/Date'
-    BuildEstateFinancing:
-      allOf:
-        - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-        - type: object
-          properties:
-            landPrice:
-              description: Price land
-              $ref: '#/components/schemas/EuroAmount'
-            buildCosts:
-              $ref: '#/components/schemas/EstateBuildingCosts'
-            completionDate:
-              $ref: '#/components/schemas/Date'
-    EstateBuildingCosts:
-      type: object
-      properties:
-        cost:
-          description: Costs associated to the building process
-          $ref: '#/components/schemas/EuroAmount'
-        additionalCosts:
-          description: Additional costs associated to the building process. For instance,
-            costs for architect, structural engineer or for the building permit
-          $ref: '#/components/schemas/EuroAmount'
-        outsideCosts:
-          description: Costs associated to the outdoor facilities. For instance, costs
-            for paving or planting
-          $ref: '#/components/schemas/EuroAmount'
-    DebtReschedulingFinancing:
-      allOf:
-        - $ref: '#/components/schemas/OwnEstateFinancingNeed'
-        - type: object
-          properties:
-            additionalLoan:
-              $ref: '#/components/schemas/EstateAdditionalLoan'
-    OwnEstateFinancingNeed:
-      allOf:
-        - $ref: '#/components/schemas/FinancingNeedDetails'
-        - type: object
-          properties:
-            renovationCosts:
-              description: Renovation costs
-              $ref: '#/components/schemas/EuroAmount'
-            originalValue:
-              description: Originaly paid purchase-/build price
-              $ref: '#/components/schemas/EuroAmount'
-            acquisitionYear:
-              description: Year of payment / Year of completion
-              type: integer
-              format: int32
-            marketValue:
-              description: Actual market value
-              $ref: '#/components/schemas/EuroAmount'
-    EstateAdditionalLoan:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        usage:
-          type: string
-          anyOf:
-            - enum:
-                - OPERATIONAL_COSTS
-                - REPAY_ANOTHER_LOAN
-                - PREPAYMENT_PENALTY
-                - CONSTRUCTION
-                - RENOVATION
-                - OTHER
-    RenovateEstateFinancing:
-      allOf:
-        - $ref: '#/components/schemas/OwnEstateFinancingNeed'
-    OtherCapitalFinancing:
-      allOf:
-        - $ref: '#/components/schemas/OwnEstateFinancingNeed'
-        - type: object
-          properties:
-            neededLoan:
-              $ref: '#/components/schemas/OtherCapitalNeededLoan'
-    OtherCapitalNeededLoan:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        usage:
-          type: string
-          anyOf:
-            - enum:
-                - OPERATIONAL_COSTS
-                - REPAY_ANOTHER_LOAN
-                - PREPAYMENT_PENALTY
-                - RESIDENTIAL_USE
-                - RENEWABLE_ENERGY
-                - DISBURSMENT_COOWNERS
-                - DISBURSMENT_HEIRS
-                - OTHER
-                - RECONSTRUCTION
-                - BUY
-                - CONSTRUCTION
-                - BUY_CONSTRUCTION
-                - SUPPLEMENTARY_FINANCING
-    HandoverReport:
-      type: string
-      format: binary
-    HandoverItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Handover'
-    Handover:
-      type: object
-      description: Advisory Handover notes and recommendations
-      properties:
-        recommendation:
-          $ref: '#/components/schemas/Recommendation'
-        hints:
-          type: string
-          description: Hints provided by the financing advisor
-    Recommendation:
-      type: object
-      description: Financing advisor recommendations
-      properties:
-        chefsSuggestion:
-          type: boolean
-          description: Offer is recommended from the financing advisor
-        explanation:
-          type: string
-          description: Explanation of the financing advisor's recommendation
-    Consultation:
-      type: object
-      properties:
-        advisors:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdvisorItem'
-        informers:
-          type: array
-          items:
-            $ref: '#/components/schemas/InformerItem'
-        expectation:
-          $ref: '#/components/schemas/FinancingExpectationItem'
-        application:
-          $ref: '#/components/schemas/FinancingApplicationItem'
-        handover:
-          $ref: '#/components/schemas/HandoverItem'
-    Protocol:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProtocolItem'
-    Submissions:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubmissionItem'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SubmissionItem:
-      allOf:
-        - $ref: '#/components/schemas/SubmissionRef'
-        - type: object
-          required:
-            - id
-            - statusInfo
-            - date
-          properties:
-            statusInfo:
-              $ref: '#/components/schemas/SubmissionStatusInfo'
-            date:
-              type: string
-              format: date-time
-              description: A UTC date-time indicates the submission date.
-              example: 2019-12-29T10:22:50Z
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/Submission'
-    SubmissionStatusInfo:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/SubmissionStatus'
-        remark:
-          type: string
-      required:
-        - status
-      discriminator:
-        propertyName: status
-        mapping:
-          SUBMITTED: '#/components/schemas/SimpleStatus'
-          ONHOLD: '#/components/schemas/SubmissionStatusOnhold'
-          INWORK: '#/components/schemas/SimpleStatus'
-          REJECT: '#/components/schemas/SubmissionStatusReject'
-          CREDIT_ACCEPTED: '#/components/schemas/SimpleStatus'
-          CREDIT_VERIFIED: '#/components/schemas/SimpleStatus'
-          CONTRACT_SIGN: '#/components/schemas/SimpleStatus'
-          CANCELED: '#/components/schemas/SubmissionStatusCancel'
-          REVOKE: '#/components/schemas/SimpleStatus'
-    Submission:
-      required:
-        - id
-      properties:
-        id:
-          type: string
-        overview:
-          $ref: '#/components/schemas/SubmissionOverview'
-        offer:
-          $ref: '#/components/schemas/FinancingOffer'
-        consultation:
-          $ref: '#/components/schemas/Consultation'
-        credit:
-          $ref: '#/components/schemas/Credit'
-    SubmissionOverview:
-      type: object
-      description: General Submission information
-      properties:
-        mode:
-          $ref: '#/components/schemas/SubmissionMode'
-        statusInfo:
-          $ref: '#/components/schemas/SubmissionStatusInfo'
-        date:
-          type: string
-          format: date-time
-          description: A UTC date-time indicates the submission date.
-          example: 2019-12-29T10:22:50Z
-        decisionDate:
-          description: Decision date for the submission
-          $ref: '#/components/schemas/Date'
-        loanPartnerProcessingInfo:
-          $ref: '#/components/schemas/LoanPartnerProcessingInfo'
-    SubmissionMode:
-      type: string
-      anyOf:
-        - enum:
-            - NORMAL
-            - PHYP_DIRECT
-            - DIBA_DIRECT
-            - PHYP_PROLO
-            - PHYP_SELECT
-            - IHYP
-            - PROHYP_SELE
-            - EXPRESS
-    LoanPartnerProcessingInfo:
-      description: Processing Unit and current processor of the loan partner
-      type: object
-      properties:
-        unit:
-          description: Loan partner processing unit
-          $ref: '#/components/schemas/LoanPartnerProcessingUnit'
-        processorId:
-          description: Current processor within the loan partner processing unit
-          $ref: '#/components/schemas/LoanPartnerProcessorId'
-    LoanPartnerProcessingUnit:
-      description: Processing unit of the loan partner
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/LoanPartnerProcessingUnitId'
-        name:
-          type: string
-          description: Name of the loan partner processing unit
-    LoanPartnerProcessingUnitId:
-      description: Id of loan partner processing unit.
-      required:
-        - value
-      properties:
-        value:
-          type: integer
-          format: int64
-    LoanPartnerProcessorId:
-      description: Id of loan partner processor.
-      required:
-        - value
-      properties:
-        value:
-          type: integer
-          format: int64
-    FinancingOffer:
-      type: object
-      required:
-        - id
-        - type
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: offer id
-        type:
-          $ref: '#/components/schemas/FinancingOfferType'
-        financingConfirmationRequired:
-          description: Indicates if financing confirmation should be provided
-          type: boolean
-        loanQuota:
-          $ref: '#/components/schemas/LoanQuota'
-        loans:
-          type: array
-          items:
-            $ref: '#/components/schemas/Loan'
-        total:
-          $ref: '#/components/schemas/EuroAmount'
-        paymentTime:
-          description: Time when payent is processed
-          $ref: '#/components/schemas/PaymentTime'
-        baserateIssueDate:
-          description: Issued date of the used baserates
-          $ref: '#/components/schemas/Date'
-        additionalInfos:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-      discriminator:
-        propertyName: type
-        mapping:
-          BID: '#/components/schemas/BidFinancingOffer'
-          CONTRACT: '#/components/schemas/ContractFinancingOffer'
-    SubmissionCorrespondence:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubmissionCorrespondenceItem'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SubmissionCorrespondenceItem:
-      type: object
-      properties:
-        submission:
-          $ref: '#/components/schemas/SubmissionRef'
-        correspondence:
-          $ref: '#/components/schemas/SubmissionCorrespondenceRef'
-    SubmissionCorrespondenceRef:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/EmbeddedSubmissionCorrespondence'
-    EmbeddedSubmissionCorrespondence:
-      type: object
-      properties:
-        correspondence:
-          type: array
-          items:
-            $ref: '#/components/schemas/CorrespondenceItem'
-    RegularPayment:
-      type: object
-      properties:
-        burden:
-          description: Monthly period payment
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        interest:
-          description: Monthly interest amount
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    KfwPromotionLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/Loan'
-        - properties:
-            maturity:
-              description: Maturity of the interest rate
-              $ref: '#/components/schemas/KfwInterestMaturity'
-            contractNumber:
-              type: string
-              description: Loan number / contract number
-            kfwProgram:
-              $ref: '#/components/schemas/KfwProgram'
-            financedEstate:
-              description: Estate associated to the loan tranche
-              $ref: '#/components/schemas/EstateRole'
-            freeAllocationPeriod:
-              description: Months in which the creditor does not demand interest for
-                allocated but not withdrawn credit
-              $ref: '#/components/schemas/Months'
-            amortisationFreePeriod:
-              description: Amortisation-free years
-              $ref: '#/components/schemas/Years'
-            commission:
-              $ref: '#/components/schemas/KfwCommissionInfo'
-            reservations:
-              type: array
-              items:
-                $ref: '#/components/schemas/KfwReservationInfo'
-            paymentTime:
-              $ref: '#/components/schemas/PaymentTime'
-            payoutRate:
-              description: Loan payout rate
-              $ref: '#/components/schemas/Percentage'
-    AuxiliaryLoan:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/Loan'
-        - properties:
-            maturity:
-              description: Maturity of the interest rate
-              $ref: '#/components/schemas/InterestMaturity'
-            specialPayment:
-              $ref: '#/components/schemas/SpecialRepayment'
-            product:
-              $ref: '#/components/schemas/AuxProductType'
-            commission:
-              $ref: '#/components/schemas/CommissionInfo'
-            payoutRate:
-              description: Loan payout rate
-              $ref: '#/components/schemas/Percentage'
-    JsonPatchOperation:
-      description: JSON Patch definition according to <a href="https://tools.ietf.org/html/rfc6902">RFC
-        6902</a>.
-      required:
-        - op
-        - path
-      properties:
-        op:
-          type: string
-          anyOf:
-            - enum:
-                - add
-                - remove
-                - replace
-        path:
-          type: string
-        value:
-          type: object
-    PatchSubmissionOperation:
-      description: 'Schema to patch a submission Supported paths: <ul><li>overview/loanParnterProcessingInfo
-        (changes the loan partner processing unit including a new processor)</li>
-        <li>overview/loanPartnerProcessingInfo/processor (changes the loan partner
-        processor)</li> <li>overview/statusInfo</li> <li>credit/sendContractDate</li>
-        <li>credit/signContractDate</li> <li>credit/cancelContractDate</li> <li>credit/loans
-        (changes the loans of a accepted credit)</li></ul>'
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/JsonPatchOperation'
-        - properties:
-            path:
-              type: string
-              anyOf:
-                - enum:
-                    - overview/loanParnterProcessingInfo
-                    - overview/loanPartnerProcessingInfo/processor
-                    - overview/statusInfo
-                    - credit/sendContractDate
-                    - credit/signContractDate
-                    - credit/cancelContractDate
-                    - credit/loans
-      discriminator:
-        propertyName: path
-        mapping:
-          overview/loanParnterProcessingInfo: '#/components/schemas/PatchLoanPartnerProcessingInfo'
-          overview/loanPartnerProcessingInfo/processor: '#/components/schemas/PatchLoanPartnerProcessorOfSubmission'
-          overview/statusInfo: '#/components/schemas/PatchSubmissionStatusInfo'
-          credit/sendContractDate: '#/components/schemas/PatchSendContractDate'
-          credit/signContractDate: '#/components/schemas/PatchSignContractDate'
-          credit/cancelContractDate: '#/components/schemas/PatchCancelContractDate'
-          credit/loans: '#/components/schemas/PatchCreditLoans'
-    PatchLoanPartnerProcessingInfo:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/PatchLoanPartnerProcessingInfoValue'
-    PatchLoanPartnerProcessingInfoValue:
-      description: Schema to patch the processing info
-      type: object
-      required:
-        - unitId
-      properties:
-        unitId:
-          $ref: '#/components/schemas/LoanPartnerProcessingUnitId'
-        processorId:
-          $ref: '#/components/schemas/LoanPartnerProcessorId'
-    PatchLoanPartnerProcessorOfSubmission:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/LoanPartnerProcessorId'
-    PatchSubmissionStatusInfo:
-      description: Schema to patch the submission status
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/SubmissionStatusInfo'
-    PatchSendContractDate:
-      description: Schema to patch the contract date of a submission
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/Date'
-    PatchSignContractDate:
-      description: Schema to patch the date the contract is signed
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/Date'
-    PatchCancelContractDate:
-      description: Schema to patch the date the contract is cancelded
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              $ref: '#/components/schemas/Date'
-    PatchCreditLoans:
-      description: Schema to patch the credit loans
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PatchSubmissionOperation'
-        - properties:
-            value:
-              type: array
-              items:
-                $ref: '#/components/schemas/CreditLoan'
-    HandoverReports:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/HandoverReportItem'
-    HandoverReportItem:
-      type: object
-      required:
-        - name
-        - description
-        - createdAt
-        - content
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        content:
-          $ref: '#/components/schemas/ResourceRef'
-    KfwInterestMaturity:
-      type: string
-      anyOf:
-        - enum:
-            - 5_YEARS
-            - 10_YEARS
-            - FULL
-    Household:
-      type: object
-      description: Household information
-      properties:
-        customers:
-          $ref: '#/components/schemas/Customers'
-        carsHousehold:
-          type: integer
-          format: int32
-          description: Number of cars in household
-        numberOfChildren:
-          type: integer
-          format: int32
-          description: Number of children
-        personsHousehold:
-          type: integer
-          format: int32
-          description: Number of persons in the same household
-    Customers:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomerItem'
-    SubmissionStatus:
-      type: string
-      enum:
-        - CREDIT_ACCEPTED
-        - CREDIT_VERIFIED
-        - ONHOLD
-        - INWORK
-        - REJECTED
-        - CONTRACT_SIGN
-        - CANCELED
-        - REVOKED
-        - SUBMITTED
-    SimpleStatus:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/SubmissionStatusInfo'
-    SubmissionStatusOnhold:
-      type: object
-      required:
-        - onHoldReason
-        - expectedOnholdDuration
-      allOf:
-        - $ref: '#/components/schemas/SubmissionStatusInfo'
-        - properties:
-            onHoldReason:
-              $ref: '#/components/schemas/OnHoldReason'
-            expectedOnholdDuration:
-              $ref: '#/components/schemas/ExpectedOnholdDuration'
-    OnHoldReason:
-      description: Reason for status 'ONHOLD'
-      type: string
-      anyOf:
-        - enum:
-            - MISSING_DOCUMENTS
-            - DOCUMENTS_DELIVER_IN_ADDITIONAL
-            - INFORMATION_DELIVER_IN_ADDITIONAL
-            - CUSTOMER_WISH
-            - SECURE_FINANCING_CONDITIONS
-            - EXPERT_REPORT_IS_CREATED
-            - WATING_FOR_ORIGINAL_CONTRACT
-            - REJECT_SOON
-            - TRANSFER_FOR_FINAL_APPROVEMENT
-    ExpectedOnholdDuration:
-      type: object
-      description: Expected duration of status ONHOLD
-      required:
-        - processingContinuesOn
-        - processingTime
-      properties:
-        processingContinuesOn:
-          description: Expected date when submission processing continues
-          $ref: '#/components/schemas/Date'
-        processingTime:
-          description: Expected processing time in days for the submission
-          $ref: '#/components/schemas/Days'
-    SubmissionStatusReject:
-      type: object
-      required:
-        - rejectReason
-      allOf:
-        - $ref: '#/components/schemas/SubmissionStatusInfo'
-        - properties:
-            rejectReason:
-              type: string
-    SubmissionStatusCancel:
-      type: object
-      required:
-        - cancelContractDate
-      allOf:
-        - $ref: '#/components/schemas/SubmissionStatusInfo'
-        - properties:
-            cancelContractDate:
-              $ref: '#/components/schemas/Date'
-    CustomerItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          required:
-            - id
-            - role
-          properties:
-            id:
-              type: string
-              description: Customer identifier
-            role:
-              $ref: '#/components/schemas/CustomerType'
-            embedded:
-              $ref: '#/components/schemas/Customer'
-    CustomerType:
-      type: string
-      anyOf:
-        - enum:
-            - MAIN
-            - ADD
-    FinancingOfferType:
-      type: string
-      anyOf:
-        - enum:
-            - BID
-            - CONTRACT
-    LoanQuota:
-      type: object
-      description: Value and percentage for a loan quota
-      properties:
-        type:
-          type: string
-          anyOf:
-            - enum:
-                - CALCULATED
-                - EXTERNAL
-        value:
-          $ref: '#/components/schemas/EuroAmount'
-        percentage:
-          $ref: '#/components/schemas/Percentage'
-        conditional:
-          $ref: '#/components/schemas/EuroAmount'
-    BidFinancingOffer:
-      allOf:
-        - $ref: '#/components/schemas/FinancingOffer'
-        - type: object
-    ContractFinancingOffer:
-      allOf:
-        - $ref: '#/components/schemas/FinancingOffer'
-        - type: object
-    KfwCommissionInfo:
-      type: object
-      description: Information about commission for a kfw Loan
-      properties:
-        kfwCommission:
-          $ref: '#/components/schemas/CommissionInfo'
-        interhyp:
-          $ref: '#/components/schemas/InterhypKfwCommission'
-        thirdParty:
-          $ref: '#/components/schemas/ThirdPartyKfwCommission'
-    CommissionInfo:
-      type: object
-      description: Complete information about commissions
-      properties:
-        percent:
-          $ref: '#/components/schemas/Percentage'
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-    InterhypKfwCommission:
-      type: object
-      description: Kfw Interhyp Group commission information
-      properties:
-        interhypKfWCommission:
-          description: Commission Share for Interhyp Group
-          $ref: '#/components/schemas/EuroAmount'
-        interhypKfWCommissionPercent:
-          description: Commission Share for Interhyp Group in percent
-          $ref: '#/components/schemas/Percentage'
-    ThirdPartyKfwCommission:
-      type: object
-      description: Kfw Third Party commission information
-      properties:
-        thirdPartyKfWCommission:
-          description: Commission share third-party
-          $ref: '#/components/schemas/EuroAmount'
-        thirdPartyKfWCommissionPercent:
-          description: Commission share third-party in percent
-          $ref: '#/components/schemas/Percentage'
-    KfwReservationInfo:
-      type: object
-      description: Additional Information about the Kfw Loan reservations
-      properties:
-        id:
-          type: string
-          description: Identification nummer for a immediate confirmation
-        callType:
-          type: string
-          $ref: '#/components/schemas/KfwCallType'
-        conditionReservationDate:
-          description: Reservation date for kfw condition
-          $ref: '#/components/schemas/Date'
-        validity:
-          description: Kfw condition reservation validity date
-          $ref: '#/components/schemas/Date'
-    KfwCallType:
-      type: string
-      description: Kfw reservation process call type
-      anyOf:
-        - enum:
-            - LIGHT
-            - PLUS
-    FinancingOffers:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/FinancingOfferItem'
-    FinancingOfferItem:
-      allOf:
-        - $ref: '#/components/schemas/ResourceRef'
-        - type: object
-          properties:
-            embedded:
-              description: Optional field, only set when *embed* query parameter is
-                set to *True*
-              $ref: '#/components/schemas/FinancingOffer'
-    Unauthorized:
-      allOf:
-        - $ref: '#/components/schemas/ClientError'
-    Advisors:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdvisorItem'
-    Binary:
-      type: string
-      format: binary
-    Conflict:
-      allOf:
-        - $ref: '#/components/schemas/ClientError'
-    BadRequest:
-      allOf:
-        - $ref: '#/components/schemas/ClientError'
-    Cursor:
-      properties:
-        before:
-          type: string
-        after:
-          type: string
-    AuxProductType:
-      type: string
-      description: Auxiliary Loan Product types
-      anyOf:
-        - enum:
-            - DSL_PRIVAT
-            - OYAK_ANKER
-            - HANSEATIC_ALL
+      - $ref: '#/components/schemas/DocumentValidity'
+      - type: object
+        description: Resolution based on yearly basis
+        properties:
+          value:
+            type: string
+            format: date-fullyear
+            example: 2019
+            description: date-fullyear format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
   parameters:
-    customer-role-filter:
-      name: role
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - main
-          - add
-      description: query parameter to restrict customers associated to the provided
-        role.
-    estate-id:
-      name: estateId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested estate.
-    bid-id-query:
-      name: bidId
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int64
-      description: query parameter to restrict submissions associated to the provided
-        bid id.
-    sbms-correspondence-limit:
-      name: limit
-      in: query
-      description: Specifies how many items to return at one time (max 40). <br> A
-        query may return fewer than the value of limit due to filtering.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 40
-        default: 20
     until:
       name: until
       in: query
@@ -4500,40 +693,22 @@ components:
         type: string
         format: date-time
         example: 2019-12-29T10:22:50Z
-    advisor-id:
-      name: advisorId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested advisor
-    customer-id:
-      name: customerId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested customer.
-    offer-id:
-      name: offerId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested offer
-    financial-standing-filter:
-      name: type
+    cursor-after:
+      name: after
       in: query
+      description: Cursor that points to the end of the page of data that has been
+        returned.
       required: false
       schema:
         type: string
-        enum:
-          - debt
-          - equity
-          - income
-          - expense
-      description: query parameter to restrict financial state associated to the provided
-        type.
+    cursor-before:
+      name: before
+      in: query
+      description: Cursor that points to the start of the page of data that has been
+        returned.
+      required: false
+      schema:
+        type: string
     submission-id:
       name: submissionId
       in: path
@@ -4541,71 +716,16 @@ components:
       schema:
         type: string
       description: Id for the requested submission.
-    advisor-filter:
-      name: type
+    since:
+      name: since
       in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - company_submitter
-          - consultant
-          - executive_submitter
-          - regulatory_address
-          - regulatory_address_broker
-          - regulatory_address_submitter
-          - submitter
-      description: query parameter to restrict advisors associated to the provided
-        type.
-    protocol-type-filter:
-      name: protocolType
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - document
-          - data
-          - status
-          - new_submission
-      description: query parameter to restrict submissions associated to the provided
-        protocol type.
-    sbms-sort:
-      name: sort
-      in: query
-      style: form
-      required: false
-      description: Comma-separated list of fields to define the sort order.<br> To
-        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
-        descending. <br> **e.g.** /submissions?sort=+id <br> ***Note*** sorting applies
-        only within a single result page when multiple pages are returned. <br>
-      example: sort=+id
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - +id
-            - -id
-            - +date
-            - -date
-    offer-filter:
-      name: type
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - bid
-          - contract
-      description: query parameter to restrict offers associated to the provided type.
-    informer-id:
-      name: informerId
-      in: path
+      description: A UTC date-time value that points to the start of the range of
+        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
       required: true
       schema:
         type: string
-      description: Id for the requested informer
+        format: date-time
+        example: 2019-12-29T10:22:50Z
     embed:
       name: embed
       in: query
@@ -4617,17 +737,45 @@ components:
         By default is set to `FALSE` where only a **ref** to the sub-resources will
         be returned.<br> By set it to `TRUE` the sub-resources content will be embedded
         in the response which might affect the payload size
-    estate-role-filter:
-      name: role
+    protocol-type-filter:
+      name: protocolType
       in: query
       required: false
       schema:
         type: string
         enum:
-          - main
-          - add
-      description: query parameter to restrict estates associated to the provided
-        role.
+        - document
+        - data
+        - status
+        - new_submission
+      description: query parameter to restrict submissions associated to the provided
+        protocol type.
+    document-category-name-filter:
+      name: categoryName
+      in: query
+      required: false
+      schema:
+        type: string
+      description: query parameter to filter the selected documents based on the provided
+        category.
+    sbms-protocol-sort:
+      name: sort
+      in: query
+      style: form
+      required: false
+      description: Comma-separated list of fields to define the sort order.<br> To
+        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
+        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
+        applies only within a single result page when multiple pages are returned.
+        <br>
+      example: sort=+createdAt
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - +createdAt
+          - -createdAt
     document-id:
       name: documentId
       in: path
@@ -4647,110 +795,3 @@ components:
         minimum: 1
         maximum: 40
         default: 20
-    handover-report-name:
-      name: handoverReportName
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Name for the requested handover report.
-    correspondence-item-id:
-      name: itemId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested submission correspondence item.
-    correspondence-type-filter:
-      name: correspondenceType
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - message
-          - note
-      description: query parameter to restrict submissions associated to the provided
-        correspondence type.
-    sbms-limit:
-      name: limit
-      in: query
-      description: Specifies how many items to return at one time (max 10). <br> A
-        query may return fewer than the value of limit due to filtering.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 10
-        default: 10
-    sbms-correspondence-sort:
-      name: sort
-      in: query
-      style: form
-      required: false
-      description: Comma-separated list of fields to define the sort order.<br> To
-        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
-        descending. <br> **e.g.** /correspondence?sort=+createdAt <br> ***Note***
-        sorting applies only within a single result page when multiple pages are returned.
-        <br>
-      example: sort=+createdAt
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - +createdAt
-            - -createdAt
-    cursor-after:
-      name: after
-      in: query
-      description: Cursor that points to the end of the page of data that has been
-        returned.
-      required: false
-      schema:
-        type: string
-    cursor-before:
-      name: before
-      in: query
-      description: Cursor that points to the start of the page of data that has been
-        returned.
-      required: false
-      schema:
-        type: string
-    document-category-name-filter:
-      name: categoryName
-      in: query
-      required: false
-      schema:
-        type: string
-      description: query parameter to filter the selected documents based on the provided
-        category.
-    since:
-      name: since
-      in: query
-      description: A UTC date-time value that points to the start of the range of
-        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
-      required: true
-      schema:
-        type: string
-        format: date-time
-        example: 2019-12-29T10:22:50Z
-    sbms-protocol-sort:
-      name: sort
-      in: query
-      style: form
-      required: false
-      description: Comma-separated list of fields to define the sort order.<br> To
-        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
-        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
-        applies only within a single result page when multiple pages are returned.
-        <br>
-      example: sort=+createdAt
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - +createdAt
-            - -createdAt
