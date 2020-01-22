@@ -23,6 +23,8 @@ servers:
 - url: https://api.interhyp.de/submission
   description: Production
 tags:
+- name: submissions
+  description: access to submissions
 - name: documents
   description: access to submission documents
 - name: document-categories
@@ -351,6 +353,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/handover-reports:
+    get:
+      summary: Get handover reports
+      description: Delivers the handover reports for a specific submission
+      operationId: getHandoverReports
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Requested handover reports are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HandoverReports'
+        '202':
+          description: Payload is being prepared, try again later
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: payload is expected to be ready after the specified amout
+                of seconds
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/handover-reports/{handoverReportName}:
+    get:
+      summary: Get a specific handover report
+      description: Delivers detailed information about a specific handover report.
+      operationId: getHandoverReportByName
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/handover-report-name'
+      responses:
+        '200':
+          description: Requested handover report is returned
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/HandoverReport'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
 security:
 - BearerAuth: []
 components:
@@ -360,28 +453,9 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    ResourceRef:
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          description: Link to retrieve a specific resource
-          example: http://some-domain/some/link/to/somewhere
-    NotFound:
-      allOf:
-      - $ref: '#/components/schemas/ClientError'
-    ClientError:
-      allOf:
-      - $ref: '#/components/schemas/UnexpectedError'
-      - type: object
-        required:
-        - rootCause
-        properties:
-          message:
-            type: string
-          exception:
-            type: string
+    HandoverReport:
+      type: string
+      format: binary
     UnexpectedError:
       required:
       - status
@@ -442,64 +516,10 @@ components:
         name:
           type: string
           example: MIETAUSGANG
-    Unauthorized:
-      allOf:
-      - $ref: '#/components/schemas/ClientError'
-    Binary:
-      type: string
-      format: binary
-    Conflict:
-      allOf:
-      - $ref: '#/components/schemas/ClientError'
-    BadRequest:
-      allOf:
-      - $ref: '#/components/schemas/ClientError'
-    SubmissionProtocol:
+    Protocol:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubmissionProtocolItem'
-        paging:
-          $ref: '#/components/schemas/Paging'
-    SubmissionProtocolItem:
-      type: object
-      properties:
-        submission:
-          $ref: '#/components/schemas/SubmissionProtocolRefItem'
-        protocol:
-          $ref: '#/components/schemas/SubmissionProtocolRef'
-    SubmissionProtocolRefItem:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/SubmissionRef'
-      - type: object
-        properties:
-          legacyId:
-            description: Legacy submission id
-            type: string
-    SubmissionRef:
-      allOf:
-      - $ref: '#/components/schemas/ResourceRef'
-      - type: object
-        properties:
-          id:
-            type: string
-            description: Submission id
-    SubmissionProtocolRef:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ResourceRef'
-      - properties:
-          embedded:
-            description: Optional field, only set when *embed* query parameter is
-              set to *True*
-            $ref: '#/components/schemas/EmbeddedSubmissionProtocol'
-    EmbeddedSubmissionProtocol:
-      type: object
-      properties:
-        protocol:
           type: array
           items:
             $ref: '#/components/schemas/ProtocolItem'
@@ -524,12 +544,14 @@ components:
           NEW_SUBMISSION: '#/components/schemas/NewSubmission'
     ProtocolItemType:
       type: string
-      anyOf:
-      - enum:
-        - DOCUMENT
-        - DATA
-        - STATUS
-        - NEW_SUBMISSION
+      description: open ended enum contains possible protocol item types, possible
+        values are (DOCUMENT, DATA, STATUS, NEW_SUBMISSION)
+      example: DOCUMENT
+      x-extensible-enum:
+      - DOCUMENT
+      - DATA
+      - STATUS
+      - NEW_SUBMISSION
     SubmissionDocumentUpdate:
       type: object
       description: Holds submission document related updates which may require action
@@ -539,13 +561,23 @@ components:
       - properties:
           action:
             type: string
-            anyOf:
-            - enum:
-              - ADDED
-              - REMOVED
-              - CHANGED
+            description: open ended enum contains possible actions, possible values
+              are (ADDED, REMOVED, CHANGED)
+            example: ADDED
+            x-extensible-enum:
+            - ADDED
+            - REMOVED
+            - CHANGED
           document:
             $ref: '#/components/schemas/ResourceRef'
+    ResourceRef:
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          description: Link to retrieve a specific resource
+          example: http://some-domain/some/link/to/somewhere
     SubmissionDataUpdate:
       type: object
       description: Holds submission data related state transitions and updates
@@ -580,8 +612,81 @@ components:
       - $ref: '#/components/schemas/ProtocolItem'
       - properties:
           documents:
-            description: Link to access document for this submission
             $ref: '#/components/schemas/SubmissionRef'
+    SubmissionRef:
+      type: object
+      description: Holds submission status related updates which require actions to
+        be taken, or show state transition
+      allOf:
+      - $ref: '#/components/schemas/ResourceRef'
+      - properties:
+          id:
+            type: string
+            description: Submission id
+    NotFound:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    ClientError:
+      type: object
+      required:
+      - rootCause
+      allOf:
+      - $ref: '#/components/schemas/UnexpectedError'
+      - properties:
+          message:
+            type: string
+          exception:
+            type: string
+    Unauthorized:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    Binary:
+      type: string
+      format: binary
+    Conflict:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    BadRequest:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    SubmissionProtocol:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionProtocolItem'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SubmissionProtocolItem:
+      type: object
+      properties:
+        submission:
+          $ref: '#/components/schemas/SubmissionProtocolRefItem'
+        protocol:
+          $ref: '#/components/schemas/SubmissionProtocolRef'
+    SubmissionProtocolRefItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/SubmissionRef'
+      - properties:
+          legacyId:
+            description: Legacy submission id
+            type: string
+    SubmissionProtocolRef:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ResourceRef'
+      - properties:
+          embedded:
+            $ref: '#/components/schemas/EmbeddedSubmissionProtocol'
+    EmbeddedSubmissionProtocol:
+      type: object
+      properties:
+        protocol:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolItem'
     Paging:
       properties:
         cursor:
@@ -607,13 +712,32 @@ components:
           type: string
         after:
           type: string
-    Protocol:
+    HandoverReports:
       type: object
+      required:
+      - data
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ProtocolItem'
+            $ref: '#/components/schemas/HandoverReportItem'
+    HandoverReportItem:
+      type: object
+      required:
+      - name
+      - description
+      - createdAt
+      - content
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        content:
+          $ref: '#/components/schemas/ResourceRef'
     Documents:
       type: object
       required:
@@ -650,32 +774,34 @@ components:
       properties:
         resolution:
           type: string
-          anyOf:
-          - enum:
-            - MONTH
-            - YEAR
+          description: open ended enum contains type of resolutions, possible values
+            are (MONTH, YEAR)
+          example: MONTH
+          x-extensible-enum:
+          - MONTH
+          - YEAR
       discriminator:
         propertyName: resolution
         mapping:
           MONTH: '#/components/schemas/MonthlyResolution'
           YEAR: '#/components/schemas/YearlyResolution'
     MonthlyResolution:
+      type: object
+      description: Resolution based on monthly basis
       allOf:
       - $ref: '#/components/schemas/DocumentValidity'
-      - type: object
-        description: Resolution based on monthly basis
-        properties:
+      - properties:
           value:
             type: string
             format: date-month
             example: 12
             description: date-month format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
     YearlyResolution:
+      type: object
+      description: Resolution based on yearly basis
       allOf:
       - $ref: '#/components/schemas/DocumentValidity'
-      - type: object
-        description: Resolution based on yearly basis
-        properties:
+      - properties:
           value:
             type: string
             format: date-fullyear
@@ -709,23 +835,6 @@ components:
       required: false
       schema:
         type: string
-    submission-id:
-      name: submissionId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested submission.
-    since:
-      name: since
-      in: query
-      description: A UTC date-time value that points to the start of the range of
-        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
-      required: true
-      schema:
-        type: string
-        format: date-time
-        example: 2019-12-29T10:22:50Z
     embed:
       name: embed
       in: query
@@ -737,19 +846,6 @@ components:
         By default is set to `FALSE` where only a **ref** to the sub-resources will
         be returned.<br> By set it to `TRUE` the sub-resources content will be embedded
         in the response which might affect the payload size
-    protocol-type-filter:
-      name: protocolType
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-        - document
-        - data
-        - status
-        - new_submission
-      description: query parameter to restrict submissions associated to the provided
-        protocol type.
     document-category-name-filter:
       name: categoryName
       in: query
@@ -758,24 +854,6 @@ components:
         type: string
       description: query parameter to filter the selected documents based on the provided
         category.
-    sbms-protocol-sort:
-      name: sort
-      in: query
-      style: form
-      required: false
-      description: Comma-separated list of fields to define the sort order.<br> To
-        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
-        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
-        applies only within a single result page when multiple pages are returned.
-        <br>
-      example: sort=+createdAt
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-          - +createdAt
-          - -createdAt
     document-id:
       name: documentId
       in: path
@@ -795,3 +873,58 @@ components:
         minimum: 1
         maximum: 40
         default: 20
+    handover-report-name:
+      name: handoverReportName
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Name for the requested handover report.
+    submission-id:
+      name: submissionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested submission.
+    since:
+      name: since
+      in: query
+      description: A UTC date-time value that points to the start of the range of
+        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: 2019-12-29T10:22:50Z
+    protocol-type-filter:
+      name: protocolType
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - document
+        - data
+        - status
+        - new_submission
+      description: query parameter to restrict submissions associated to the provided
+        protocol type.
+    sbms-protocol-sort:
+      name: sort
+      in: query
+      style: form
+      required: false
+      description: Comma-separated list of fields to define the sort order.<br> To
+        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
+        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
+        applies only within a single result page when multiple pages are returned.
+        <br>
+      example: sort=+createdAt
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - +createdAt
+          - -createdAt
