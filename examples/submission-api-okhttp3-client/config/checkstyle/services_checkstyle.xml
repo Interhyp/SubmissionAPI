@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!--
+  Checkstyle configuration that checks the sun coding conventions from:
+    - the Java Language Specification at
+      http://java.sun.com/docs/books/jls/second_edition/html/index.html
+    - the Sun Code Conventions at http://java.sun.com/docs/codeconv/
+    - the Javadoc guidelines at
+      http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
+    - the JDK Api documentation http://java.sun.com/j2se/docs/api/index.html
+    - some best practices
+  Checkstyle is very configurable. Be sure to read the documentation at
+  http://checkstyle.sf.net (or in your downloaded distribution).
+  Most Checks are configurable, be sure to consult the documentation.
+  To completely disable a check, just comment it out or delete it from the file.
+  Finally, it is worth reading the documentation.
+-->
+
+<module name="Checker">
+    <!--
+        If you set the basedir property below, then all reported file
+        names will be relative to the specified directory. See
+        http://checkstyle.sourceforge.net/5.x/config.html#Checker
+        <property name="basedir" value="${basedir}"/>
+    -->
+
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- Checks that a package-info.java file exists for each package.     -->
+    <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocPackage -->
+    <!-- disabled by sbartels - we do not want to clutter our packages with these -->
+    <!-- <module name="JavadocPackage"/> -->
+
+    <!-- Checks whether files end with a new line.                        -->
+    <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
+    <module name="NewlineAtEndOfFile"/>
+
+    <!-- Checks that property files contain the same keys.         -->
+    <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+    <module name="Translation"/>
+
+    <!-- Checks for Size Violations.                    -->
+    <!-- See http://checkstyle.sf.net/config_sizes.html -->
+    <module name="FileLength">
+        <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Checks for whitespace                               -->
+    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+    <module name="FileTabCharacter"/>
+
+    <!-- Miscellaneous other checks.                   -->
+    <!-- See http://checkstyle.sf.net/config_misc.html -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <!--Notify on Created by-Comments, created by IntelliJ-->
+    <module name="RegexpSingleline">
+        <property name="format" value="^ \* Created by \w+ on (\d|\.)+.$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Created by entry in class comment."/>
+    </module>
+
+    <!--Notify on JUnit Parameterized-Runner-->
+    <module name="RegexpSingleline">
+        <property name="format" value="^.*@RunWith\((.*\.)?Parameterized.class\).*$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="JUnit-Parameterized Runner used. Please use ErisParameterized-Runner instead."/>
+    </module>
+
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u0000-\u007f][^\u0000-\u007f\u00c0-\u00ff]"/>
+        <property name="message" value="UTF-8 error: Invalid byte sequence start." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00c0-\u00df][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid two byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00e0-\u00ef][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid three byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00e0-\u00ef][^\u0000-\u007f][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid three byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00f0-\u00f7][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid four byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00f0-\u00f7][^\u0000-\u007f][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid four byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00f0-\u00f7][^\u0000-\u007f][^\u0000-\u007f][\u0000-\u007f]"/>
+        <property name="message" value="UTF-8 error: Invalid four byte sequence." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00fb-\u00fd]"/>
+        <property name="message" value="UTF-8 error: Invalid byte (RFC 2279 not supported)." />
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="[\u00fe\u00ff]"/>
+        <property name="message" value="UTF-8 error: Invalid byte (BOM not supported)." />
+    </module>
+
+    <!--Filter SuppressionCommentFilter uses pairs of comments to suppress audit events.-->
+    <module name="SuppressionCommentFilter"/>
+
+    <!-- custom check limit all filenames to A-Z0-9._- -->
+    <!-- not available with current IntelliJ version
+    <module name="RegexpOnFilename">
+      <property name="fileNamePattern" value="^[A-Za-z0-9_.-]+$"/>
+      <property name="folderPattern" value="^[a-z0-9_.-]+$"/>
+      <property name="match" value="false"/>
+    </module>
+    -->
+
+    <!-- Checks for Headers                                -->
+    <!-- See http://checkstyle.sf.net/config_header.html   -->
+    <!-- <module name="Header"> -->
+    <!--   <property name="headerFile" value="${checkstyle.header.file}"/> -->
+    <!--   <property name="fileExtensions" value="java"/> -->
+    <!-- </module> -->
+
+    <module name="TreeWalker">
+
+        <!-- Checks for Javadoc comments.                     -->
+        <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+        <module name="JavadocStyle"/>
+
+        <!-- Checks for Naming Conventions.                  -->
+        <!-- See http://checkstyle.sf.net/config_naming.html -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <!-- Checks for imports                              -->
+        <!-- See http://checkstyle.sf.net/config_import.html -->
+        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+        <module name="RedundantImport"/>
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="false"/>
+        </module>
+
+        <!-- Checks for Size Violations.                    -->
+        <!-- See http://checkstyle.sf.net/config_sizes.html -->
+        <module name="MethodLength"/>
+        <module name="ParameterNumber"/>
+
+        <!-- Checks for whitespace                               -->
+        <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="OperatorWrap"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+
+        <!-- Modifier Checks                                    -->
+        <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- Checks for blocks. You know, those {}'s         -->
+        <!-- See http://checkstyle.sf.net/config_blocks.html -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <!-- we want to allow single line ifs -->
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
+
+        <!-- Checks for common coding problems               -->
+        <!-- See http://checkstyle.sf.net/config_coding.html -->
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="HiddenField">
+            <property name="ignoreSetter" value="true"/>
+            <property name="setterCanReturnItsClass" value="true"/>
+            <property name="ignoreConstructorParameter" value="true"/>
+        </module>
+        <module name="IllegalInstantiation"/>
+        <module name="InnerAssignment"/>
+        <!-- under discussion -->
+        <!--<module name="MagicNumber">-->
+            <!--<property name="ignoreNumbers" value="-1, 0, 0.5, 1, 2"/>-->
+            <!--<property name="ignoreHashCodeMethod" value="true"/>-->
+            <!--<property name="ignoreAnnotation" value="true"/>-->
+            <!--<property name="ignoreFieldDeclaration" value="true"/>-->
+            <!--<property name="tokens" value="NUM_DOUBLE, NUM_FLOAT"/>-->
+            <!--<property name="severity" value="info"/>-->
+        <!--</module>-->
+        <module name="MissingSwitchDefault"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="EqualsAvoidNull">
+            <property name="severity" value="warning"/>
+        </module>
+        <module name="OneStatementPerLine"/>
+        <module name="StringLiteralEquality"/>
+
+        <!-- Checks for class design                         -->
+        <!-- See http://checkstyle.sf.net/config_design.html -->
+        <module name="FinalClass"/>
+        <module name="OneTopLevelClass">
+            <property name="severity" value="warning"/>
+        </module>
+        <module name="InterfaceIsType"/>
+        <module name="VisibilityModifier"/>
+
+        <!-- Miscellaneous other checks.                   -->
+        <!-- See http://checkstyle.sf.net/config_misc.html -->
+        <module name="ArrayTypeStyle"/>
+        <module name="TodoComment"/>
+        <module name="UpperEll"/>
+        <module name="OuterTypeFilename"/>
+
+        <module name="Indentation"/>
+        <!-- Holds the current file contents for global access when configured as a TreeWalker sub-module.
+            For example, a filter can access the current file contents through this module. -->
+        <!-- used by the SuppressionCommentFilter module -->
+        <module name="FileContentsHolder"/>
+    </module>
+
+</module>
