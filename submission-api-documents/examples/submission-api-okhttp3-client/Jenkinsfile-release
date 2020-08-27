@@ -1,0 +1,37 @@
+#!/usr/bin/env groovy
+@Library('interhyp-jenkins') _
+
+def serviceName = 'submissionapi'
+
+properties([
+        parameters([
+                choice(name: 'releaseScope', choices: ["minor", "major", "patch"].join('\n'), description: 'The release scope [default: minor]'),
+        ]),
+        [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: true],
+        disableConcurrentBuilds(),
+])
+
+def releaseVersion
+
+performOnNode('services') {
+    callSafely {
+        timeout(time: 10, unit: 'MINUTES') {
+            stage('init') {
+                serviceStages.checkoutAndCleanup(scm)
+                sh 'git checkout master'
+                sh 'git pull'
+                releaseVersion = sh(returnStdout: true, script: './gradlew properties -Prelease.stage=final -Prelease.scope=' + params.releaseScope + ' | grep ^version | awk \'{printf $2}\'')
+                currentBuild.displayName = "$releaseVersion"
+            }
+            stage('release') {
+                heading("Releasing version $releaseVersion")
+                sh gradleCmd('final -Prelease.scope=' + params.releaseScope)
+            }
+        }
+    }
+    if (currentBuild.result != 'SUCCESS') {
+        emailext recipientProviders: [requestor()], subject: "$serviceName release failed",
+                body: "The release of the $serviceName service has failed: ${env.BUILD_URL}.\n\nPlease check the log files!",
+                attachLog: true
+    }
+}
