@@ -1,0 +1,930 @@
+openapi: 3.0.2
+info:
+  title: Interhyp Submission API
+  version: 2.0.0
+  contact:
+    name: Interhyp AG (Team Provider Excellence)
+    email: support_submission_api@interhyp.de
+  license:
+    name: Interhyp AG
+  description: |-
+    ### This document describes the RESTful API and resources provided by Interhyp AG.<p> The RESTful API provides access to resources associated to submission process via *URI* paths, a client application will make an HTTP request using standard HTTP methods like *GET, PUT, POST and DELETE* and parse the response in *JSON* format.<p>
+    ### API Audience<p> The API is intended to be consumed by clients who want to integrate Interhyp submission process in their own workflow.
+    + **Bank Partners**
+    ### API design Principles <p> During API design a set of principles were taken into consideration.
+    + **API First**
+    + **Mobile First**
+    ### API client <p> As an API client you should adhere to the following robustness principle
+    + **Tolerant Reader** Be tolerant with unknown fields in the payload. This is required to avoid new API versions if new fields were added, i.e. ignore new fields but do not eliminate them from payload if needed for subsequent *PUT* requests
+    + Be prepared to handle HTTP status codes not explicitly specified in endpoint definitions.
+servers:
+- url: https://api-test.interhyp.de/submission
+  description: Test-Staging
+- url: https://api.interhyp.de/submission
+  description: Production
+tags:
+- name: submissions
+  description: access to submissions
+- name: documents
+  description: access to submission documents
+- name: document-categories
+  description: access to document categories associated to submission process
+- name: protocol
+  description: access to submission protocol
+paths:
+  /v2/submissions/{submissionId}/documents/metadata:
+    get:
+      tags:
+      - documents
+      summary: Delievers all submission relevant documents metadata
+      operationId: getDocumentsMetadata
+      description: Retrieve all submission relevant documents in the requested format.
+        <p>
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/embed'
+      responses:
+        '200':
+          description: Submission documents matching provided criteria in the requested
+            format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Documents'
+        '202':
+          description: Documents metadata are being prepared, try again later, please
+            refer to Retry-After Header
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: metadata is expected to be ready after the specified amout
+                of seconds
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/documents/binaries:
+    get:
+      tags:
+      - documents
+      summary: Delievers all submission relevant documents as binary format.
+      operationId: getDocumentsBinary
+      description: 'Retrieve all submission relevant documents in the requested format.
+        <p /> *PossibleTypes* are `PDF` and `ZIP`<p /> Note: retries following a 202
+        *must* provide the If-Match header.'
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+          format: etag
+        required: false
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/document-category-name-filter'
+      responses:
+        '200':
+          description: Submission documents matching provided criteria in the requested
+            format
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Binary'
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/Binary'
+        '202':
+          description: Payload is being prepared, try again later
+          headers:
+            ETag:
+              schema:
+                type: string
+                format: etag
+              description: unique ID of payload creation request; use as If-Match
+                in subsequent calls to retrieve payload
+            Retry-After:
+              schema:
+                type: integer
+              description: payload is expected to be ready after the specified amout
+                of seconds
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/documents/{documentId}/binaries:
+    get:
+      tags:
+      - documents
+      summary: Delievers specific submission document in `pdf` format
+      operationId: getDocumentBinary
+      description: 'Retrieve specific submission document based on an identifier in
+        `pdf` format<p /> Note: retries following a 202 *must* provide the If-Match
+        header.'
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+          format: etag
+        required: false
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/document-id'
+      responses:
+        '200':
+          description: Requested submission document is returned
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Binary'
+        '202':
+          description: Payload is being prepared, try again later
+          headers:
+            ETag:
+              schema:
+                type: string
+                format: etag
+              description: unique ID of payload creation request; use as If-Match
+                in subsequent calls to retrieve payload
+            Retry-After:
+              schema:
+                type: integer
+              description: payload is expected to be ready after the specified amout
+                of seconds
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '409':
+          description: Error indicates the document has a stale state. Maybe the document
+            was modified or deleted. Please refresh the documents metadata of the
+            submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conflict'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/documents/categories:
+    get:
+      tags:
+      - document-categories
+      summary: Delievers document categories
+      operationId: getDocumentCategories
+      description: Retrieve information about possible document categories associated
+        with submission process.
+      parameters:
+      - $ref: '#/components/parameters/document-category-name-filter'
+      responses:
+        '200':
+          description: Document categories associated with submission process are
+            returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentCategoriesDefinition'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/protocol:
+    get:
+      summary: Delivers all submissions protocol for a provider
+      description: Delivers a collection of submission protocol for a specific provider
+        filtered by the date of protocol.<p> *By Default*, we will return the first
+        *20* matching records. However, this is not a hard limitation! a parameter
+        called `limit` can be used to tell the API how many records you want to return
+        all at once *(max 40)*.<p> To get further matching records, a parameter called
+        `after` or `before` can be used to tell the API the start of each page using
+        specified cursor.<p> To navigate through the query result, a reference to
+        the following navigations are included in the response *(next, prev, first,
+        last, self)*.
+      operationId: getSubmissionsProtocol
+      tags:
+      - protocol
+      parameters:
+      - $ref: '#/components/parameters/since'
+      - $ref: '#/components/parameters/until'
+      - $ref: '#/components/parameters/protocol-type-filter'
+      - $ref: '#/components/parameters/sbms-protocol-limit'
+      - $ref: '#/components/parameters/cursor-after'
+      - $ref: '#/components/parameters/cursor-before'
+      - $ref: '#/components/parameters/embed'
+      responses:
+        '200':
+          description: A paged array of submissions protocol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionProtocol'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/protocol:
+    get:
+      summary: Get protocol for a specific submission
+      description: Delivers detailed information about protocol associated with a
+        specific submission. By default the result will be sorted based on createdAt
+        ascending.
+      operationId: getProtocolBySubmissionId
+      tags:
+      - protocol
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/protocol-type-filter'
+      - $ref: '#/components/parameters/sbms-protocol-sort'
+      responses:
+        '200':
+          description: Submission protocol are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Protocol'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/handover-reports:
+    get:
+      summary: Get handover reports
+      description: Delivers the handover reports for a specific submission
+      operationId: getHandoverReports
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Requested handover reports are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HandoverReports'
+        '202':
+          description: Payload is being prepared, try again later
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: payload is expected to be ready after the specified amout
+                of seconds
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+  /v2/submissions/{submissionId}/handover-reports/{handoverReportName}:
+    get:
+      summary: Get a specific handover report
+      description: Delivers detailed information about a specific handover report.
+      operationId: getHandoverReportByName
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/handover-report-name'
+      responses:
+        '200':
+          description: Requested handover report is returned
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/HandoverReport'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+security:
+- BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    HandoverReport:
+      type: string
+      format: binary
+    UnexpectedError:
+      required:
+      - status
+      - message
+      - timestamp
+      - path
+      - traceId
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        path:
+          type: string
+        traceId:
+          type: string
+        errorCode:
+          type: integer
+          format: int32
+    DocumentCategoriesDefinition:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentCategoryDefinition'
+    DocumentCategoryDefinition:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        title:
+          type: string
+          example: Konto-/Depotauszug Eigenkapital
+        description:
+          type: string
+          example: Nachweis des vorhandenen Eigenkapitals - z.B. Bankguthaben, Bausparguthaben,
+            Wertpapiere - durch Konto- und Depotauszüge.
+    DocumentCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          example: KONTOAUSZUG
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentCategoryTag'
+    DocumentCategoryTag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: MIETAUSGANG
+    Protocol:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolItem'
+    ProtocolItem:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ProtocolItemType'
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        author:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          DOCUMENT: '#/components/schemas/SubmissionDocumentUpdate'
+          DATA: '#/components/schemas/SubmissionDataUpdate'
+          STATUS: '#/components/schemas/SubmissionStatusUpdate'
+          NEW_SUBMISSION: '#/components/schemas/NewSubmission'
+    ProtocolItemType:
+      type: string
+      description: open ended enum contains possible protocol item types, possible
+        values are (DOCUMENT, DATA, STATUS, NEW_SUBMISSION)
+      example: DOCUMENT
+      x-extensible-enum:
+      - DOCUMENT
+      - DATA
+      - STATUS
+      - NEW_SUBMISSION
+    SubmissionDocumentUpdate:
+      type: object
+      description: Holds submission document related updates which may require action
+        to be taken
+      allOf:
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          action:
+            type: string
+            description: open ended enum contains possible actions, possible values
+              are (ADDED, REMOVED, CHANGED)
+            example: ADDED
+            x-extensible-enum:
+            - ADDED
+            - REMOVED
+            - CHANGED
+          document:
+            $ref: '#/components/schemas/ResourceRef'
+    ResourceRef:
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          description: Link to retrieve a specific resource
+          example: http://some-domain/some/link/to/somewhere
+    SubmissionDataUpdate:
+      type: object
+      description: Holds submission data related state transitions and updates
+      allOf:
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          field:
+            type: string
+          change:
+            $ref: '#/components/schemas/StateTransitionValue'
+          reason:
+            type: string
+          remark:
+            type: string
+    StateTransitionValue:
+      type: object
+      properties:
+        old:
+          type: string
+        new:
+          type: string
+    SubmissionStatusUpdate:
+      type: object
+      description: Holds submission status related updates which require actions to
+        be taken, or show state transition
+      allOf:
+      - $ref: '#/components/schemas/SubmissionDataUpdate'
+    NewSubmission:
+      type: object
+      description: Holds information when the new submission was created
+      allOf:
+      - $ref: '#/components/schemas/ProtocolItem'
+      - properties:
+          documents:
+            $ref: '#/components/schemas/SubmissionRef'
+    SubmissionRef:
+      type: object
+      description: Holds submission status related updates which require actions to
+        be taken, or show state transition
+      allOf:
+      - $ref: '#/components/schemas/ResourceRef'
+      - properties:
+          id:
+            type: string
+            description: Submission id
+    NotFound:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    ClientError:
+      type: object
+      required:
+      - rootCause
+      allOf:
+      - $ref: '#/components/schemas/UnexpectedError'
+      - properties:
+          message:
+            type: string
+          exception:
+            type: string
+    Unauthorized:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    Binary:
+      type: string
+      format: binary
+    Conflict:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    BadRequest:
+      allOf:
+      - $ref: '#/components/schemas/ClientError'
+    SubmissionProtocol:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionProtocolItem'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SubmissionProtocolItem:
+      type: object
+      properties:
+        submission:
+          $ref: '#/components/schemas/SubmissionProtocolRefItem'
+        protocol:
+          $ref: '#/components/schemas/SubmissionProtocolRef'
+    SubmissionProtocolRefItem:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/SubmissionRef'
+      - properties:
+          legacyId:
+            description: Legacy submission id
+            type: string
+    SubmissionProtocolRef:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ResourceRef'
+      - properties:
+          embedded:
+            $ref: '#/components/schemas/EmbeddedSubmissionProtocol'
+    EmbeddedSubmissionProtocol:
+      type: object
+      properties:
+        protocol:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProtocolItem'
+    Paging:
+      properties:
+        cursor:
+          $ref: '#/components/schemas/Cursor'
+        previous:
+          type: string
+          format: uri
+        next:
+          type: string
+          format: uri
+        first:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+        self:
+          type: string
+          format: uri
+    Cursor:
+      properties:
+        before:
+          type: string
+        after:
+          type: string
+    HandoverReports:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HandoverReportItem'
+    HandoverReportItem:
+      type: object
+      required:
+      - name
+      - description
+      - createdAt
+      - content
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        content:
+          $ref: '#/components/schemas/ResourceRef'
+    Documents:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentItem'
+    DocumentItem:
+      type: object
+      required:
+      - id
+      - content
+      - category
+      properties:
+        id:
+          type: string
+        content:
+          $ref: '#/components/schemas/ResourceRef'
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        reference:
+          type: string
+          description: holds information about who/what this document category references
+          example: Mustermann, Max
+        validity:
+          $ref: '#/components/schemas/DocumentValidity'
+    DocumentValidity:
+      type: object
+      required:
+      - value
+      - resolution
+      properties:
+        resolution:
+          type: string
+          description: open ended enum contains type of resolutions, possible values
+            are (MONTH, YEAR)
+          example: MONTH
+          x-extensible-enum:
+          - MONTH
+          - YEAR
+      discriminator:
+        propertyName: resolution
+        mapping:
+          MONTH: '#/components/schemas/MonthlyResolution'
+          YEAR: '#/components/schemas/YearlyResolution'
+    MonthlyResolution:
+      type: object
+      description: Resolution based on monthly basis
+      allOf:
+      - $ref: '#/components/schemas/DocumentValidity'
+      - properties:
+          value:
+            type: string
+            format: date-month
+            example: 12
+            description: date-month format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
+    YearlyResolution:
+      type: object
+      description: Resolution based on yearly basis
+      allOf:
+      - $ref: '#/components/schemas/DocumentValidity'
+      - properties:
+          value:
+            type: string
+            format: date-fullyear
+            example: 2019
+            description: date-fullyear format following [ISO8601](https://tools.ietf.org/html/rfc3339#section-5.6)
+  parameters:
+    until:
+      name: until
+      in: query
+      description: A UTC date-time value that points to the end of the range of time-based
+        data. <br> If not provided, current date-time is used. Defined by date-time
+        - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: 2019-12-29T10:22:50Z
+    cursor-after:
+      name: after
+      in: query
+      description: Cursor that points to the end of the page of data that has been
+        returned.
+      required: false
+      schema:
+        type: string
+    cursor-before:
+      name: before
+      in: query
+      description: Cursor that points to the start of the page of data that has been
+        returned.
+      required: false
+      schema:
+        type: string
+    embed:
+      name: embed
+      in: query
+      style: form
+      required: false
+      schema:
+        type: boolean
+      description: Flag to expand or embed sub-resources in the response resource.<br>
+        By default is set to `FALSE` where only a **ref** to the sub-resources will
+        be returned.<br> By set it to `TRUE` the sub-resources content will be embedded
+        in the response which might affect the payload size
+    document-category-name-filter:
+      name: categoryName
+      in: query
+      required: false
+      schema:
+        type: string
+      description: query parameter to filter the selected documents based on the provided
+        category.
+    document-id:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested submission document.
+    sbms-protocol-limit:
+      name: limit
+      in: query
+      description: Specifies how many items to return at one time (max 40). <br> A
+        query may return fewer than the value of limit due to filtering.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 40
+        default: 20
+    handover-report-name:
+      name: handoverReportName
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Name for the requested handover report.
+    submission-id:
+      name: submissionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested submission.
+    since:
+      name: since
+      in: query
+      description: A UTC date-time value that points to the start of the range of
+        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: 2019-12-29T10:22:50Z
+    protocol-type-filter:
+      name: protocolType
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - document
+        - data
+        - status
+        - new_submission
+      description: query parameter to restrict submissions associated to the provided
+        protocol type.
+    sbms-protocol-sort:
+      name: sort
+      in: query
+      style: form
+      required: false
+      description: Comma-separated list of fields to define the sort order.<br> To
+        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
+        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
+        applies only within a single result page when multiple pages are returned.
+        <br>
+      example: sort=+createdAt
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - +createdAt
+          - -createdAt
