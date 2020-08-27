@@ -1,4 +1,4 @@
-# Submission Management Service Playbook
+# Submission Management System Playbook
 ## Abstract
 This document provides needed information that enables the integration with RESTful API and resources provided by Interhyp AG.<p>
 The RESTful API provides access to resources associated to submission process via *URI* paths, a client application will make an HTTP request using standard HTTP methods like *GET, PUT, PATCH, POST and DELETE* and parse the response in *JSON* format.<p>
