@@ -1,0 +1,45 @@
+#!/usr/bin/env groovy
+@Library('interhyp-jenkins') _
+
+def isMaster = env.BRANCH_NAME == "master"
+
+// ------------ constants
+def serviceName = 'SubmissionApi'
+
+def buildProperties = [disableConcurrentBuilds(), buildDiscarder(logRotator(numToKeepStr: '30'))]
+def buildParameters = []
+
+if (isMaster) {
+    buildProperties << pipelineTriggers([cron('H H(4-5) * * *')])
+    // nightly build every day at some time between 4:00 and 5:59
+}
+
+buildParameters << booleanParam(name: 'DO_DELETE', defaultValue: true, description: 'Delete workspace directory in Jenkins.')
+
+buildProperties << parameters(buildParameters)
+properties(buildProperties)
+
+performOnNode('services', params.DO_DELETE) {
+    serviceStages.notifyBitbucket()
+    callSafely {
+        timeout(time: 30, unit: 'MINUTES') {
+            stage('init') {
+                heading("init stage")
+                serviceStages.checkoutAndCleanup(scm)
+            }
+            stage('open-api-generate') {
+                heading("Open API server stubs generate stage")
+                sh gradleCmd("openApiGenerate")
+            }
+            if (isMaster) {
+                stage('publish jars') {
+                    serviceStages.publish()
+                }
+            }
+        }
+    }
+    serviceStages.notifyBitbucket()
+    if (isMaster && currentBuild.result == 'FAILURE') {
+        sendBuildFailEmail(serviceName, projectProperties.getProjectPropertyValueFromFile('contactEmail', 'gradle.properties'))
+    }
+}
