@@ -1,0 +1,10 @@
+# Postman
+## Summary
+To test the data Endpoints of the Submission Api you can either download and import the Postman collection from the postman-collection
+subfolder.
+To fetch data you are required to authorize your self by adding your Login-Credentials in the Postman Environment.
+A more in depth documentation regarding the authorization process can be found [here](../docs/partners_authentication.pdf).
+
+You can also use the following link to directly import the Postman collection.
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f7acad57bee23bc5840c#?env%5BSubmission%20Management%20Api%20Test%5D=W3sia2V5IjoiQXBpVXJsIiwidmFsdWUiOiJodHRwczovL2FwaS10ZXN0LmludGVyaHlwLmRlL3N1Ym1pc3Npb24iLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6IkF1dGhvcml6YXRpb25VcmwiLCJ2YWx1ZSI6Imh0dHBzOi8vYXBpLXRlc3QuaW50ZXJoeXAuZGUiLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6ImJlYXJlclRva2VuIiwidmFsdWUiOiIiLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6InNpZ25lZC1qd3QiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoidXNlcm5hbWUiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoicGFzc3dvcmQiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoiZmluYW5jaW5nLWFwcGxpY2F0aW9uLWlkIiwidmFsdWUiOiIiLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6InN1Ym1pc3Npb24taWQiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoiY29tbWFuZElkIiwidmFsdWUiOiIiLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6ImhhbmRvdmVyUmVwb3J0TmFtZSIsInZhbHVlIjoiIiwiZW5hYmxlZCI6dHJ1ZX1d)

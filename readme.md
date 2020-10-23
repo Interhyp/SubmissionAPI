@@ -148,3 +148,7 @@ in order not to block the client for the whole processing time and return an app
 ##### Response Headers
 - ETag 
 - Retry-After
+
+## Postman
+The different parts of the Submission API can be tested using the Postman collections in the according subfolders.
+For further information, please refer to the documentation there.
