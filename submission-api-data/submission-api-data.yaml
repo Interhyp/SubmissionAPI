@@ -5,6 +5,7 @@ info:
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
+    url: https://www.interhyp.de
   license:
     name: Interhyp AG
   description: |-
@@ -139,6 +140,55 @@ tags:
 - name: commands
   description: provides endpoints for command resources
 paths:
+  /v2/submissions/{submissionId}/calculations/{calculationType}:
+    get:
+      summary: Get calculation data
+      description: |-
+        Delivers calculation basics for specified calculation type.
+        Calculation type options:
+          - CONDITION (Konditionskalkulation)
+
+          - HOUSEHOLD (HH-Rechnung)
+
+          - LENDING_VALUE (Beleihungswert)
+      operationId: getSubmissionCalculationByType
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/calculation-type'
+      responses:
+        '200':
+          description: Requested calculation data is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/commands/{commandId}:
     get:
       summary: Get an existing command
@@ -1139,99 +1189,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/advisors:
-    get:
-      summary: Get consultation advisors
-      description: |-
-        Delivers detailed information about the consultation advisors associated with this submission.
-
-        This endpoint utilizes *Expansion* feature, where *by default* only basic information shall be returned. In order to access more full details, two options are available
-
-          - follow provided links in order to navigate to submission sub-resources (i.e /v2/submissions/{submissionId}/overview)
-
-          - initiate the call with request parameter `embed` set to *TRUE* (i.e /v2/submissions/{submissionId}?embed=true)
-
-        Please refer to *Expansion* section for more details.
-      operationId: getFinancingApplicationAdvisors
-      tags:
-      - financing-application
-      parameters:
-      - $ref: '#/components/parameters/financing-application-id'
-      - $ref: '#/components/parameters/embed'
-      responses:
-        '200':
-          description: Requested financing advisors associated with this financing
-            application are returned.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Advisors'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/advisors/{advisorId}:
-    get:
-      summary: Get a specific mortgage advisor
-      description: Delivers detailed information for a financing advisor by his id.
-      operationId: getFinancingApplicationAdvisorById
-      tags:
-      - financing-application
-      parameters:
-      - $ref: '#/components/parameters/financing-application-id'
-      - $ref: '#/components/parameters/advisor-id'
-      responses:
-        '200':
-          description: Requested advisor is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Advisor'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested advisor resource was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
   /v2/financing-applications/{financingApplicationId}/informers:
     get:
       summary: Get consultation informers
@@ -1671,7 +1628,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/creditLoans/{creditLoanId}:
+  /v2/submissions/{submissionId}/credit-loans/{creditLoanId}:
     get:
       summary: Get a specific credit loan
       description: |-
@@ -1830,6 +1787,17 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    CountryCode:
+      type: object
+      description: |
+        DE: Ländercode nach ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). <br/> EN: Official ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code.
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          example: DE
+          pattern: ^[A-Z]{2}$
     OtherCapitalFinancing:
       description: |
         DE: Finanzierungsrelevante Information zur Kapitalbeschaffung. <br/>
@@ -1840,13 +1808,23 @@ components:
       allOf:
       - $ref: '#/components/schemas/OwnEstateFinancingNeed'
       - properties:
+          reason:
+            type: string
+            default: OTHER_CAPITAL
           neededLoan:
             $ref: '#/components/schemas/OtherCapitalNeededLoan'
     OwnEstateFinancingNeed:
       type: object
+      required:
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingNeed'
       - properties:
+          type:
+            type: string
+            default: OWN
+          reason:
+            type: string
           renovationCosts:
             description: |
               DE: Werterhaltende Maßnahmen <br/> EN: Value-conserving actions
@@ -1861,11 +1839,26 @@ components:
             items:
               allOf:
               - $ref: '#/components/schemas/ExistingMortgageRef'
+      discriminator:
+        propertyName: reason
+        mapping:
+          DEBT_RESCHEDULING: '#/components/schemas/DebtReschedulingFinancing'
+          OTHER_CAPITAL: '#/components/schemas/OtherCapitalFinancing'
+          RENOVATE: '#/components/schemas/RenovateEstateFinancing'
     FinancingNeed:
       type: object
+      required:
+      - type
       properties:
         additionalCosts:
           $ref: '#/components/schemas/EstateAdditionalCosts'
+        type:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          OWN: '#/components/schemas/OwnEstateFinancingNeed'
+          FOREIGN: '#/components/schemas/ForeignEstateFinancingNeed'
     EstateAdditionalCosts:
       type: object
       properties:
@@ -1875,6 +1868,171 @@ components:
           $ref: '#/components/schemas/EuroAmount'
         description:
           type: string
+    ForeignEstateFinancingNeed:
+      type: object
+      required:
+      - reason
+      allOf:
+      - $ref: '#/components/schemas/FinancingNeed'
+      - properties:
+          type:
+            type: string
+            default: FOREIGN
+          reason:
+            type: string
+          estateAcquisitionCosts:
+            $ref: '#/components/schemas/EstateAcquisitionCosts'
+      discriminator:
+        propertyName: reason
+        mapping:
+          BUILD: '#/components/schemas/BuildEstateFinancing'
+          BUY_EXISTING: '#/components/schemas/BuyExistingEstateFinancing'
+          BUY_NEW: '#/components/schemas/BuyNewEstateFinancing'
+    EstateAcquisitionCosts:
+      type: object
+      description: |
+        DE: Kosten für den Erwerb der Immobilie. <br/> EN: Estate costs when purchasing a property.
+      properties:
+        brokerage:
+          description: |
+            DE: Maklercourtage. <br/>
+            EN: Broker costs.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        costsNotary:
+          description: |
+            DE: Notar-/ Grundbuchkosten <br/>
+            EN: Notary costs.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        purchaseTax:
+          description: |
+            DE: Grunderwerbsteuer. <br/>
+            EN: Purchase tax.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+    BuildEstateFinancing:
+      description: |
+        DE: Finanzierungsrelevante Information zu dem Bau der Immobilie. <br/>
+        EN: Financing-relevant information for the construction of the property.
+      type: object
+      required:
+      - buildCosts
+      allOf:
+      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
+      - properties:
+          reason:
+            type: string
+            default: BUILD
+          buildCosts:
+            $ref: '#/components/schemas/EstateBuildingCosts'
+          completionDate:
+            description: |
+              DE: Geplante Fertigstellung. <br/>
+              EN: Planed completion date.
+            allOf:
+            - $ref: '#/components/schemas/ISODate'
+    EstateBuildingCosts:
+      description: |
+        DE: Sammlung aller Kosten, die für den Bau der Immobilie relevant sind. <br/>
+        EN: All costs associated with construction of the property.
+      type: object
+      required:
+      - construction
+      properties:
+        landPrice:
+          description: |
+            DE: Grundstückpreis. <br/>
+            EN: Land price.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        construction:
+          description: |
+            DE: Baukosten. <br/>
+            EN: Construction costs.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        additional:
+          description: |
+            DE: Zusätzliche Kosten. <br/>
+            EN: Additional costs.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        outside:
+          description: |
+            DE: Kosten der Außenanlagen. <br/>
+            EN: Cost of the outdoor facilities.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+    ISODate:
+      description: |
+        DE: Datum, Syntax nach <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a><br/> EN: Date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a>
+      type: string
+      format: date
+      example: 2019-12-29T00:00:00Z
+    BuyExistingEstateFinancing:
+      description: |
+        DE: Finanzierungsrelevante Information zu dem Kauf bestehender Neubauimmobilie. <br/>
+        EN: Financing-relevant information for the purchase of an existing property.
+      type: object
+      required:
+      - purchasePrice
+      allOf:
+      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
+      - properties:
+          reason:
+            type: string
+            default: BUY_EXISTING
+          renovationCosts:
+            description: |
+              DE: Summe der durchgeführten wertsteigernden Maßnahmen bei der Renovierung. <br/> EN: Sum of completed value-enhancing refurbishments.
+            allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+          plannedModernisations:
+            $ref: '#/components/schemas/PlannedModernisations'
+          purchasePrice:
+            description: |
+              DE: Kaufpreis der Immobilie. <br/>
+              EN: Purchase price of the property.
+            allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+          priceDue:
+            description: |
+              DE: Fälligkeit des Kaufpreises. <br/>
+              EN: Due date of the purchase price.
+            allOf:
+            - $ref: '#/components/schemas/ISODate'
+    BuyNewEstateFinancing:
+      type: object
+      description: |
+        DE: Finanzierungsrelevante Information zum Kauf der Neubauimmobilie. <br/>
+        EN: Financing-relevant information for the purchase of a newly built property.
+      required:
+      - purchasePrice
+      allOf:
+      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
+      - properties:
+          reason:
+            type: string
+            default: BUY_NEW
+          optionalEquipment:
+            description: |
+              DE: Kosten für Sonderausstattungen. <br/>
+              EN: Special / optional equipment costs.
+            allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+          purchasePrice:
+            description: |
+              DE: Kaufpreis des Objekts. <br/>
+              EN: Purchase price.
+            allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+          priceDue:
+            description: |
+              DE: Fälligkeit des Kaufpreises. <br/>
+              EN: Due date of the purchase price.
+            allOf:
+            - $ref: '#/components/schemas/ISODate'
     EuroAmount:
       type: object
       required:
@@ -1943,6 +2101,64 @@ components:
           $ref: '#/components/schemas/ResourceRef'
         id:
           $ref: '#/components/schemas/DebtId'
+    DebtReschedulingFinancing:
+      description: |
+        DE: Finanzierungsrelevante Information zur Anschlussfinanzierung / Umschuldung. <br/>
+        EN: Financing-relevant information for the follow-up financing / rescheduling.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OwnEstateFinancingNeed'
+      - properties:
+          reason:
+            type: string
+            default: DEBT_RESCHEDULING
+          additionalLoan:
+            $ref: '#/components/schemas/EstateAdditionalLoan'
+    EstateAdditionalLoan:
+      description: |
+        DE: Information über ein bestehendes Darlehen (Hypothek). <br/>
+        EN: Information about the already existing mortgage.
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          description: |
+            DE: Darlehenssumme. <br/>
+            EN: Loan amount.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        description:
+          type: string
+        usage:
+          $ref: '#/components/schemas/EstateAdditionalLoanUsage'
+    EstateAdditionalLoanUsage:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/EstateAdditionalLoanUsageKey'
+    EstateAdditionalLoanUsageKey:
+      type: string
+      description: |
+        DE: Zusätzliche Verwendung der Hypothek (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER. <br/> EN: Open ended enum contains possible estate additional loan usages, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER.
+      example: OPERATIONAL_COSTS
+      x-extensible-enum:
+      - OPERATIONAL_COSTS
+      - REPAY_ANOTHER_LOAN
+      - PREPAYMENT_PENALTYC
+      - CONSTRUCTION
+      - RENOVATION
+      - OTHER
+    RenovateEstateFinancing:
+      description: |
+        DE: Finanzierungsrelevante Information zum Umbau / Modernisierung. <br/>
+        EN: Financing-relevant information for the refurbishment / modernisation.
+      allOf:
+      - $ref: '#/components/schemas/OwnEstateFinancingNeed'
+      properties:
+        reason:
+          type: string
+          default: RENOVATE
     OtherCapitalNeededLoan:
       description: |
         DE: Details über das Darlehen, welches zur Kapitalbeschaffung benötigt wird. <br/>
@@ -1958,25 +2174,98 @@ components:
           allOf:
           - $ref: '#/components/schemas/EuroAmount'
         usage:
+          $ref: '#/components/schemas/OtherCapitalNeededLoanUsage'
+    OtherCapitalNeededLoanUsage:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/OtherCapitalNeededLoanUsageKey'
+    OtherCapitalNeededLoanUsageKey:
+      type: string
+      description: |
+        DE: Zusätzlicher Kapitalbedarf (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING. <br/>
+        EN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.
+      example: OPERATIONAL_COSTS
+      x-extensible-enum:
+      - OPERATIONAL_COSTS
+      - REPAY_ANOTHER_LOAN
+      - PREPAYMENT_PENALTY
+      - RESIDENTIAL_USE
+      - RENEWABLE_ENERGY
+      - DISBURSMENT_COOWNERS
+      - DISBURSMENT_HEIRS
+      - OTHER
+      - RECONSTRUCTION
+      - BUY
+      - CONSTRUCTION
+      - BUY_CONSTRUCTION
+      - SUPPLEMENTARY_FINANCING
+    Households:
+      type: object
+      description: |
+        A wrapper Type to hold a set of households associated with the financing application.
+      properties:
+        _href:
+          $ref: '#/components/schemas/ResourceRef'
+        embedded:
+          $ref: '#/components/schemas/HouseholdsQuery'
+    ResourceRef:
+      required:
+      - href
+      properties:
+        href:
           type: string
           description: |
-            DE: Zusätzlicher Kapitalbedarf (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING. <br/>
-            EN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.
-          example: OPERATIONAL_COSTS
-          x-extensible-enum:
-          - OPERATIONAL_COSTS
-          - REPAY_ANOTHER_LOAN
-          - PREPAYMENT_PENALTY
-          - RESIDENTIAL_USE
-          - RENEWABLE_ENERGY
-          - DISBURSMENT_COOWNERS
-          - DISBURSMENT_HEIRS
-          - OTHER
-          - RECONSTRUCTION
-          - BUY
-          - CONSTRUCTION
-          - BUY_CONSTRUCTION
-          - SUPPLEMENTARY_FINANCING
+            DE: Link zu einer spezifischen Ressource. <br/> EN: Link to retrieve a specific resource.
+          example: http://some-domain/some/link/to/somewhere
+    HouseholdsQuery:
+      type: object
+      description: |
+        A wrapper Type to hold a set of households associated with the financing application.
+      properties:
+        data:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Household'
+    Household:
+      type: object
+      description: |
+        DE: Informationen zum Haushalt. <br/> EN: Information regarding a Household and it's inhabitants.
+      required:
+      - applicants
+      properties:
+        applicants:
+          type: array
+          description: |
+            DE: Sammlung von Referenzen zu den Einwohnern die zu diesem Haushalt gehören. <br/>
+            EN: Reference to the applicants involved in this household.
+          items:
+            $ref: '#/components/schemas/ApplicantIdRef'
+        carsHousehold:
+          type: integer
+          format: int32
+          description: |
+            DE: Anzahl PKWs im Haushalt. <br/> EN: Number of cars in household.
+        numberOfChildren:
+          type: integer
+          format: int32
+          description: |
+            DE: Anzahl unterhaltsberechtigter Kinder im Haushalt. <br/> EN: Number of children in household.
+        personsHousehold:
+          type: integer
+          format: int32
+          description: |
+            DE: Anzahl im Haushalt lebender Personen. <br/> EN: Number of persons in the same household.
+    ApplicantIdRef:
+      type: object
+      description: |
+        DE: Id und Referenz des Antragstellers. <br/> EN: Id and reference of the applicant.
+      properties:
+        _href:
+          $ref: '#/components/schemas/ResourceRef'
+        applicantId:
+          $ref: '#/components/schemas/ApplicantId'
     RateDetails:
       type: object
       required:
@@ -2057,6 +2346,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/PeriodicalEuroAmount'
     PaymentTime:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/PaymentTimeKey'
+    PaymentTimeKey:
       type: string
       description: |
         DE: Mögliche Zahlungszeit-Arten (nicht abschließende Aufzählung), z.B. ADVANCE=Vorschüssig, ARREARS=Nachschüssig. <br/> EN: Open ended enum contains possible payment time types, possible values are ADVANCE, ARREARS.
@@ -2072,6 +2366,7 @@ components:
       properties:
         value:
           type: integer
+          format: int32
         unit:
           type: string
           enum:
@@ -2142,6 +2437,11 @@ components:
           depositValue:
             $ref: '#/components/schemas/EuroAmount'
     SuspendedRepaymentProductType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/SuspendedRepaymentProductTypeKey'
+    SuspendedRepaymentProductTypeKey:
       type: string
       description: |
         DE: Art des Tilgungssurrogats (nicht abschließende Aufzählung), z.B. DT_KAP_LV, DT_KAP_RV, BRIT_KAP_LV, BRIT_KAP_RV, FONDS_LV, FONDS_RV, FONDS_SPAR, BAU_SPAR, OTHER. <br/> EN: Open ended enum contains type of repayment surrogate, possible values are DT_KAP_LV, DT_KAP_RV, BRIT_KAP_LV, BRIT_KAP_RV, FONDS_LV, FONDS_RV, FONDS_SPAR, BAU_SPAR, OTHER.
@@ -2156,15 +2456,6 @@ components:
       - FONDS_SPAR
       - BAU_SPAR
       - OTHER
-    ApplicantIdRef:
-      type: object
-      description: |
-        DE: Id und Referenz des Antragstellers. <br/> EN: Id and reference of the applicant.
-      properties:
-        _href:
-          $ref: '#/components/schemas/ResourceRef'
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
     UpcomingPayments:
       type: object
       description: |
@@ -2187,60 +2478,6 @@ components:
             EN: Duration of the repayment surrogate product.
           allOf:
           - $ref: '#/components/schemas/Duration'
-    Households:
-      type: object
-      description: |
-        A wrapper Type to hold a set of households associated with the financing application.
-      properties:
-        _href:
-          $ref: '#/components/schemas/ResourceRef'
-        embedded:
-          $ref: '#/components/schemas/HouseholdsQuery'
-    ResourceRef:
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          description: |
-            DE: Link zu einer spezifischen Ressource. <br/> EN: Link to retrieve a specific resource.
-          example: http://some-domain/some/link/to/somewhere
-    HouseholdsQuery:
-      type: array
-      description: |
-        A wrapper Type to hold a set of households associated with the financing application.
-      minItems: 1
-      items:
-        $ref: '#/components/schemas/Household'
-    Household:
-      type: object
-      description: |
-        DE: Informationen zum Haushalt. <br/> EN: Information regarding a Household and it's inhabitants.
-      required:
-      - applicants
-      properties:
-        applicants:
-          type: array
-          description: |
-            DE: Sammlung von Referenzen zu den Einwohnern die zu diesem Haushalt gehören. <br/>
-            EN: Reference to the applicants involved in this household.
-          items:
-            $ref: '#/components/schemas/ApplicantIdRef'
-        carsHousehold:
-          type: integer
-          format: int32
-          description: |
-            DE: Anzahl PKWs im Haushalt. <br/> EN: Number of cars in household.
-        numberOfChildren:
-          type: integer
-          format: int32
-          description: |
-            DE: Anzahl unterhaltsberechtigter Kinder im Haushalt. <br/> EN: Number of children in household.
-        personsHousehold:
-          type: integer
-          format: int32
-          description: |
-            DE: Anzahl im Haushalt lebender Personen. <br/> EN: Number of persons in the same household.
     Applicant:
       type: object
       description: |
@@ -2274,11 +2511,6 @@ components:
             DE: Voranschrift. <br/> EN: Previous address of the applicant.
           allOf:
           - $ref: '#/components/schemas/Address'
-        birthPlace:
-          type: string
-          example: London
-          description: |
-            DE: Geburtsort des Antragstellers. <br/> EN: The birth place of the applicant.
         nationalities:
           type: array
           description: |
@@ -2295,12 +2527,6 @@ components:
             DE: Beschreibung des ehelichen Güterstandes vom Antragsteller. <br/> EN: Matrimonial property of the applicant.
           allOf:
           - $ref: '#/components/schemas/MaritalPropertyStatus'
-        children:
-          description: |
-            DE: Alle unterhaltsberechtigte Kinder des Antragstellers. <br/> EN: All dependent childs of the applicant.
-          type: array
-          items:
-            $ref: '#/components/schemas/Child'
         creditWorthiness:
           description: |
             DE: Informationen über die Kreditwürdigkeit des Antragstellers. <br/> EN: Information regarding credit worthiness of the applicant.
@@ -2333,8 +2559,10 @@ components:
           - $ref: '#/components/schemas/ResourceRef'
     ApplicantId:
       type: object
+      required:
+      - value
       properties:
-        applicantId:
+        value:
           description: |
             DE: Id des Antragstellers. <br/> EN: Id of the applicant.
           type: string
@@ -2356,6 +2584,16 @@ components:
             DE: Geburtsdatum der Person. <br/> EN: Date of birth of the person.
           allOf:
           - $ref: '#/components/schemas/ISODate'
+        birthPlace:
+          type: string
+          example: London
+          description: |
+            DE: Geburtsort der Person. <br/> EN: The birth place of the person.
+        birthCountry:
+          description: |
+            DE: Geburtsland der Person. <br/> EN: BirthCountry of the person.
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
     Contact:
       type: object
       properties:
@@ -2371,9 +2609,6 @@ components:
     Address:
       type: object
       required:
-      - street
-      - houseNumber
-      - postalCode
       - city
       - country
       properties:
@@ -2415,24 +2650,35 @@ components:
     Nationality:
       type: object
       required:
-      - countryCode
+      - country
       - type
       properties:
-        countryCode:
-          type: string
+        country:
           description: |
-            DE: Staatsangehörigkeit des Antragstellers nach ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). <br/> EN: Official ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code of the nationality.
-          example: DE
-          pattern: ^[A-Z]{2}$
+            DE: Staatsangehörigkeit des Antragstellers. <br/> EN: Country of the nationality.
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
         type:
-          type: string
-          description: |
-            DE: Art der Staatsbürgerschaft (nicht abschließende Aufzählung, zum Beispiel FIRST = Erste Staatsbürgerschaft, SECOND = Zweite Staatsbürgerschaft). <br/> EN: Open ended enum contains values for the Nationality, possible values are (FIRST, SECOND, THIRD).
-          x-extensible-enum:
-          - FIRST
-          - SECOND
-          - THIRD
+          $ref: '#/components/schemas/NationalityType'
+    NationalityType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/NationalityTypeKey'
+    NationalityTypeKey:
+      type: string
+      description: |
+        DE: Art der Staatsbürgerschaft (nicht abschließende Aufzählung, zum Beispiel FIRST = Erste Staatsbürgerschaft, SECOND = Zweite Staatsbürgerschaft). <br/> EN: Open ended enum contains values for the Nationality, possible values are (FIRST, SECOND, THIRD).
+      x-extensible-enum:
+      - FIRST
+      - SECOND
+      - THIRD
     MaritalStatus:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/MaritalStatusKey'
+    MaritalStatusKey:
       type: string
       description: |
         DE: Familienstand des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: SINGLE = LEDIG, MARRIED = VERHEIRATET, REGISTERED_PARTNERSHIP = EINGETRAGENE LEBENSPARTNERSCHAFT, WIDOWED = VERWITWET, DIVORCED = GESCHIEDEN, SEPARATED=GETRENNT). <br/> EN: Open ended enum contains values for the marital status, possible values are SINGLE, MARRIED, REGISTERED_PARTNER, WIDOWED, DIVORCED, SEPARATED.
@@ -2444,7 +2690,13 @@ components:
       - WIDOWED
       - DIVORCED
       - SEPARATED
+      - COHABITING
     MaritalPropertyStatus:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/MaritalPropertyStatusKey'
+    MaritalPropertyStatusKey:
       type: string
       description: |
         DE: Beschreibung des ehelichen Güterstandes (nicht abschließende Aufzählung, zum Beispiel: COMMUNITY_OF_ACQUESTS_AND_GAINS = ZUGEWINNGEMEINSCHAFT, SEPARATION_OF_PROPERTY = GÜTERTRENNUNG, ABSOLUTE_COMMUNITY_PROPERTY = GÜTERGEMEINSCHAFT). <br/> EN: Open ended enum contains values for the matrimonial property, possible values are COMMUNITY_OF_ACQUESTS_AND_GAINS, SEPARATE_PROPERTY, ABSOLUTE_COMMUNITY_PROPERTY.
@@ -2453,35 +2705,10 @@ components:
       - COMMUNITY_OF_ACQUESTS_AND_GAINS
       - SEPARATE_PROPERTY
       - ABSOLUTE_COMMUNITY_PROPERTY
-    Child:
-      type: object
-      description: |
-        DE: Informationen über ein Kind des Antragstellers. <br/> EN: Information about a child of the applicant.
-      properties:
-        birthDate:
-          $ref: '#/components/schemas/ISODate'
-    ISODate:
-      description: |
-        DE: Datum, Syntax nach <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a><br/> EN: Date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a>
-      type: string
-      format: date
-      example: 2019-12-29T00:00:00Z
     CreditWorthiness:
       type: object
       description: |
         DE: Informationen über die Kreditwürdigkeit des Antragstellers (zum Beispiel Schufa Score). <br/> EN: Information regarding credit worthiness (like Schufa-Score).
-      properties:
-        negativeWorthiness:
-          type: boolean
-          description: |
-            DE: WAHR, wenn die Kreditwürdigkeit negativ ist. <br/> EN: TRUE, if there is a negative credit worthiness.
-        worthinessRating:
-          description: |
-            DE: Bewertung der Kreditwürdigkeit. <br/> EN: Rating of the credit worthiness.
-          allOf:
-          - $ref: '#/components/schemas/WorthinessRating'
-    WorthinessRating:
-      type: object
       required:
       - type
       properties:
@@ -2500,13 +2727,17 @@ components:
       description: |
         DE: Bewertung der Kreditwürdigkeit des Antragstellers durch die Schufa. <br/> EN: Rating of the credit worthiness by Schufa.
       allOf:
-      - $ref: '#/components/schemas/WorthinessRating'
+      - $ref: '#/components/schemas/CreditWorthiness'
       - properties:
           type:
             description: |
               DE: Kreditwürdigkeitsbeurteilung der Schufa. <br/> EN: Worthiness Ratings of the applicant rated by Schufa.
             type: string
             default: SCHUFA
+          hasNegativeSchufaEntry:
+            type: boolean
+            description: |
+              DE: WAHR, wenn ein negativer Schufa-Krediteintrag vorhanden ist. <br/> EN: TRUE, if there is a negative schufa entry.
           ratingStep:
             type: string
             description: |
@@ -2633,6 +2864,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/ISODate'
     BusinessLine:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/BusinessLineKey'
+    BusinessLineKey:
       type: string
       description: |
         DE: Branche der Tätigkeit (nicht abschließende Aufzählung). <br/> EN: Open ended enum contains values for the business line, possible values are AGRICULTURE, CAR_DEALER, CAR_REPAIR, CHURCH, CONSTRUCTION_INDUSTRY, COURIER_SERVICE, DATING_SERVICE, EDUCATION, ENERGY, EROTIC_INDUSTRY, FINANCES, FINANCIAL_SERVICES, FITNESS, GAS_STATION, GASTRONOMY, HANDCRAFT, HEALTH_SERVICE, HOTEL_INDUSTRY, IT_CONSULTING, KIOSK, OTHER, PRODUCTION_AND_INDUSTRY, PUBLIC_SERVICE, REAL_ESTATE, TAXI, TRANSPORT, TRAVEL_AGENCY, WHOLE_AND_RETAIL_SALE.
@@ -2658,7 +2894,6 @@ components:
       - HOTEL_INDUSTRY
       - IT_CONSULTING
       - KIOSK
-      - OTHER
       - PRODUCTION_AND_INDUSTRY
       - PUBLIC_SERVICE
       - REAL_ESTATE
@@ -2666,6 +2901,26 @@ components:
       - TRANSPORT
       - TRAVEL_AGENCY
       - WHOLE_AND_RETAIL_SALE
+      - MINING
+      - CHEMICAL_INDUSTRY
+      - DIPLOMATIC_SERVICE
+      - PRINTING_INDUSTRY
+      - FISHING_INDUSTRY
+      - WOOD_INDUSTRY
+      - IRON_INDUSTRY
+      - CAR_MANUFACTURER
+      - MILITARY
+      - FOOD_INDUSTRY
+      - NON_PROFIT_ORGANISATION
+      - MEDIA_INDUSTRY
+      - SEAFARING
+      - LOGISTIC
+      - TEXTILE_INDUSTRY
+      - TOURISM
+      - MANUFACTURING_INDUSTRY
+      - PASSENGER_TRANSPORT
+      - TEMP_EMPLOYMENT_AGENCY
+      - OTHER
     ContractLimitation:
       type: object
       required:
@@ -2748,6 +3003,11 @@ components:
           minimum: 0
           maximum: 100
     FreeLancerJobType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/FreeLancerJobTypeKey'
+    FreeLancerJobTypeKey:
       type: string
       description: |
         DE: Freiberufliche Tätigkeit des Antragstellers (nicht abschließende Aufzählung). <br/> EN: open ended enum contains alues for the freelancer job types, possible values are CARER, AMBORDERLY, ADVOCATE, APOTHECARY, ARCHITECT, PHYSICIAN, UNDERTAKER, ACCOUNTANT, REVISOR, FED_DP_COMMISSIONER, DECORATOR, DIETICIAN, INTERPRET, ERGOTHERAPIST, NUTRITIONIST, GEOGRAPHER, CONSULTANT, IT_CONSULT, FINANCSERV, PHOTOGRAPH, DESIGNER, MIDWIFE, HEALERMASSEUR, HEALER, HISTORIAN, COMPUTER_SPEC, ENGINEER, INSOLVENCY_ADMIN, JOURNALIST, PHYSIOTHER, ORDERLY, NURSE, MUSICIAN, CONSTRUCTOR, THERAPIST, MASSEUR, PARAMEDIC, NOTARY, OPTICIAN, OPERA_SINGER, HR_ADVISR, PSYCHOLOG, PSYCHOTHER, PHYSTHERAP, INTER_DECORATOR, RADIO_ANNOUNCER, EXPERT, TOWN_PLANER, STRUCT_ENG, TAX_ADVISR, TAX_AGENT, VETERINARY, TRANSLATOR, UNDER_ADVISR, AUDITOR, DENTAL_TECH, DENTIST, OTHER.
@@ -2810,6 +3070,7 @@ components:
       - AUDITOR
       - DENTAL_TECH
       - DENTIST
+      - BROKER
       - OTHER
     Executive:
       type: object
@@ -2840,21 +3101,19 @@ components:
       - accountOwner
       properties:
         iban:
-          type: string
-          example: DE46500210000010130383
           description: |
             DE: IBAN <br/> EN: The International Bank Account Number
-          pattern: ^[A-Z]{2}[0-9]{3,32}$
+          allOf:
+          - $ref: '#/components/schemas/Iban'
         accountOwner:
           type: string
           description: |
             DE: Name des Kontobesitzers <br/> EN: The name of the account owner
         bic:
-          type: string
           description: |
             DE: BIC <br/> EN: The Business Identifier Code
-          example: INGBDEFF
-          pattern: ^[A-Z]{6}[2-9A-Z]{1}[0-9A-Z]{1}([0-9A-Z]{3})?$
+          allOf:
+          - $ref: '#/components/schemas/Bic'
         bank:
           type: string
           description: |
@@ -2926,15 +3185,11 @@ components:
       description: |
         DE: ID des Finanzierungsantrages <br/> EN: Financing Application identifier
       type: object
+      required:
+      - value
       properties:
         value:
           type: string
-    RenovateEstateFinancing:
-      description: |
-        DE: Finanzierungsrelevante Information zum Umbau / Modernisierung. <br/>
-        EN: Financing-relevant information for the refurbishment / modernisation.
-      allOf:
-      - $ref: '#/components/schemas/OwnEstateFinancingNeed'
     PeriodicalEuroAmountPerSquareMeter:
       type: object
       required:
@@ -2943,15 +3198,58 @@ components:
         periodicalAmount:
           $ref: '#/components/schemas/PeriodicalEuroAmount'
     Cycle:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/CycleKey'
+    ModernisationTypeAndScope:
+      type: object
+      description: |
+        DE: Information über den Typ und Umfang der Modernisierung. <br/>
+        EN: Information about the type and scope of the modernisation.
+      required:
+      - modernisationType
+      properties:
+        modernisationType:
+          $ref: '#/components/schemas/ModernisationType'
+        modernisationScope:
+          $ref: '#/components/schemas/ModernisationScope'
+    ModernisationType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ModernisationTypeKey'
+    ModernisationTypeKey:
       type: string
       description: |
-        DE: Mögliche Zykluswerte (nicht abschließende Aufzählung), z.B. MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL. <br/> EN: Open ended enum contains possible cycle values, possible values are MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL.
-      example: ANNUAL
+        DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER).
+      example: ELECTRIC
       x-extensible-enum:
-      - MONTHLY
-      - QUARTERLY
-      - HALF_YEARLY
-      - ANNUAL
+      - ELECTRIC
+      - FASSADE
+      - FLOOR_PLAN
+      - FLOORING
+      - HEATING
+      - INSTALLATION
+      - INSULATION
+      - ROOF
+      - SANITARY
+      - WINDOW
+      - OTHER
+    ModernisationScope:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ModernisationScopeKey'
+    ModernisationScopeKey:
+      type: string
+      description: |
+        DE: Umfang der Modernisierung (nicht abschließende Aufzählung), z.B. (COMPLETE=komplett, PARTIAL=teilweise, UNKNOWN=unbekannt). <br/> EN: Open ended enum contains scope of the modernisation, possible values are (COMPLETE, PARTIAL, UNKNOWN).
+      example: COMPLETE
+      x-extensible-enum:
+      - COMPLETE
+      - PARTIAL
+      - UNKNOWN
     RFC7807Problem:
       type: object
       description: Holds information regarding the returned error
@@ -3012,54 +3310,13 @@ components:
           type: string
           description: Description of the invalid field value
           example: must be greater than or equal to 0
-    ModernisationTypeAndScope:
-      type: object
-      description: |
-        DE: Information über den Typ und Umfang der Modernisierung. <br/>
-        EN: Information about the type and scope of the modernisation.
-      required:
-      - modernisationType
-      properties:
-        modernisationType:
-          $ref: '#/components/schemas/ModernisationType'
-        modernisationScope:
-          $ref: '#/components/schemas/ModernisationScope'
-    ModernisationType:
-      type: string
-      description: |
-        DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER).
-      example: ELECTRIC
-      x-extensible-enum:
-      - ELECTRIC
-      - FASSADE
-      - FLOOR_PLAN
-      - FLOORING
-      - HEATING
-      - INSTALLATION
-      - INSULATION
-      - ROOF
-      - SANITARY
-      - WINDOW
-      - OTHER
-    ModernisationScope:
-      type: string
-      description: |
-        DE: Umfang der Modernisierung (nicht abschließende Aufzählung), z.B. (COMPLETE=komplett, PARTIAL=teilweise, UNKNOWN=unbekannt). <br/> EN: Open ended enum contains scope of the modernisation, possible values are (COMPLETE, PARTIAL, UNKNOWN).
-      example: COMPLETE
-      x-extensible-enum:
-      - COMPLETE
-      - PARTIAL
-      - UNKNOWN
     Advisor:
       type: object
       description: |
         DE: Informationen über den Berater. <br/> EN: Information about the advisor.
       required:
-      - advisorId
       - advisorCompany
       properties:
-        advisorId:
-          $ref: '#/components/schemas/AdvisorId'
         advisorCompany:
           description: |
             DE: Die an der Vermittlung beteiligte Firma.. <br/> EN: Company involved in the brokerage process.
@@ -3071,18 +3328,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ResponsiblePerson'
-    AdvisorId:
-      type: object
-      description: |
-        DE: ID des Beraters. <br/>
-        EN: Financing advisor Id.
-      required:
-      - value
-      properties:
-        value:
-          type: string
     CompanyAdvisor:
       type: object
+      required:
+      - companyAddress
       properties:
         companyName:
           type: string
@@ -3103,12 +3352,7 @@ components:
       type: object
       properties:
         legalBasis:
-          type: string
-          description: |
-            DE: Relevante Rechtsnorm (nicht abschließende Aufzählung), z.B. (34_C_GEWO, 34_I_GEWO siehe auch (https://www.gesetze-im-internet.de/gewo/)). <br/> EN: Open ended enum contains the relevant legal norm, possible values are (34_C_GEWO, 34_I_GEWO).
-          x-extensible-enum:
-          - 34_C_GEWO
-          - 34_I_GEWO
+          $ref: '#/components/schemas/RegulatoryAuthorityLegalBasis'
         name:
           description: |
             DE: Name der Aufsichtsbehörde. <br/> EN: Name of the responsible supervisory authority.
@@ -3121,6 +3365,18 @@ components:
           type: string
           description: |
             DE: Internetseite der Aufsichtsbehrde. <br/> EN: Website of the responsible supervisory authority.
+    RegulatoryAuthorityLegalBasis:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/RegulatoryAuthorityLegalBasisKey'
+    RegulatoryAuthorityLegalBasisKey:
+      type: string
+      description: |
+        DE: Relevante Rechtsnorm (nicht abschließende Aufzählung), z.B. (34_C_GEWO, 34_I_GEWO siehe auch (https://www.gesetze-im-internet.de/gewo/)). <br/> EN: Open ended enum contains the relevant legal norm, possible values are (34_C_GEWO, 34_I_GEWO).
+      x-extensible-enum:
+      - 34_C_GEWO
+      - 34_I_GEWO
     ResponsiblePerson:
       type: object
       required:
@@ -3128,16 +3384,23 @@ components:
       - personName
       properties:
         type:
-          type: string
-          description: |
-            DE: Rolle der zuständigen Person (nicht abschließende Aufzählung), z.B. (PROCESSOR=Ansprechpartner, MANAGER=Führungskraft). <br/> EN: Open ended enum contains the role of the responsible person , possible values are (PROCESSOR, MANAGER)
-          x-extensible-enum:
-          - PROCESSOR
-          - MANAGER
+          $ref: '#/components/schemas/ResponsiblePersonType'
         personName:
           $ref: '#/components/schemas/PersonName'
         contact:
           $ref: '#/components/schemas/Contact'
+    ResponsiblePersonType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ResponsiblePersonTypeKey'
+    ResponsiblePersonTypeKey:
+      type: string
+      description: |
+        DE: Rolle der zuständigen Person (nicht abschließende Aufzählung), z.B. (PROCESSOR=Ansprechpartner, MANAGER=Führungskraft). <br/> EN: Open ended enum contains the role of the responsible person , possible values are (PROCESSOR, MANAGER)
+      x-extensible-enum:
+      - PROCESSOR
+      - MANAGER
     PersonName:
       type: object
       required:
@@ -3153,16 +3416,7 @@ components:
           - M
           - F
         title:
-          type: string
-          description: |
-            DE: Akademischer Titel des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: DR, PH_D, PD_DR, PROF, PROF_DR). <br/> EN: Open ended enum contains possible title values, possible values are DR, PH_D, PD_DR, PROF, PROF_DR.
-          example: DIPL_ING
-          x-extensible-enum:
-          - DR
-          - PH_D
-          - PD_DR
-          - PROF
-          - PROF_DR
+          $ref: '#/components/schemas/Title'
         firstName:
           type: string
           description: |
@@ -3187,6 +3441,8 @@ components:
           $ref: '#/components/schemas/FinancingApplicationRef'
     CommandId:
       type: object
+      required:
+      - value
       properties:
         value:
           type: string
@@ -3376,7 +3632,6 @@ components:
       required:
       - id
       - type
-      - address
       properties:
         id:
           $ref: '#/components/schemas/EstateId'
@@ -3437,7 +3692,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PropertiesRegisterInventory'
-        owner:
+        owners:
           description: |
             DE: Derzeitige Eigentümer (Erste Abteilung des Grundbuchblattes). <br/> EN: Current owners (first section of the land register sheet).
           type: array
@@ -3477,6 +3732,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/Inhabitants'
     Neighbourhood:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/NeighbourhoodKey'
+    NeighbourhoodKey:
       type: string
       description: |
         DE: Umgebung (nicht abschließende Aufzählung), z.B. RESIDENTIAL_COMPLETE=reines_Wohngebiet, COMMERCIAL_MAINLY=ueberwiegend_Gewerbegebiet, MIXED=Mischgebiet, INDUSTRIAL=Industriegebiet, OUTSIDE_CITY=Einzellage_außerhalb_des_Ortes. <br/> EN: Open ended enum contains neighbourhood details, possible values are RESIDENTIAL, COMMERCIAL, MIXED, INDUSTRIAL, OUTSIDE .
@@ -3488,6 +3748,11 @@ components:
       - INDUSTRIAL
       - OUTSIDE
     Inhabitants:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/InhabitantsKey'
+    InhabitantsKey:
       type: string
       description: |
         DE: Anzahl Einwohner im Ort (nicht abschließende Aufzählung), z.B. UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000. <br/> EN: open ended enum contains umber of inhabitants in the city, possible values are UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000.
@@ -3546,6 +3811,11 @@ components:
               DE: Rangrücktritt. <br/> EN: Subordination (Resignation of priority).
             type: boolean
     LessorType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/LessorTypeKey'
+    LessorTypeKey:
       type: string
       description: |
         DE: Erbbaurechtgeber (nicht abschließende Aufzählung), z.B. CHURCH, CITY, INDIVIDUAL, COMPANY, OTHER. <br/> EN: open ended enum contains building lease owner, possible values are CHURCH, CITY, INDIVIDUAL, COMPANY, OTHER.
@@ -3680,6 +3950,11 @@ components:
         prefabrication:
           $ref: '#/components/schemas/Prefabrication'
     Construction:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ConstructionKey'
+    ConstructionKey:
       type: string
       description: |
         DE: Bauweise des Gebäudes (nicht abschließende Aufzählung), z.B. MASSIVE=Massivbauweise, PREFABRICATED=Plattenbauweise, WOOD_FRAME=Holzständerbauweise, WOOD=Holzbauweise, HALF_TIMBERED=Fachwerkbauweise, LOG_BUILDING=Blockhausbauweise, LOAM=Lehmbauweise. <br/> EN: open ended enum contains construction of the property, possible values are SOLID, CONCRETE_SLAB, WOOD_STAND, WOOD, TIMBER_FRAMING, LOG_BUILDING, COB, OTHER
@@ -3704,6 +3979,11 @@ components:
           type: number
           format: double
     Prefabrication:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/PrefabricationKey'
+    PrefabricationKey:
       type: string
       description: |
         DE: Besonderheiten der Bauart (nicht abschließende Aufzählung), z.B NORMAL=keine_Besonderheiten, PREFABRICATED_Fertighaus, BAREBONES_HOUSE_Ausbauhaus, CONSTRUCTION_KIT_Bausatzhaus . <br/> EN: Open ended enum contains special construction design, possible values are NO_SPECIFICS, PREFABRICATED_HOUSE, GROW_HOUSE, SELF_BUILD_HOUSE .
@@ -3714,6 +3994,11 @@ components:
       - GROW_HOUSE
       - SELF_BUILD_HOUSE
     RealEstatePropertyCondition:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/RealEstatePropertyConditionKey'
+    RealEstatePropertyConditionKey:
       type: string
       description: |
         DE: Zustand des Gebäudes (nicht abschließende Aufzählung), z.B. IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW. <br/> EN: open ended enum contains general condition of the real estate, possible values are IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW
@@ -3726,6 +4011,11 @@ components:
       - WELL_KEPT
       - AS_NEW
     Furnishing:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/FurnishingKey'
+    FurnishingKey:
       type: string
       description: |
         DE: Beurteilung der Austattung der Immobilie (nicht abschließende Aufzählung). Einflussfaktoren sind z. B. verwendete Böden, etc. <br/> EN: Open ended enum contains property configuration (furnishing) details, possible values are (SIMPLE, GOOD, VERY_GOOD).
@@ -3742,14 +4032,7 @@ components:
         DE: Information über den Parkplatz. <br/> EN: Information about the parking space.
       properties:
         type:
-          type: string
-          x-extensible-enum:
-          - OUTSIDE_PARKING_SPACE
-          - UNDERGOUND_GARAGE
-          - DUPLEX_GARAGE
-          - CARPORT_GARAGE
-          - SEPARATE_GARAGE
-          - DOUBLE_GARAGE
+          $ref: '#/components/schemas/ParkingSpaceType'
         pitchNumber:
           description: |
             DE: Stellplatznummer. <br/> EN: Parking Space Number.
@@ -3758,6 +4041,22 @@ components:
           description: |
             DE: Anzahl Parkplätze von diesem Typ. <br/> EN: Number of parking spaces of this type.
           type: integer
+          format: int32
+    ParkingSpaceType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ParkingSpaceTypeKey'
+    ParkingSpaceTypeKey:
+      type: string
+      example: DUPLEX_GARAGE
+      x-extensible-enum:
+      - OUTSIDE_PARKING_SPACE
+      - UNDERGROUND_GARAGE
+      - DUPLEX_GARAGE
+      - CARPORT_GARAGE
+      - SEPARATE_GARAGE
+      - DOUBLE_GARAGE
     ExistingModernisations:
       type: object
       description: |
@@ -3870,7 +4169,12 @@ components:
       description: |
         DE: Information laut Immobilionbewertung. <br/> EN: Information from estate evaluation
       type: object
+      required:
+      - type
       properties:
+        type:
+          type: string
+          default: DEFAULT
         marketValue:
           description: |
             DE: Geschätzter Marktwert. <br/> EN: Estimated market value.
@@ -3881,6 +4185,11 @@ components:
             DE: Marktwert entsprechend einer Infoquelle (z. B. Sprengnetter). <br/> EN: Market value according to an information source (e.g. Sprengnetter).
           allOf:
           - $ref: '#/components/schemas/MarketValueEvaluation'
+      discriminator:
+        propertyName: type
+        mapping:
+          HOUSE: '#/components/schemas/HouseRating'
+          DEFAULT: '#/components/schemas/RealEstateRating'
     MarketValueEvaluation:
       type: object
       description: |
@@ -3919,6 +4228,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/EvaluationInformationContactData'
     StatSource:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/StatSourceKey'
+    StatSourceKey:
       type: string
       description: |
         DE: Infoquelle fuer den aktuellen Marktwert des Gebäudes oder Grundstuecks, z.B. MAP=Bodenrichtwertkarte, GSD, EVAL_COM=Gutachterausschuss, HVB, IMMOSCOUT, IMMOPOOL, LBS_LOCA=LBS_Zweigstelle, PLOETZ, IVD_SPIEGEL, BANK_LOCAL=Bank_vor_Ort, CITY, SPGNET=Sprengnetter, ING=ING_Objektbewertung, OTHER. <br/> EN: Open ended enum contains source for the current market or land value evaluation, possible values are MAP, GSD, EVAL_COM, HVB, IMMOSCOUT, IMMOPOOL, LBS_LOCAL, PLOETZ, IVD_SPIEGEL, BANK_LOCAL, CITY, SPGNET, ING, OTHER.
@@ -3953,61 +4267,6 @@ components:
           description: |
             DE: Telefonnummer des Ansprechspartner für die Bewertung. <br/> EN: Phone number of the contact person for evaluation.
           type: string
-    ApartmentFloor:
-      type: string
-      description: |
-        DE: Lage des Appartments im Gebäude (nicht abschließende Aufzählung), zum Beispiel: BASEMENT=Untergeschoss, GROUND_FLOOR=Erdgeschoss, UPPER_FLOOR=Obergeschoss/Erster Stock, SECOND_FLOOR=Zweiter Stock etc. <br/> EN: open ended enum contains position of the apartment in the building, possible values are BASEMENT, GROUND_FLOOR, UPPER_FLOOR, SECOND_FLOOR, THIRD_FLOOR, FOURTH_FLOOR, FIFTH_FLOOR, SIXTH_FLOOR_OR_HIGHER
-      example: BASEMENT
-      x-extensible-enum:
-      - BASEMENT
-      - GROUND_FLOOR
-      - UPPER_FLOOR
-      - SECOND_FLOOR
-      - THIRD_FLOOR
-      - FOURTH_FLOOR
-      - FIFTH_FLOOR
-      - SIXTH_FLOOR_OR_HIGHER
-    SpecialRealEstateCharacteristics:
-      description: |
-        DE: Spezielle Nutzung der Immobilie. <br/> EN: Special use of property.
-      type: object
-      properties:
-        careProperty:
-          description: |
-            DE: Betreutes Wohnen. <br/> EN: Assisted living.
-          type: boolean
-        holidayProp:
-          description: |
-            DE: Ferienimmobilie. <br/> EN: Holiday property.
-          type: boolean
-        luxury:
-          description: |
-            DE: Luxusobjekt. <br/> EN: Luxury estate.
-          type: boolean
-        monumentProtection:
-          description: |
-            DE: Objekt unter Denkmalschutz. <br/> EN: Estate under monument protection.
-          type: boolean
-    House:
-      description: |
-        DE: Zusätzliche Information zu der Immobilie von Typ "HOUSE" (Haus). <br/>
-        EN: Additional Information for the estate with the type "HOUSE".
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RealEstate'
-      - properties:
-          rating:
-            $ref: '#/components/schemas/HouseRating'
-          attic:
-            $ref: '#/components/schemas/AtticDetail'
-          basement:
-            $ref: '#/components/schemas/Basement'
-          specialCharacteristics:
-            $ref: '#/components/schemas/SpecialHouseCharacteristics'
-          separatedByWEG:
-            description: |
-              DE: Geteilt nach dem Wohneigentumsgesetz (WEG). <br/> EN: Separated based on the WEG law.
-            type: boolean
     HouseRating:
       description: |
         DE: Bewertung des Hauses (Gebäude und Grundstueck). <br/> EN: Rating of a house (building and property).
@@ -4015,6 +4274,9 @@ components:
       allOf:
       - $ref: '#/components/schemas/RealEstateRating'
       - properties:
+          type:
+            type: string
+            default: HOUSE
           landValueEvaluation:
             $ref: '#/components/schemas/LandValueEvaluation'
     LandValueEvaluation:
@@ -4036,14 +4298,104 @@ components:
             EN: Information about the land value evaluation.
           allOf:
           - $ref: '#/components/schemas/EvaluationInformation'
+    ApartmentFloor:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ApartmentFloorKey'
+    ApartmentFloorKey:
+      type: string
+      description: |
+        DE: Lage des Appartments im Gebäude (nicht abschließende Aufzählung), zum Beispiel: BASEMENT=Untergeschoss, GROUND_FLOOR=Erdgeschoss, UPPER_FLOOR=Obergeschoss/Erster Stock, SECOND_FLOOR=Zweiter Stock etc. <br/> EN: open ended enum contains position of the apartment in the building, possible values are BASEMENT, GROUND_FLOOR, UPPER_FLOOR, SECOND_FLOOR, THIRD_FLOOR, FOURTH_FLOOR, FIFTH_FLOOR, SIXTH_FLOOR_OR_HIGHER
+      example: BASEMENT
+      x-extensible-enum:
+      - BASEMENT
+      - GROUND_FLOOR
+      - UPPER_FLOOR
+      - SECOND_FLOOR
+      - THIRD_FLOOR
+      - FOURTH_FLOOR
+      - FIFTH_FLOOR
+      - THIRD_FOURTH_OR_FIFTH_FLOOR
+      - SIXTH_FLOOR_OR_HIGHER
+    SpecialRealEstateCharacteristics:
+      description: |
+        DE: Spezielle Nutzung der Immobilie. <br/> EN: Special use of property.
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          default: DEFAULT
+        careProperty:
+          description: |
+            DE: Betreutes Wohnen. <br/> EN: Assisted living.
+          type: boolean
+        holidayProp:
+          description: |
+            DE: Ferienimmobilie. <br/> EN: Holiday property.
+          type: boolean
+        luxury:
+          description: |
+            DE: Luxusobjekt. <br/> EN: Luxury estate.
+          type: boolean
+        monumentProtection:
+          description: |
+            DE: Objekt unter Denkmalschutz. <br/> EN: Estate under monument protection.
+          type: boolean
+      discriminator:
+        propertyName: type
+        mapping:
+          HOUSE: '#/components/schemas/SpecialHouseCharacteristics'
+          DEFAULT: '#/components/schemas/SpecialRealEstateCharacteristics'
+    SpecialHouseCharacteristics:
+      description: |
+        DE: Spezielle Nutzung des Hauses. <br/> EN: Special use of the house.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/SpecialRealEstateCharacteristics'
+      - properties:
+          type:
+            type: string
+            default: HOUSE
+          farm:
+            description: |
+              DE: Bauernhof. <br/> EN: Farm.
+            type: boolean
+    House:
+      description: |
+        DE: Zusätzliche Information zu der Immobilie von Typ "HOUSE" (Haus). <br/>
+        EN: Additional Information for the estate with the type "HOUSE".
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RealEstate'
+      - properties:
+          rating:
+            $ref: '#/components/schemas/HouseRating'
+          attic:
+            $ref: '#/components/schemas/AtticDetail'
+          basement:
+            $ref: '#/components/schemas/Basement'
+          specialCharacteristics:
+            $ref: '#/components/schemas/SpecialHouseCharacteristics'
+          separatedByWEG:
+            description: |
+              DE: Geteilt nach dem Wohneigentumsgesetz (WEG). <br/> EN: Separated based on the WEG law.
+            type: boolean
     AtticDetail:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/AtticDetailKey'
+    AtticDetailKey:
       type: string
       description: |
         DE: Details zum Dachgeschoss (nicht abschließende Aufzählung), z.B DEVELOPED=ausgebaut, UPGRADEABLE=ausbaufähig, NOT_UPGRADEABLE=nicht_ausbaufähig. <br/> EN: open ended enum contains attic details, possible values are DEVELOPED, UPGRADEABLE, NOT_UPGRADEABLE.
       example: DEVELOPED
       x-extensible-enum:
       - DEVELOPED
-      - PARTIALY_DEVELOPED
+      - PARTIALLY_DEVELOPED
       - UPGRADEABLE
       - NOT_UPGRADEABLE
     Basement:
@@ -4060,25 +4412,19 @@ components:
           allOf:
           - $ref: '#/components/schemas/SquareMeter'
     BasementDetail:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/BasementDetailKey'
+    BasementDetailKey:
       type: string
       description: |
         DE: Details zum Keller (nicht abschließende Aufzählung), z.B DEVELOPED=voll_unterkellert, PARTIALY_DEVELOPED=teil_unterkellert, NONE=nicht_unterkellert. <br/> EN: Open ended enum contains basement details, possible values are DEVELOPED, PARTIALY_DEVELOPED, NONE.
       example: DEVELOPED
       x-extensible-enum:
       - DEVELOPED
-      - PARTIALY_DEVELOPED
+      - PARTIALLY_DEVELOPED
       - NONE
-    SpecialHouseCharacteristics:
-      description: |
-        DE: Spezielle Nutzung des Hauses. <br/> EN: Special use of the house.
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/SpecialRealEstateCharacteristics'
-      - properties:
-          farm:
-            description: |
-              DE: Bauernhof. <br/> EN: Farm.
-            type: boolean
     Plot:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "PLOT" (Grundstück). <br/>
@@ -4108,70 +4454,6 @@ components:
           description: |
             DE: Modernisierungskosten. <br/>
             EN: Modernisation costs.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-    BuyExistingEstateFinancing:
-      description: |
-        DE: Finanzierungsrelevante Information zu dem Kauf bestehender Neubauimmobilie. <br/>
-        EN: Financing-relevant information for the purchase of an existing property.
-      type: object
-      required:
-      - purchasePrice
-      allOf:
-      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-      - properties:
-          renovationCosts:
-            description: |
-              DE: Summe der durchgeführten wertsteigernden Maßnahmen bei der Renovierung. <br/> EN: Sum of completed value-enhancing refurbishments.
-            allOf:
-            - $ref: '#/components/schemas/EuroAmount'
-          plannedModernisations:
-            $ref: '#/components/schemas/PlannedModernisations'
-          purchasePrice:
-            description: |
-              DE: Kaufpreis der Immobilie. <br/>
-              EN: Purchase price of the property.
-            allOf:
-            - $ref: '#/components/schemas/EuroAmount'
-          priceDue:
-            description: |
-              DE: Fälligkeit des Kaufpreises. <br/>
-              EN: Due date of the purchase price.
-            allOf:
-            - $ref: '#/components/schemas/ISODate'
-    ForeignEstateFinancingNeed:
-      type: object
-      required:
-      - estateAcquisitionCosts
-      allOf:
-      - $ref: '#/components/schemas/FinancingNeed'
-      - properties:
-          estateAcquisitionCosts:
-            $ref: '#/components/schemas/EstateAcquisitionCosts'
-    EstateAcquisitionCosts:
-      type: object
-      required:
-      - costsNotary
-      - purchaseTax
-      description: |
-        DE: Kosten für den Erwerb der Immobilie. <br/> EN: Estate costs when purchasing a property.
-      properties:
-        brokerage:
-          description: |
-            DE: Maklercourtage. <br/>
-            EN: Broker costs.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        costsNotary:
-          description: |
-            DE: Notar-/ Grundbuchkosten <br/>
-            EN: Notary costs.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        purchaseTax:
-          description: |
-            DE: Grunderwerbsteuer. <br/>
-            EN: Purchase tax.
           allOf:
           - $ref: '#/components/schemas/EuroAmount'
     ConsultationItem:
@@ -4380,6 +4662,11 @@ components:
             EN: Description of the existing loan.
           type: string
     VentureRelevantLoanType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/VentureRelevantLoanTypeKey'
+    VentureRelevantLoanTypeKey:
       type: string
       description: |
         DE: Bestehender Darlehenstyp (nicht abschließende Aufzählung), z.B. EMPLOYMENT=Arbeitgeberdarlehen, PRIVATE=Privatdarlehen, MORTGAGE_SAVING_PLAN=Bauspardarlehen, PUBLIC=Öffentliche Darlehen, OTHER=Sonstige Darlehen. <br/> EN: Open ended enum contains existing loan debt type, possible values are (EMPLOYMENT, PRIVATE, MORTGAGE_SAVING_PLAN, PUBLIC, OTHER)
@@ -4391,14 +4678,10 @@ components:
       - PUBLIC
       - OTHER
     Utilization:
-      type: string
-      description: |
-        DE: Nutzung des Ojektes (nicht abschließende Aufzählung), z.B. SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT. <br/> EN: Open ended enum contains utilization of the property, possible values are SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT.
-      example: SELF_OCCUPIED
-      x-extensible-enum:
-      - SELF_OCCUPIED
-      - PARTLY_RENT_OUT
-      - RENT_OUT
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/UtilizationKey'
     FinancingVentureBuyNew:
       description: |
         DE: Information über das Finanzierungsvorhaben für den Kauf einer Neubauimmobilie. <br/>
@@ -4420,34 +4703,6 @@ components:
               EN: Financing details relevant for purchase of newly build property.
             allOf:
             - $ref: '#/components/schemas/ForeignEstateFinancingDetails'
-    BuyNewEstateFinancing:
-      type: object
-      description: |
-        DE: Finanzierungsrelevante Information zum Kauf der Neubauimmobilie. <br/>
-        EN: Financing-relevant information for the purchase of a newly built property.
-      required:
-      - purchasePrice
-      allOf:
-      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-      - properties:
-          optionalEquipment:
-            description: |
-              DE: Kosten für Sonderausstattungen. <br/>
-              EN: Special / optional equipment costs.
-            allOf:
-            - $ref: '#/components/schemas/EuroAmount'
-          purchasePrice:
-            description: |
-              DE: Kaufpreis des Objekts. <br/>
-              EN: Purchase price.
-            allOf:
-            - $ref: '#/components/schemas/EuroAmount'
-          priceDue:
-            description: |
-              DE: Fälligkeit des Kaufpreises. <br/>
-              EN: Due date of the purchase price.
-            allOf:
-            - $ref: '#/components/schemas/ISODate'
     ForeignEstateFinancingDetails:
       description: |
         DE: Finanzierungsdetails über das Finanzierungvorhaben der Immobilie die erworben wird. <br/>
@@ -4456,6 +4711,9 @@ components:
       allOf:
       - $ref: '#/components/schemas/FinancingDetails'
       - properties:
+          type:
+            type: string
+            default: FOREIGN
           newOwners:
             description: |
               DE: Eigentümer zum Zeitpunkt der Finanzierung (Erste Abteilung des Grundbuchblattes). <br/> EN: Owner at the time of financing (First Section of the Land Register Page)
@@ -4471,7 +4729,11 @@ components:
         DE: Detailierte Information über das Finanzierungvorhaben. <br/>
         EN: Detailed information about the financing process.
       type: object
+      required:
+      - type
       properties:
+        type:
+          type: string
         payoutDate:
           description: |
             DE: Auszahlungsdatum. <br/>
@@ -4486,19 +4748,18 @@ components:
           - $ref: '#/components/schemas/ISODate'
         loanQuota:
           $ref: '#/components/schemas/LoanQuota'
+      discriminator:
+        propertyName: type
+        mapping:
+          OWN: '#/components/schemas/OwnEstateFinancingDetails'
+          FOREIGN: '#/components/schemas/ForeignEstateFinancingDetails'
     LoanQuota:
       type: object
       description: |
         DE: Wert und Prozentsatz für die Darlehensquote. <br/> EN: Value and percentage for a loan quota
       properties:
         type:
-          type: string
-          description: |
-            DE: Ursprung des Wertes der Darlehensquote (nicht abschließende Aufzählung), z.B. CALCULATED, EXTERNAL. <br/> EN: Open ended enum contains loan quota values, possible values are CALCULATED, EXTERNAL.
-          example: CALCULATED
-          x-extensible-enum:
-          - CALCULATED
-          - EXTERNAL
+          $ref: '#/components/schemas/LoanQuotaType'
         lendingValue:
           description: |
             DE: Beleihungswert. <br/>
@@ -4517,6 +4778,22 @@ components:
             EN: Loan quota for condition retrieval.
           allOf:
           - $ref: '#/components/schemas/Percentage'
+    OwnEstateFinancingDetails:
+      description: |
+        DE: Finanzierungsdetails über das Finanzierungvorhaben der bereits besessenen Immobilie. <br/>
+        EN: Financing details about financing process associated with already owned property.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/FinancingDetails'
+      - properties:
+          type:
+            type: string
+            default: OWN
+          acquisitionYear:
+            description: |
+              DE: Jahr der Zahlung / Jahr der Fertigstellung. <br/> EN: Purchase / completion year.
+            allOf:
+            - $ref: '#/components/schemas/Year'
     PropertyRegisterOwner:
       type: object
       description: |
@@ -4565,6 +4842,11 @@ components:
         auction:
           $ref: '#/components/schemas/AuctionInfo'
     PreviousOwner:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/PreviousOwnerKey'
+    PreviousOwnerKey:
       type: string
       description: |
         DE: Vorheriger Immobilienbesitzer (nicht abschließende Aufzählung), z.B. THIRD_PERSON, FAMILY_MEMBER. <br/> EN: Open ended enum contains previous owner of the estate, possible values are THIRD_PERSON, FAMILY_MEMBER.
@@ -4628,25 +4910,6 @@ components:
             $ref: '#/components/schemas/BuildEstateFinancing'
           financingDetails:
             $ref: '#/components/schemas/ForeignEstateFinancingDetails'
-    BuildEstateFinancing:
-      description: |
-        DE: Finanzierungsrelevante Information zu dem Bau der Immobilie. <br/>
-        EN: Financing-relevant information for the construction of the property.
-      type: object
-      required:
-      - landPrice
-      - buildCosts
-      allOf:
-      - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
-      - properties:
-          buildCosts:
-            $ref: '#/components/schemas/EstateBuildingCosts'
-          completionDate:
-            description: |
-              DE: Geplante Fertigstellung. <br/>
-              EN: Planed completion date.
-            allOf:
-            - $ref: '#/components/schemas/ISODate'
     FinancingVentureDebtRescheduling:
       description: |
         DE: Information über das Finanzierungsvorhaben beim Anschlussfinanzierung / Umschuldung. <br/>
@@ -4664,29 +4927,6 @@ components:
             $ref: '#/components/schemas/DebtReschedulingFinancing'
           financingDetails:
             $ref: '#/components/schemas/OwnEstateFinancingDetails'
-    DebtReschedulingFinancing:
-      description: |
-        DE: Finanzierungsrelevante Information zur Anschlussfinanzierung / Umschuldung. <br/>
-        EN: Financing-relevant information for the follow-up financing / rescheduling.
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OwnEstateFinancingNeed'
-      - properties:
-          additionalLoan:
-            $ref: '#/components/schemas/EstateAdditionalLoan'
-    OwnEstateFinancingDetails:
-      description: |
-        DE: Finanzierungsdetails über das Finanzierungvorhaben der bereits besessenen Immobilie. <br/>
-        EN: Financing details about financing process associated with already owned property.
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/FinancingDetails'
-      - properties:
-          acquisitionYear:
-            description: |
-              DE: Jahr der Zahlung / Jahr der Fertigstellung. <br/> EN: Purchase / completion year.
-            allOf:
-            - $ref: '#/components/schemas/Year'
     FinancingVentureRenovation:
       description: |
         DE: Information über das Finanzierungsvorhaben beim Umbau / Modernisierung. <br/>
@@ -4721,6 +4961,272 @@ components:
             $ref: '#/components/schemas/OtherCapitalFinancing'
           financingDetails:
             $ref: '#/components/schemas/OwnEstateFinancingDetails'
+    Calculation:
+      type: object
+      required:
+      - type
+      - loanType
+      - calculationDate
+      properties:
+        type:
+          $ref: '#/components/schemas/CalculationType'
+        calculationDate:
+          description: |
+            DE: Datum der Kalkulation. <br/>
+            EN: Calculation date.
+          allOf:
+          - $ref: '#/components/schemas/ISODate'
+      discriminator:
+        propertyName: type
+        mapping:
+          HOUSEHOLD: '#/components/schemas/HouseholdCalculation'
+          CONDITION: '#/components/schemas/ConditionCalculation'
+          LENDING_VALUE: '#/components/schemas/LendingValueCalculation'
+    CalculationType:
+      type: string
+      description: |
+        DE: Kalkulationstyp (nicht abschließende Aufzählung), z.B. HOUSEHOLD=Haushaltsrechnung, CONDITION=Konditionskalkulation, LENDING_VALUE=Beleihungswert-Kalkulation <br/> EN: Calculation type - open ended enum contains property type details, possible values are HOUSEHOLD, CONDITION, LENDING_VALUE
+      example: HOUSEHOLD
+      x-extensible-enum:
+      - HOUSEHOLD
+      - CONDITION
+      - LENDING_VALUE
+    HouseholdCalculation:
+      description: |
+        DE: Information zu der Haushalt Kalkulation <br/>
+        EN: Information about the household calculation.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Calculation'
+      - properties:
+          type:
+            type: string
+            default: HOUSEHOLD
+          details:
+            type: array
+            items:
+              $ref: '#/components/schemas/CalculationDetail'
+          financialBurden:
+            type: array
+            items:
+              $ref: '#/components/schemas/FinancialBurdenDetail'
+    CalculationDetail:
+      description: |
+        DE: Detailierte Information über einen Eintrag in der Kalkulation.<br/>
+        EN: Detailed information about single entry in the calculation.
+      type: object
+      properties:
+        index:
+          type: integer
+          description: |
+            DE: Reihenfolge Index innerhalb der Kalkulationdetails. <br/>
+            EN: Order index within calculation details.
+        category:
+          $ref: '#/components/schemas/DetailType'
+        name:
+          type: string
+          description: |
+            DE: Name des Wertes. <br/>
+            EN: Entry name.
+        description:
+          type: string
+          description: |
+            DE: Beschreibung des Wertes. <br/>
+            EN: Entry description.
+        userInputValue:
+          type: string
+          description: |
+            DE: Von user eingetragene Wert. <br/>
+            EN: User input value.
+        calculatedValue:
+          type: string
+          description: |
+            DE: Berechnete Wert. <br/>
+            EN: Calculated value.
+        hints:
+          type: array
+          description: |
+            DE: Hinweise zum  <br/>
+            EN: Collection of calculation hints.
+          items:
+            type: string
+    DetailType:
+      type: string
+      description: |
+        DE: Kategorie des Kalkulkationwertes (nicht abschließende Aufzählung), z.B. ENTRY, SUB_TOTAL. <br/> EN: Calculated value category - open ended enum contains property type details, possible values are ENTRY, SUB_TOTAL.
+      example: ENTRY
+      x-extensible-enum:
+      - ENTRY
+      - SUB_TOTAL
+    FinancialBurdenDetail:
+      description: |
+        DE: Detailierte Information über den Belastungsplan innerhalb der Haushaltsrechnung.<br/>
+        EN: Detailed information about financial burden within household calculation.
+      type: object
+      properties:
+        index:
+          description: |
+            DE: Reihenfolge Index innerhalb Belastungsplan. <br/>
+            EN: Order index within financial burden.
+          type: integer
+        deadline:
+          description: |
+            DE: Stichtag für die Belastung. <br/>
+            EN: Burden deadline.
+          allOf:
+          - $ref: '#/components/schemas/ISODate'
+        occasion:
+          type: string
+          description: |
+            DE: Anlass der Belastung. <br/>
+            EN: Burden reason.
+        description:
+          type: string
+          description: |
+            DE: Beschreibung der Belastung. <br/>
+            EN: Burden description.
+        deltaLiquidity:
+          description: |
+            DE: Deltaliquidität. <br/>
+            EN: Delta liquidity.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        residualLiquidity:
+          description: |
+            DE: Restliquidität. <br/>
+            EN: Residual liquidity.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+    ConditionCalculation:
+      description: |
+        DE: Information über Konditionskalkulation. <br/>
+        EN: Information about condition calculation.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Calculation'
+      - properties:
+          type:
+            type: string
+            default: CONDITION
+          loans:
+            type: array
+            items:
+              $ref: '#/components/schemas/LoanConditionInfo'
+    LoanConditionInfo:
+      description: |
+        DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>
+        EN: Information about single loan which is a part of condition calculation.
+      type: object
+      properties:
+        loan:
+          $ref: '#/components/schemas/LoanConditionGeneral'
+        details:
+          type: array
+          description: |
+            DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>
+            EN: Information about single entry within condition calculation.
+          items:
+            $ref: '#/components/schemas/AdditionalInfo'
+        summary:
+          $ref: '#/components/schemas/LoanConditionSummary'
+    LoanConditionGeneral:
+      description: |
+        DE: Allgemeine Information zu einem Darlehen (Konditionskalkulation). <br/>
+        EN: General loan information (conditions calculation).
+      type: object
+      properties:
+        loanId:
+          $ref: '#/components/schemas/LoanId'
+        loanAmount:
+          description: |
+            DE: Darlehnsbetrag. <br/>
+            EN: Loan amount.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        loanQuota:
+          description: |
+            DE: Darlehnsquote (Prozentsatz) <br/>
+            EN: Loan quota (percentage).
+          allOf:
+          - $ref: '#/components/schemas/Percentage'
+        mixedEffectiveRate:
+          description: |
+            DE: Mischzins (effektiv). <br/>
+            EN: Mixed effective rate.
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalPercentage'
+        baserateIssueDate:
+          description: |
+            DE: Einstandsdatum. <br/>
+            EN: Base rate issue date.
+          allOf:
+          - $ref: '#/components/schemas/ISODate'
+        burden:
+          description: |
+            DE: Periodische Rate (z.B. monatliche Rate). <br/>
+            EN: Periodical payment amount (e.g. rate per month).
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        paymentTime:
+          $ref: '#/components/schemas/PaymentTime'
+    LoanId:
+      type: object
+      description: |
+        DE: ID des Darlehens. <br/> EN: Loan identifier.
+      properties:
+        value:
+          type: string
+    Percentage:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: number
+          format: double
+    LoanConditionSummary:
+      description: |
+        DE: Zusammenfassung von Informationen zu einzelnem Darlehen (Konditionskalkulation). <br/>
+        EN: Summary information about single loan (conditions calculation).
+      type: object
+      properties:
+        effectiveRate:
+          description: |
+            DE: Effektiver Zins. <br/>
+            EN: Effective interest rate.
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalPercentage'
+        nominalRate:
+          description: |
+            DE: Sollzins <br/>
+            EN: Nominal rate.
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalPercentage'
+        trueEffectiveRate:
+          description: |
+            DE: Summe effektiver Bestandteile. <br/>
+            EN: True effective rate.
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalPercentage'
+        additionalInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdditionalInfo'
+    LendingValueCalculation:
+      description: |
+        DE: Information zu der Kalkulation <br/>
+        EN: Information about the calculation.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Calculation'
+      - properties:
+          type:
+            type: string
+            default: LENDING_VALUE
+          details:
+            type: array
+            items:
+              $ref: '#/components/schemas/CalculationDetail'
     OriginInfo:
       type: object
       required:
@@ -4732,6 +5238,11 @@ components:
         externalId:
           $ref: '#/components/schemas/ExternalId'
     Client:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ClientKey'
+    ClientKey:
       type: string
       description: |
         DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.
@@ -4800,6 +5311,8 @@ components:
       description: |
         DE: ID der Verbindlichkeit. <br/>
         EN: ID of the associated Debt.
+      required:
+      - value
       properties:
         value:
           type: string
@@ -4855,11 +5368,14 @@ components:
         embedded:
           $ref: '#/components/schemas/ApplicantRelationshipsQuery'
     ApplicantRelationshipsQuery:
-      type: array
+      type: object
       description: |
         A wrapper Type to hold a set of possible relationships among applicants involved in the financing application.
-      items:
-        $ref: '#/components/schemas/ApplicantRelationship'
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicantRelationship'
     ApplicantRelationship:
       type: object
       description: |
@@ -4880,27 +5396,69 @@ components:
         relationType:
           $ref: '#/components/schemas/ApplicantRelationshipType'
     ApplicantRelationshipType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ApplicantRelationshipTypeKey'
+    ApplicantRelationshipTypeKey:
       type: string
       description: |
         DE: Beziehungsart (nicht abschließende Aufzählung) z.B. (MARRIED=mit Ehepartner/in, REGISTERED_PARTNERSHIP=eingetragenem Lebenspartner/in, PARTNERSHIP=Lebenspartner/in). <br/>
         EN: Open ended enum contains values for relation type, possible values are (MARRIED, REGISTERED_PARTNERSHIP, PARTNERSHIP)
-      x-extensible-enum: MARRIED, REGISTERED_PARTNERSHIP, PARTNERSHIP
-    Percentage:
-      type: object
-      required:
-      - value
-      properties:
-        value:
-          type: number
-          format: double
+      x-extensible-enum:
+      - MARRIED,
+      - REGISTERED_PARTNERSHIP,
+      - PARTNERSHIP
+    CycleKey:
+      type: string
+      description: |
+        DE: Mögliche Zykluswerte (nicht abschließende Aufzählung), z.B. MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL. <br/> EN: Open ended enum contains possible cycle values, possible values are MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL.
+      example: ANNUAL
+      x-extensible-enum:
+      - MONTHLY
+      - QUARTERLY
+      - HALF_YEARLY
+      - ANNUAL
     Phone:
       type: object
+      required:
+      - phoneNumber
+      - type
       properties:
         phoneNumber:
           type: string
           description: |
             DE: Mobil- oder Festnetztelefonnummer des Antragstellers. <br/> EN: Mobile or landline telephone number of the customer.
           example: +49 160 123456
+        type:
+          $ref: '#/components/schemas/PhoneType'
+        reachable:
+          $ref: '#/components/schemas/PhoneReachability'
+    PhoneType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/PhoneTypeKey'
+    PhoneTypeKey:
+      type: string
+      description: |
+        DE: Art der Telefonnummer (nicht abschließende Aufzählung, zum Beispiel: MOBILE = Mobilfunknummer, LANDLINE = Festnetznummer, UNSPECIFIED = nicht angegeben). <br/> EN: Type of the phone number, possible values are MOBILE, LANDLINE, UNSPECIFIED.
+      x-extensible-enum:
+      - MOBILE
+      - LANDLINE
+      - UNSPECIFIED
+    PhoneReachability:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/PhoneReachabilityKey'
+    PhoneReachabilityKey:
+      type: string
+      description: |
+        DE: Erreichbarkeit unter dieser Telefonnumer (nicht abschließende Aufzählung, zum Beispiel: DAYTIME = tagsüber, EVENING = abends). <br/> EN: Reachable by this phone number, possible values are DAYTIME, EVENING.
+      x-extensible-enum:
+      - DAYTIME
+      - EVENING
     FinancialStandings:
       type: object
       description: |
@@ -4948,8 +5506,10 @@ components:
       type: object
       description: |
         Id of a specific FinancialStanding.
+      required:
+      - value
       properties:
-        id:
+        value:
           type: string
     FinancialStandingType:
       type: string
@@ -5249,7 +5809,6 @@ components:
       type: object
       required:
       - type
-      - residualDebt
       description: |
         DE: Raten- und Leasingkredite. <br/> EN: Installment and leasing credits.
       allOf:
@@ -5346,11 +5905,23 @@ components:
         bic:
           description: |
             DE: BIC-Code des Darlehensgebers. <br/> EN: BIC code of loaner.
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/Bic'
         name:
           description: |
             DE: Schuldner. <br/> EN: Debitor.
           type: string
+    Bic:
+      type: object
+      description: |
+        DE: BIC <br/> EN: The Business Identifier Code
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          example: INGBDEFF
+          pattern: ^[A-Z]{6}[2-9A-Z]{1}[0-9A-Z]{1}([0-9A-Z]{3})?$
     ForwardExistingMortgage:
       type: object
       description: |
@@ -5438,7 +6009,6 @@ components:
       type: object
       required:
       - net
-      - numberOfPayments
       description: |
         DE: Informationen über das Gehalt. <br/> EN: Information regarding salary.
       properties:
@@ -5548,14 +6118,7 @@ components:
         DE: Berechnung des selbstständigen Einkommens. <br/> EN: Calculation of independent (self employment) income.
       properties:
         method:
-          type: string
-          description: |
-            DE: Berechnungsmethode für das Einkommen (nicht abschließende Aufzaehlung), z.B. (CUSTOMER_SPECIFICATION=Kundenangabe, PROFIT_AND_LOSS_ACCOUNT=Gewinn- und Verlustrechnung, NO_METHOD). <br/> EN: Open ended enum contains method for profit calculation, possible values are (CUSTOMER_SPECIFICATION, PROFIT_AND_LOSS_ACCOUNT, NO_METHOD).
-          example: CUSTOMER_SPECIFICATION
-          x-extensible-enum:
-          - CUSTOMER_SPECIFICATION
-          - PROFIT_AND_LOSS_ACCOUNT
-          - NO_METHOD
+          $ref: '#/components/schemas/SelfEmploymentIncomeMethod'
         description:
           type: string
           description: |
@@ -5570,6 +6133,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SelfEmploymentIncomeItem'
+    SelfEmploymentIncomeMethod:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/SelfEmploymentIncomeMethodKey'
+    SelfEmploymentIncomeMethodKey:
+      type: string
+      description: |
+        DE: Berechnungsmethode für das Einkommen (nicht abschließende Aufzaehlung), z.B. (CUSTOMER_SPECIFICATION=Kundenangabe, PROFIT_AND_LOSS_ACCOUNT=Gewinn- und Verlustrechnung, NO_METHOD). <br/> EN: Open ended enum contains method for profit calculation, possible values are (CUSTOMER_SPECIFICATION, PROFIT_AND_LOSS_ACCOUNT, NO_METHOD).
+      example: CUSTOMER_SPECIFICATION
+      x-extensible-enum:
+      - CUSTOMER_SPECIFICATION
+      - PROFIT_AND_LOSS_ACCOUNT
+      - NO_METHOD
     SelfEmploymentIncomeItem:
       type: object
       description: |
@@ -5705,7 +6282,7 @@ components:
             EN: Regular income from stock and bonds investments (e.g. GmbH share)
           allOf:
           - $ref: '#/components/schemas/PeriodicalEuroAmount'
-        rentalIncome:
+        rentalIncomes:
           type: array
           items:
             $ref: '#/components/schemas/RentalIncomeItem'
@@ -5762,7 +6339,6 @@ components:
     HousingExpense:
       type: object
       required:
-      - costs
       - currentHousingSituation
       description: |
         DE: Informationen zu Wohnungsausgaben. <br/> EN: Information regarding housing expenses.
@@ -5780,6 +6356,11 @@ components:
           description: |
             DE: Wahr, wenn die Wohnungsausgaben nach der Finanzierung entfallen. <br/> EN: True if accommodation/housing costs are obsolete after financing.
     HousingSituation:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/HousingSituationKey'
+    HousingSituationKey:
       type: string
       description: |
         DE: Art der derzeitigen Wohnsituation (nicht abschließende Aufzaehlung), z.B. (RENT=zur Miete, RATE=im Eigentum mit Darlehensrate, DEBT_FREE=im abbezahlten Eigentum, PARENTS=mietfrei bei den Eltern/Partner, OWN_PROPERTY=im Eigentum, FIRST_APPLICANT=in einer Eigentumswohnung). <br/> EN: Open ended enum contains value for the current housing/accomodation types, possible values are (RENT, RATE, DEBT_FREE, PARENTS, OWN_PROPERTY, FIRST_APPLICANT).
@@ -5873,8 +6454,6 @@ components:
       properties:
         value:
           $ref: '#/components/schemas/PeriodicalEuroAmount'
-        additional:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
         description:
           type: string
     InterestMaturity:
@@ -5955,39 +6534,17 @@ components:
             EN: Complete information about the financing venture.
           allOf:
           - $ref: '#/components/schemas/FinancingVenture'
-    EstateBuildingCosts:
-      description: |
-        DE: Sammlung aller Kosten, die für den Bau der Immobilie relevant sind. <br/>
-        EN: All costs associated with construction of the property.
+    Iban:
       type: object
+      description: |
+        DE: IBAN <br/> EN: The International Bank Account Number
       required:
-      - landPrice
-      - construction
+      - value
       properties:
-        landPrice:
-          description: |
-            DE: Grundstückpreis. <br/>
-            EN: Land price.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        construction:
-          description: |
-            DE: Baukosten. <br/>
-            EN: Construction costs.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        additional:
-          description: |
-            DE: Zusätzliche Kosten. <br/>
-            EN: Additional costs.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        outside:
-          description: |
-            DE: Kosten der Außenanlagen. <br/>
-            EN: Cost of the outdoor facilities.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
+        value:
+          type: string
+          example: DE46500210000010130383
+          pattern: ^[A-Z]{2}[0-9]{3,32}$
     Informers:
       type: object
       description: |
@@ -6083,6 +6640,22 @@ components:
       - MAIN_LOAN
       - AUXILIARY_LOAN
       - KFW_PROMOTION_LOAN
+    Title:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/TitleKey'
+    TitleKey:
+      type: string
+      description: |
+        DE: Akademischer Titel des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: DR, PH_D, PD_DR, PROF, PROF_DR). <br/> EN: Open ended enum contains possible title values, possible values are DR, PH_D, PD_DR, PROF, PROF_DR.
+      example: PROF_DR
+      x-extensible-enum:
+      - DR
+      - PH_D
+      - PD_DR
+      - PROF
+      - PROF_DR
     Correspondence:
       type: object
       properties:
@@ -6138,6 +6711,11 @@ components:
         offer:
           $ref: '#/components/schemas/FinancingOfferItem'
     FinancingApplicationStatus:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/FinancingApplicationStatusKey'
+    FinancingApplicationStatusKey:
       type: string
       description: |
         DE: Status des Finanzierungsantrages. <br/> EN: Status of the application.
@@ -6145,6 +6723,11 @@ components:
       - QUALIFIED_FOR_SUBMISSION
       - SUBMITTED
     ApplicationSubType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ApplicationSubTypeKey'
+    ApplicationSubTypeKey:
       type: string
       description: |
         DE: Unterkategorie des Antragstyp (nicht abschließende Aufzählung), z.B. (NEW_CUSTOMER, PROLONGATION, SUPPLEMENTARY_FINANCING). <br/>
@@ -6480,6 +7063,8 @@ components:
       type: object
       description: |
         DE: Id der Finanzierungsstruktur. <br/> EN: Credit Loan identifier.
+      required:
+      - value
       properties:
         value:
           type: string
@@ -6515,7 +7100,7 @@ components:
           items:
             $ref: '#/components/schemas/Estate'
           minItems: 1
-        financialStanding:
+        financialStandings:
           type: array
           items:
             $ref: '#/components/schemas/FinancialStanding'
@@ -6717,6 +7302,11 @@ components:
           $ref: '#/components/schemas/LoanTypes'
         handover:
           $ref: '#/components/schemas/Handover'
+        calculation:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Calculation'
     LoanTypes:
       type: object
       required:
@@ -6750,34 +7340,6 @@ components:
             type: string
           person:
             $ref: '#/components/schemas/Person'
-    EstateAdditionalLoan:
-      description: |
-        DE: Information über ein bestehendes Darlehen (Hypothek). <br/>
-        EN: Information about the already existing mortgage.
-      type: object
-      required:
-      - amount
-      properties:
-        amount:
-          description: |
-            DE: Darlehenssumme. <br/>
-            EN: Loan amount.
-          allOf:
-          - $ref: '#/components/schemas/EuroAmount'
-        description:
-          type: string
-        usage:
-          type: string
-          description: |
-            DE: Zusätzliche Verwendung der Hypothek (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER. <br/> EN: Open ended enum contains possible estate additional loan usages, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER.
-          example: OPERATIONAL_COSTS
-          x-extensible-enum:
-          - OPERATIONAL_COSTS
-          - REPAY_ANOTHER_LOAN
-          - PREPAYMENT_PENALTYC
-          - CONSTRUCTION
-          - RENOVATION
-          - OTHER
     Protocol:
       type: object
       properties:
@@ -6954,6 +7516,15 @@ components:
           format: uri
           description: |
             A Hyperlink that will return the current page of data.
+    UtilizationKey:
+      type: string
+      description: |
+        DE: Nutzung des Ojektes (nicht abschließende Aufzählung), z.B. SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT. <br/> EN: Open ended enum contains utilization of the property, possible values are SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT.
+      example: SELF_OCCUPIED
+      x-extensible-enum:
+      - SELF_OCCUPIED
+      - PARTLY_RENT_OUT
+      - RENT_OUT
     SubmissionCorrespondence:
       type: object
       properties:
@@ -6984,13 +7555,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CorrespondenceItem'
-    LoanId:
-      type: object
-      description: |
-        DE: ID des Darlehens. <br/> EN: Loan identifier.
-      properties:
-        value:
-          type: string
     SpecialRepayment:
       type: object
       required:
@@ -7203,6 +7767,19 @@ components:
           $ref: '#/components/schemas/SubmissionOverviewItem'
         creditLoans:
           $ref: '#/components/schemas/CreditLoans'
+    LoanQuotaType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/LoanQuotaTypeKey'
+    LoanQuotaTypeKey:
+      type: string
+      description: |
+        DE: Ursprung des Wertes der Darlehensquote (nicht abschließende Aufzählung), z.B. CALCULATED, EXTERNAL. <br/> EN: Open ended enum contains loan quota values, possible values are CALCULATED, EXTERNAL.
+      example: CALCULATED
+      x-extensible-enum:
+      - CALCULATED
+      - EXTERNAL
     OAuthProblem:
       type: object
       description: Error while Authentication
@@ -7222,11 +7799,6 @@ components:
       description: |
         DE: Grundbuchdaten. <br/> EN: General information about the land register sheet.
       type: object
-      required:
-      - registerCourt
-      - registerCity
-      - registerVolume
-      - registerPage
       properties:
         registerCourt:
           description: |
@@ -7341,6 +7913,11 @@ components:
         type:
           $ref: '#/components/schemas/SpecialPropertyType'
     SpecialPropertyType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/SpecialPropertyTypeKey'
+    SpecialPropertyTypeKey:
       type: string
       description: |
         DE: Sondereigentumstyp (nicht abschließende Aufzählung), z.B. BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE. <br/> EN: open ended enum contains unit Property details, possible values are (BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE)
@@ -7489,6 +8066,11 @@ components:
             allOf:
             - $ref: '#/components/schemas/EuroAmount'
     CessionType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/CessionTypeKey'
+    CessionTypeKey:
       type: string
       description: |
         DE: Abschnittstyp in der Abteilung III des Grundbuches (nicht abschließende Aufzählung), z.B. LETTER, BOOK <br/> EN: Open ended enum contains type of section III of the land register, possible values are (LETTER, BOOK).
@@ -7512,11 +8094,16 @@ components:
         value:
           type: string
     FinancingOfferStatus:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/FinancingOfferStatusKey'
+    FinancingOfferStatusKey:
       description: |
         DE: Status des Finanzierungsangebots. <br/>
         EN: Financing offer status.
       type: string
-      enum:
+      x-extensible-enum:
       - ACCEPTED
       - REJECTED
     OfferFinancingNeed:
@@ -7590,6 +8177,11 @@ components:
             $ref: '#/components/schemas/Loan'
           minItems: 1
     KfwProgram:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/KfwProgramKey'
+    KfwProgramKey:
       type: string
       description: |
         DE: KFW-Förderprogramm (nicht abschließende Aufzählung), z.B. Wohneigen, Wohn159, Energie153-40, Energie151, Energie152, Energie167. <br/> EN: Open ended enum contains possible programs for Kfw, possible values are Wohneigen, Wohn159, Energie153-40, Energie151, Energie152, Energie167.
@@ -7625,6 +8217,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/ISODate'
     KfwCallType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/KfwCallTypeKey'
+    KfwCallTypeKey:
       type: string
       description: |
         DE: Art der KFW-Reservierung (nicht abschließende Aufzählung), z.B. LIGHT, PLUS. <br/> EN: Open ended enum contains Kfw reservation process call type, possible values are LIGHT, PLUS.
@@ -7632,33 +8229,6 @@ components:
       x-extensible-enum:
       - LIGHT
       - PLUS
-    Advisors:
-      type: object
-      description: |
-        A wrapper Type to hold a set of financing advisors involved in the consultation phase.
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdvisorItem'
-    AdvisorItem:
-      type: object
-      description: |
-        A wrapper Type to hold detailed information about a financing advisor involved in the consultation phase.
-      properties:
-        _href:
-          $ref: '#/components/schemas/ResourceRef'
-        advisorId:
-          $ref: '#/components/schemas/AdvisorId'
-        companyName:
-          type: string
-          description: |
-            DE: Name der Firma für welche der Berater arbeitet. <br/>
-            EN: Name of the advisor company.
-        embedded:
-          $ref: '#/components/schemas/Advisor'
     Cursor:
       type: object
       description: |
@@ -7675,6 +8245,11 @@ components:
           description: This is the cursor that points to the end of the page of data
             that has been returned.
     AuxProductType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/AuxProductTypeKey'
+    AuxProductTypeKey:
       type: string
       description: |
         DE: Typ des Nachrangdarlehens (nicht abschließende Aufzählung), z.B. DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL. <br/> EN: Open ended enum contains auxiliary loan product types, possible values are DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL.
@@ -7743,13 +8318,6 @@ components:
         type: string
         format: date-time
         example: 2019-12-29T10:22:50Z
-    advisor-id:
-      name: advisorId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested advisor
     credit-loan-id:
       name: creditLoanId
       in: path
@@ -7836,6 +8404,17 @@ components:
       schema:
         type: string
       description: Id for the requested existing mortgage.
+    calculation-type:
+      name: calculationType
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+        - household
+        - condition
+        - lending_value
+      description: Subtype of the calculation data.
     correspondence-item-id:
       name: itemId
       in: path

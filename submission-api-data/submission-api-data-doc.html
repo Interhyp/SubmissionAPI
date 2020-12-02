@@ -702,7 +702,7 @@
   "description" : "DE: Zusätzliche Information als Schlüssel-Wert Paar. <br/> EN: Additional Information as key-value pairs.\n"
 };
             defs["Address"] = {
-  "required" : [ "city", "country", "houseNumber", "postalCode", "street" ],
+  "required" : [ "city", "country" ],
   "type" : "object",
   "properties" : {
     "street" : {
@@ -743,12 +743,9 @@
   }
 };
             defs["Advisor"] = {
-  "required" : [ "advisorCompany", "advisorId" ],
+  "required" : [ "advisorCompany" ],
   "type" : "object",
   "properties" : {
-    "advisorId" : {
-      "$ref" : "#/components/schemas/AdvisorId"
-    },
     "advisorCompany" : {
       "description" : "DE: Die an der Vermittlung beteiligte Firma.. <br/> EN: Company involved in the brokerage process.\n",
       "allOf" : [ {
@@ -764,48 +761,6 @@
     }
   },
   "description" : "DE: Informationen über den Berater. <br/> EN: Information about the advisor.\n"
-};
-            defs["AdvisorId"] = {
-  "required" : [ "value" ],
-  "type" : "object",
-  "properties" : {
-    "value" : {
-      "type" : "string"
-    }
-  },
-  "description" : "DE: ID des Beraters. <br/>\nEN: Financing advisor Id.\n"
-};
-            defs["AdvisorItem"] = {
-  "type" : "object",
-  "properties" : {
-    "_href" : {
-      "$ref" : "#/components/schemas/ResourceRef"
-    },
-    "advisorId" : {
-      "$ref" : "#/components/schemas/AdvisorId"
-    },
-    "companyName" : {
-      "type" : "string",
-      "description" : "DE: Name der Firma für welche der Berater arbeitet. <br/>\nEN: Name of the advisor company.\n"
-    },
-    "embedded" : {
-      "$ref" : "#/components/schemas/Advisor"
-    }
-  },
-  "description" : "A wrapper Type to hold detailed information about a financing advisor involved in the consultation phase.\n"
-};
-            defs["Advisors"] = {
-  "required" : [ "data" ],
-  "type" : "object",
-  "properties" : {
-    "data" : {
-      "type" : "array",
-      "items" : {
-        "$ref" : "#/components/schemas/AdvisorItem"
-      }
-    }
-  },
-  "description" : "A wrapper Type to hold a set of financing advisors involved in the consultation phase.\n"
 };
             defs["AlimonyExpense"] = {
   "required" : [ "alimony" ],
@@ -978,6 +933,18 @@
     "$ref" : "#/components/schemas/EuroAmount"
   } ]
 };
+            defs["AllOfBankAccountBic"] = {
+  "description" : "DE: BIC <br/> EN: The Business Identifier Code\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Bic"
+  } ]
+};
+            defs["AllOfBankAccountIban"] = {
+  "description" : "DE: IBAN <br/> EN: The International Bank Account Number\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Iban"
+  } ]
+};
             defs["AllOfBasementBasementArea"] = {
   "description" : "DE: Kellerfläche. <br/>\nEN: Basement space.\n",
   "allOf" : [ {
@@ -1024,6 +991,12 @@
   "description" : "DE: Baujahr. <br/> EN: Year of construction.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/Year"
+  } ]
+};
+            defs["AllOfCalculationCalculationDate"] = {
+  "description" : "DE: Datum der Kalkulation. <br/>\nEN: Calculation date.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ISODate"
   } ]
 };
             defs["AllOfCapitalIncomeCapitalYield"] = {
@@ -1081,10 +1054,10 @@
     "$ref" : "#/components/schemas/Advisor"
   } ]
 };
-            defs["AllOfCreditWorthinessWorthinessRating"] = {
-  "description" : "DE: Bewertung der Kreditwürdigkeit. <br/> EN: Rating of the credit worthiness.\n",
+            defs["AllOfDebitorBic"] = {
+  "description" : "DE: BIC-Code des Darlehensgebers. <br/> EN: BIC code of loaner.\n",
   "allOf" : [ {
-    "$ref" : "#/components/schemas/WorthinessRating"
+    "$ref" : "#/components/schemas/Bic"
   } ]
 };
             defs["AllOfEstateAcquisitionCostsBrokerage"] = {
@@ -1219,6 +1192,24 @@
   "description" : "DE: Kindergeld. <br/>\nEN: Child Allowance.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
+            defs["AllOfFinancialBurdenDetailDeadline"] = {
+  "description" : "DE: Stichtag für die Belastung. <br/>\nEN: Burden deadline.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ISODate"
+  } ]
+};
+            defs["AllOfFinancialBurdenDetailDeltaLiquidity"] = {
+  "description" : "DE: Deltaliquidität. <br/>\nEN: Delta liquidity.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/EuroAmount"
+  } ]
+};
+            defs["AllOfFinancialBurdenDetailResidualLiquidity"] = {
+  "description" : "DE: Restliquidität. <br/>\nEN: Residual liquidity.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/EuroAmount"
   } ]
 };
             defs["AllOfFinancialStandingApplicantId"] = {
@@ -1455,6 +1446,54 @@
     "$ref" : "#/components/schemas/EuroAmount"
   } ]
 };
+            defs["AllOfLoanConditionGeneralBaserateIssueDate"] = {
+  "description" : "DE: Einstandsdatum. <br/>\nEN: Base rate issue date.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ISODate"
+  } ]
+};
+            defs["AllOfLoanConditionGeneralBurden"] = {
+  "description" : "DE: Periodische Rate (z.B. monatliche Rate). <br/>\nEN: Periodical payment amount (e.g. rate per month).\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
+            defs["AllOfLoanConditionGeneralLoanAmount"] = {
+  "description" : "DE: Darlehnsbetrag. <br/>\nEN: Loan amount.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/EuroAmount"
+  } ]
+};
+            defs["AllOfLoanConditionGeneralLoanQuota"] = {
+  "description" : "DE: Darlehnsquote (Prozentsatz) <br/>\nEN: Loan quota (percentage).\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Percentage"
+  } ]
+};
+            defs["AllOfLoanConditionGeneralMixedEffectiveRate"] = {
+  "description" : "DE: Mischzins (effektiv). <br/>\nEN: Mixed effective rate.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalPercentage"
+  } ]
+};
+            defs["AllOfLoanConditionSummaryEffectiveRate"] = {
+  "description" : "DE: Effektiver Zins. <br/>\nEN: Effective interest rate.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalPercentage"
+  } ]
+};
+            defs["AllOfLoanConditionSummaryNominalRate"] = {
+  "description" : "DE: Sollzins <br/>\nEN: Nominal rate.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalPercentage"
+  } ]
+};
+            defs["AllOfLoanConditionSummaryTrueEffectiveRate"] = {
+  "description" : "DE: Summe effektiver Bestandteile. <br/>\nEN: True effective rate.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalPercentage"
+  } ]
+};
             defs["AllOfLoanDuration"] = {
   "description" : "DE: Darlehensdauer. <br/>\nEN: Loan duration.\n",
   "allOf" : [ {
@@ -1513,6 +1552,12 @@
   "description" : "DE: Marktwert der Immobilie. <br/>\nEN: Estate market value.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/EuroAmount"
+  } ]
+};
+            defs["AllOfNationalityCountry"] = {
+  "description" : "DE: Staatsangehörigkeit des Antragstellers. <br/> EN: Country of the nationality.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/CountryCode"
   } ]
 };
             defs["AllOfOccupationRetirementDate"] = {
@@ -1597,6 +1642,12 @@
   "description" : "DE: Rentenanspruch gesetzlich. <br/>\nEN: Public pension entitlement.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
+            defs["AllOfPersonBirthCountry"] = {
+  "description" : "DE: Geburtsland der Person. <br/> EN: BirthCountry of the person.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/CountryCode"
   } ]
 };
             defs["AllOfPersonBirthDate"] = {
@@ -1948,10 +1999,18 @@
   } ]
 };
             defs["ApartmentFloor"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ApartmentFloorKey"
+    }
+  }
+};
+            defs["ApartmentFloorKey"] = {
   "type" : "string",
   "description" : "DE: Lage des Appartments im Gebäude (nicht abschließende Aufzählung), zum Beispiel: BASEMENT=Untergeschoss, GROUND_FLOOR=Erdgeschoss, UPPER_FLOOR=Obergeschoss/Erster Stock, SECOND_FLOOR=Zweiter Stock etc. <br/> EN: open ended enum contains position of the apartment in the building, possible values are BASEMENT, GROUND_FLOOR, UPPER_FLOOR, SECOND_FLOOR, THIRD_FLOOR, FOURTH_FLOOR, FIFTH_FLOOR, SIXTH_FLOOR_OR_HIGHER\n",
   "example" : "BASEMENT",
-  "x-extensible-enum" : [ "BASEMENT", "GROUND_FLOOR", "UPPER_FLOOR", "SECOND_FLOOR", "THIRD_FLOOR", "FOURTH_FLOOR", "FIFTH_FLOOR", "SIXTH_FLOOR_OR_HIGHER" ]
+  "x-extensible-enum" : [ "BASEMENT", "GROUND_FLOOR", "UPPER_FLOOR", "SECOND_FLOOR", "THIRD_FLOOR", "FOURTH_FLOOR", "FIFTH_FLOOR", "THIRD_FOURTH_OR_FIFTH_FLOOR", "SIXTH_FLOOR_OR_HIGHER" ]
 };
             defs["Applicant"] = {
   "required" : [ "id", "person" ],
@@ -1987,11 +2046,6 @@
         "$ref" : "#/components/schemas/Address"
       } ]
     },
-    "birthPlace" : {
-      "type" : "string",
-      "description" : "DE: Geburtsort des Antragstellers. <br/> EN: The birth place of the applicant.\n",
-      "example" : "London"
-    },
     "nationalities" : {
       "type" : "array",
       "description" : "DE: Nationalitäten des Antragstellers. <br/> EN: Nationalities of the applicant.\n",
@@ -2010,13 +2064,6 @@
       "allOf" : [ {
         "$ref" : "#/components/schemas/MaritalPropertyStatus"
       } ]
-    },
-    "children" : {
-      "type" : "array",
-      "description" : "DE: Alle unterhaltsberechtigte Kinder des Antragstellers. <br/> EN: All dependent childs of the applicant.\n",
-      "items" : {
-        "$ref" : "#/components/schemas/Child"
-      }
     },
     "creditWorthiness" : {
       "description" : "DE: Informationen über die Kreditwürdigkeit des Antragstellers. <br/> EN: Information regarding credit worthiness of the applicant.\n",
@@ -2056,9 +2103,10 @@
   "description" : "DE: Detaillierte Informationen des Antragstellers. <br/> EN: Detailed information about the applicant.\n"
 };
             defs["ApplicantId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
-    "applicantId" : {
+    "value" : {
       "type" : "string",
       "description" : "DE: Id des Antragstellers. <br/> EN: Id of the applicant.\n",
       "example" : "1"
@@ -2120,9 +2168,17 @@
   "description" : "DE: Beziehung zwischen genau zwei für Antrag relevanten Antragstellern. Wenn dieses Objekt nicht vorhanden ist, dann ist existieren keine Beziehungen. <br/>\nEN: Relationship between exactly 2 applicants involved in the financing application when applicable.\n\nThe absence of this object indicates that no relationship is available.\n"
 };
             defs["ApplicantRelationshipType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ApplicantRelationshipTypeKey"
+    }
+  }
+};
+            defs["ApplicantRelationshipTypeKey"] = {
   "type" : "string",
   "description" : "DE: Beziehungsart (nicht abschließende Aufzählung) z.B. (MARRIED=mit Ehepartner/in, REGISTERED_PARTNERSHIP=eingetragenem Lebenspartner/in, PARTNERSHIP=Lebenspartner/in). <br/>\nEN: Open ended enum contains values for relation type, possible values are (MARRIED, REGISTERED_PARTNERSHIP, PARTNERSHIP)\n",
-  "x-extensible-enum" : "MARRIED, REGISTERED_PARTNERSHIP, PARTNERSHIP"
+  "x-extensible-enum" : [ "MARRIED,", "REGISTERED_PARTNERSHIP,", "PARTNERSHIP" ]
 };
             defs["ApplicantRelationships"] = {
   "type" : "object",
@@ -2137,11 +2193,16 @@
   "description" : "A wrapper Type to hold a set of possible relationships among applicants involved in the financing application.\n"
 };
             defs["ApplicantRelationshipsQuery"] = {
-  "type" : "array",
-  "description" : "A wrapper Type to hold a set of possible relationships among applicants involved in the financing application.\n",
-  "items" : {
-    "$ref" : "#/components/schemas/ApplicantRelationship"
-  }
+  "type" : "object",
+  "properties" : {
+    "data" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/ApplicantRelationship"
+      }
+    }
+  },
+  "description" : "A wrapper Type to hold a set of possible relationships among applicants involved in the financing application.\n"
 };
             defs["Applicants"] = {
   "required" : [ "data" ],
@@ -2158,6 +2219,14 @@
   "description" : "A wrapper type which holds the essential applicant information.\n"
 };
             defs["ApplicationSubType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ApplicationSubTypeKey"
+    }
+  }
+};
+            defs["ApplicationSubTypeKey"] = {
   "type" : "string",
   "description" : "DE: Unterkategorie des Antragstyp (nicht abschließende Aufzählung), z.B. (NEW_CUSTOMER, PROLONGATION, SUPPLEMENTARY_FINANCING). <br/>\nEN: Open ended enum contains application sub type, possible values are (NEW_CUSTOMER, PROLONGATION, SUPPLEMENTARY_FINANCING).\n",
   "example" : "NEW_APPLICANT",
@@ -2194,10 +2263,18 @@
   "description" : "DE: Information über die gesamte Wohn- und Nutzfläche. <br/> EN: Information about the total residential and useable area.\n"
 };
             defs["AtticDetail"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/AtticDetailKey"
+    }
+  }
+};
+            defs["AtticDetailKey"] = {
   "type" : "string",
   "description" : "DE: Details zum Dachgeschoss (nicht abschließende Aufzählung), z.B DEVELOPED=ausgebaut, UPGRADEABLE=ausbaufähig, NOT_UPGRADEABLE=nicht_ausbaufähig. <br/> EN: open ended enum contains attic details, possible values are DEVELOPED, UPGRADEABLE, NOT_UPGRADEABLE.\n",
   "example" : "DEVELOPED",
-  "x-extensible-enum" : [ "DEVELOPED", "PARTIALY_DEVELOPED", "UPGRADEABLE", "NOT_UPGRADEABLE" ]
+  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "UPGRADEABLE", "NOT_UPGRADEABLE" ]
 };
             defs["AuctionInfo"] = {
   "type" : "object",
@@ -2222,6 +2299,14 @@
   "description" : "DE: Information zur Immobilienauktion. <br/> EN: Information about the estate auction.\n"
 };
             defs["AuxProductType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/AuxProductTypeKey"
+    }
+  }
+};
+            defs["AuxProductTypeKey"] = {
   "type" : "string",
   "description" : "DE: Typ des Nachrangdarlehens (nicht abschließende Aufzählung), z.B. DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL. <br/> EN: Open ended enum contains auxiliary loan product types, possible values are DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL.\n",
   "example" : "HANSEATIC_ALL",
@@ -2266,20 +2351,20 @@
   "type" : "object",
   "properties" : {
     "iban" : {
-      "pattern" : "^[A-Z]{2}[0-9]{3,32}$",
-      "type" : "string",
       "description" : "DE: IBAN <br/> EN: The International Bank Account Number\n",
-      "example" : "DE46500210000010130383"
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Iban"
+      } ]
     },
     "accountOwner" : {
       "type" : "string",
       "description" : "DE: Name des Kontobesitzers <br/> EN: The name of the account owner\n"
     },
     "bic" : {
-      "pattern" : "^[A-Z]{6}[2-9A-Z]{1}[0-9A-Z]{1}([0-9A-Z]{3})?$",
-      "type" : "string",
       "description" : "DE: BIC <br/> EN: The Business Identifier Code\n",
-      "example" : "INGBDEFF"
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Bic"
+      } ]
     },
     "bank" : {
       "type" : "string",
@@ -2304,10 +2389,30 @@
   "description" : "DE: Information über den Keller. <br/> EN: Information about building basement.\n"
 };
             defs["BasementDetail"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/BasementDetailKey"
+    }
+  }
+};
+            defs["BasementDetailKey"] = {
   "type" : "string",
   "description" : "DE: Details zum Keller (nicht abschließende Aufzählung), z.B DEVELOPED=voll_unterkellert, PARTIALY_DEVELOPED=teil_unterkellert, NONE=nicht_unterkellert. <br/> EN: Open ended enum contains basement details, possible values are DEVELOPED, PARTIALY_DEVELOPED, NONE.\n",
   "example" : "DEVELOPED",
-  "x-extensible-enum" : [ "DEVELOPED", "PARTIALY_DEVELOPED", "NONE" ]
+  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "NONE" ]
+};
+            defs["Bic"] = {
+  "required" : [ "value" ],
+  "type" : "object",
+  "properties" : {
+    "value" : {
+      "pattern" : "^[A-Z]{6}[2-9A-Z]{1}[0-9A-Z]{1}([0-9A-Z]{3})?$",
+      "type" : "string",
+      "example" : "INGBDEFF"
+    }
+  },
+  "description" : "DE: BIC <br/> EN: The Business Identifier Code\n"
 };
             defs["BonusIncome"] = {
   "type" : "object",
@@ -2385,13 +2490,17 @@
   }
 };
             defs["BuildEstateFinancing"] = {
-  "required" : [ "buildCosts", "landPrice" ],
+  "required" : [ "buildCosts" ],
   "type" : "object",
   "description" : "DE: Finanzierungsrelevante Information zu dem Bau der Immobilie. <br/>\nEN: Financing-relevant information for the construction of the property.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/ForeignEstateFinancingNeed"
   }, {
     "properties" : {
+      "reason" : {
+        "type" : "string",
+        "default" : "BUILD"
+      },
       "buildCosts" : {
         "$ref" : "#/components/schemas/EstateBuildingCosts"
       },
@@ -2438,10 +2547,18 @@
   "description" : "DE: Information über das Gebäude. <br/> EN: Information about the building.\n"
 };
             defs["BusinessLine"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/BusinessLineKey"
+    }
+  }
+};
+            defs["BusinessLineKey"] = {
   "type" : "string",
   "description" : "DE: Branche der Tätigkeit (nicht abschließende Aufzählung). <br/> EN: Open ended enum contains values for the business line, possible values are AGRICULTURE, CAR_DEALER, CAR_REPAIR, CHURCH, CONSTRUCTION_INDUSTRY, COURIER_SERVICE, DATING_SERVICE, EDUCATION, ENERGY, EROTIC_INDUSTRY, FINANCES, FINANCIAL_SERVICES, FITNESS, GAS_STATION, GASTRONOMY, HANDCRAFT, HEALTH_SERVICE, HOTEL_INDUSTRY, IT_CONSULTING, KIOSK, OTHER, PRODUCTION_AND_INDUSTRY, PUBLIC_SERVICE, REAL_ESTATE, TAXI, TRANSPORT, TRAVEL_AGENCY, WHOLE_AND_RETAIL_SALE.\n",
   "example" : "AGRICULTURE",
-  "x-extensible-enum" : [ "AGRICULTURE", "CAR_DEALER", "CAR_REPAIR", "CHURCH", "CONSTRUCTION_INDUSTRY", "COURIER_SERVICE", "DATING_SERVICE", "EDUCATION", "ENERGY", "EROTIC_INDUSTRY", "FINANCES", "FINANCIAL_SERVICES", "FITNESS", "GAS_STATION", "GASTRONOMY", "HANDCRAFT", "HEALTH_SERVICE", "HOTEL_INDUSTRY", "IT_CONSULTING", "KIOSK", "OTHER", "PRODUCTION_AND_INDUSTRY", "PUBLIC_SERVICE", "REAL_ESTATE", "TAXI", "TRANSPORT", "TRAVEL_AGENCY", "WHOLE_AND_RETAIL_SALE" ]
+  "x-extensible-enum" : [ "AGRICULTURE", "CAR_DEALER", "CAR_REPAIR", "CHURCH", "CONSTRUCTION_INDUSTRY", "COURIER_SERVICE", "DATING_SERVICE", "EDUCATION", "ENERGY", "EROTIC_INDUSTRY", "FINANCES", "FINANCIAL_SERVICES", "FITNESS", "GAS_STATION", "GASTRONOMY", "HANDCRAFT", "HEALTH_SERVICE", "HOTEL_INDUSTRY", "IT_CONSULTING", "KIOSK", "PRODUCTION_AND_INDUSTRY", "PUBLIC_SERVICE", "REAL_ESTATE", "TAXI", "TRANSPORT", "TRAVEL_AGENCY", "WHOLE_AND_RETAIL_SALE", "MINING", "CHEMICAL_INDUSTRY", "DIPLOMATIC_SERVICE", "PRINTING_INDUSTRY", "FISHING_INDUSTRY", "WOOD_INDUSTRY", "IRON_INDUSTRY", "CAR_MANUFACTURER", "MILITARY", "FOOD_INDUSTRY", "NON_PROFIT_ORGANISATION", "MEDIA_INDUSTRY", "SEAFARING", "LOGISTIC", "TEXTILE_INDUSTRY", "TOURISM", "MANUFACTURING_INDUSTRY", "PASSENGER_TRANSPORT", "TEMP_EMPLOYMENT_AGENCY", "OTHER" ]
 };
             defs["BuyExistingEstateFinancing"] = {
   "required" : [ "purchasePrice" ],
@@ -2451,6 +2568,10 @@
     "$ref" : "#/components/schemas/ForeignEstateFinancingNeed"
   }, {
     "properties" : {
+      "reason" : {
+        "type" : "string",
+        "default" : "BUY_EXISTING"
+      },
       "renovationCosts" : {
         "description" : "DE: Summe der durchgeführten wertsteigernden Maßnahmen bei der Renovierung. <br/> EN: Sum of completed value-enhancing refurbishments.\n",
         "allOf" : [ {
@@ -2483,6 +2604,10 @@
     "$ref" : "#/components/schemas/ForeignEstateFinancingNeed"
   }, {
     "properties" : {
+      "reason" : {
+        "type" : "string",
+        "default" : "BUY_NEW"
+      },
       "optionalEquipment" : {
         "description" : "DE: Kosten für Sonderausstattungen. <br/>\nEN: Special / optional equipment costs.\n",
         "allOf" : [ {
@@ -2504,6 +2629,71 @@
     }
   } ]
 };
+            defs["Calculation"] = {
+  "required" : [ "calculationDate", "loanType", "type" ],
+  "type" : "object",
+  "properties" : {
+    "type" : {
+      "$ref" : "#/components/schemas/CalculationType"
+    },
+    "calculationDate" : {
+      "description" : "DE: Datum der Kalkulation. <br/>\nEN: Calculation date.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/ISODate"
+      } ]
+    }
+  },
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "HOUSEHOLD" : "#/components/schemas/HouseholdCalculation",
+      "CONDITION" : "#/components/schemas/ConditionCalculation",
+      "LENDING_VALUE" : "#/components/schemas/LendingValueCalculation"
+    }
+  }
+};
+            defs["CalculationDetail"] = {
+  "type" : "object",
+  "properties" : {
+    "index" : {
+      "type" : "integer",
+      "description" : "DE: Reihenfolge Index innerhalb der Kalkulationdetails. <br/>\nEN: Order index within calculation details.\n"
+    },
+    "category" : {
+      "$ref" : "#/components/schemas/DetailType"
+    },
+    "name" : {
+      "type" : "string",
+      "description" : "DE: Name des Wertes. <br/>\nEN: Entry name.\n"
+    },
+    "description" : {
+      "type" : "string",
+      "description" : "DE: Beschreibung des Wertes. <br/>\nEN: Entry description.\n"
+    },
+    "userInputValue" : {
+      "type" : "string",
+      "description" : "DE: Von user eingetragene Wert. <br/>\nEN: User input value.\n"
+    },
+    "calculatedValue" : {
+      "type" : "string",
+      "description" : "DE: Berechnete Wert. <br/>\nEN: Calculated value.\n"
+    },
+    "hints" : {
+      "type" : "array",
+      "description" : "DE: Hinweise zum  <br/>\nEN: Collection of calculation hints.\n",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  },
+  "description" : "DE: Detailierte Information über einen Eintrag in der Kalkulation.<br/>\nEN: Detailed information about single entry in the calculation.\n"
+};
+            defs["CalculationType"] = {
+  "type" : "string",
+  "description" : "DE: Kalkulationstyp (nicht abschließende Aufzählung), z.B. HOUSEHOLD=Haushaltsrechnung, CONDITION=Konditionskalkulation, LENDING_VALUE=Beleihungswert-Kalkulation <br/> EN: Calculation type - open ended enum contains property type details, possible values are HOUSEHOLD, CONDITION, LENDING_VALUE\n",
+  "example" : "HOUSEHOLD",
+  "x-extensible-enum" : [ "HOUSEHOLD", "CONDITION", "LENDING_VALUE" ]
+};
             defs["CapitalIncome"] = {
   "type" : "object",
   "properties" : {
@@ -2519,7 +2709,7 @@
         "$ref" : "#/components/schemas/PeriodicalEuroAmount"
       } ]
     },
-    "rentalIncome" : {
+    "rentalIncomes" : {
       "type" : "array",
       "items" : {
         "$ref" : "#/components/schemas/RentalIncomeItem"
@@ -2582,21 +2772,28 @@
   } ]
 };
             defs["CessionType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/CessionTypeKey"
+    }
+  }
+};
+            defs["CessionTypeKey"] = {
   "type" : "string",
   "description" : "DE: Abschnittstyp in der Abteilung III des Grundbuches (nicht abschließende Aufzählung), z.B. LETTER, BOOK <br/> EN: Open ended enum contains type of section III of the land register, possible values are (LETTER, BOOK).\n",
   "example" : "LETTER",
   "x-extensible-enum" : [ "LETTER", "BOOK" ]
 };
-            defs["Child"] = {
+            defs["Client"] = {
   "type" : "object",
   "properties" : {
-    "birthDate" : {
-      "$ref" : "#/components/schemas/ISODate"
+    "key" : {
+      "$ref" : "#/components/schemas/ClientKey"
     }
-  },
-  "description" : "DE: Informationen über ein Kind des Antragstellers. <br/> EN: Information about a child of the applicant.\n"
+  }
 };
-            defs["Client"] = {
+            defs["ClientKey"] = {
   "type" : "string",
   "description" : "DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.\n",
   "example" : "INTERHYP_ASP",
@@ -2649,6 +2846,7 @@
   }
 };
             defs["CommandId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
     "value" : {
@@ -2676,6 +2874,7 @@
   "description" : "DE: Abschließende Information zur Provision. <br/> EN: Complete information about commissions.\n"
 };
             defs["CompanyAdvisor"] = {
+  "required" : [ "companyAddress" ],
   "type" : "object",
   "properties" : {
     "companyName" : {
@@ -2712,7 +2911,35 @@
     }
   } ]
 };
+            defs["ConditionCalculation"] = {
+  "type" : "object",
+  "description" : "DE: Information über Konditionskalkulation. <br/>\nEN: Information about condition calculation.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Calculation"
+  }, {
+    "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "CONDITION"
+      },
+      "loans" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/LoanConditionInfo"
+        }
+      }
+    }
+  } ]
+};
             defs["Construction"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ConstructionKey"
+    }
+  }
+};
+            defs["ConstructionKey"] = {
   "type" : "string",
   "description" : "DE: Bauweise des Gebäudes (nicht abschließende Aufzählung), z.B. MASSIVE=Massivbauweise, PREFABRICATED=Plattenbauweise, WOOD_FRAME=Holzständerbauweise, WOOD=Holzbauweise, HALF_TIMBERED=Fachwerkbauweise, LOG_BUILDING=Blockhausbauweise, LOAM=Lehmbauweise. <br/> EN: open ended enum contains construction of the property, possible values are SOLID, CONCRETE_SLAB, WOOD_STAND, WOOD, TIMBER_FRAMING, LOG_BUILDING, COB, OTHER\n",
   "example" : "SOLID",
@@ -2859,6 +3086,18 @@
     }
   }
 };
+            defs["CountryCode"] = {
+  "required" : [ "value" ],
+  "type" : "object",
+  "properties" : {
+    "value" : {
+      "pattern" : "^[A-Z]{2}$",
+      "type" : "string",
+      "example" : "DE"
+    }
+  },
+  "description" : "DE: Ländercode nach ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). <br/> EN: Official ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code.\n"
+};
             defs["CreditLoan"] = {
   "type" : "object",
   "properties" : {
@@ -2879,6 +3118,7 @@
   "description" : "DE: Informationen zur Finanzierungsstruktur. <br/>\nEN: A Credit Loan represents specific financing structure component.\n"
 };
             defs["CreditLoanId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
     "value" : {
@@ -2923,20 +3163,22 @@
   "description" : "A wrapper Type to hold a set of submission credit loans.\n"
 };
             defs["CreditWorthiness"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
-    "negativeWorthiness" : {
-      "type" : "boolean",
-      "description" : "DE: WAHR, wenn die Kreditwürdigkeit negativ ist. <br/> EN: TRUE, if there is a negative credit worthiness.\n"
-    },
-    "worthinessRating" : {
-      "description" : "DE: Bewertung der Kreditwürdigkeit. <br/> EN: Rating of the credit worthiness.\n",
-      "allOf" : [ {
-        "$ref" : "#/components/schemas/WorthinessRating"
-      } ]
+    "type" : {
+      "type" : "string",
+      "description" : "DE: Art der Ermittlung der Kreditwürdigkeitsbeurteilung (nicht abschließende Aufzählung, zum Beispiel: Schufa). <br/> EN: Open ended enum contains possible Worthiness Ratings, possible values are SCHUFA.\n",
+      "x-extensible-enum" : [ "SCHUFA" ]
     }
   },
-  "description" : "DE: Informationen über die Kreditwürdigkeit des Antragstellers (zum Beispiel Schufa Score). <br/> EN: Information regarding credit worthiness (like Schufa-Score).\n"
+  "description" : "DE: Informationen über die Kreditwürdigkeit des Antragstellers (zum Beispiel Schufa Score). <br/> EN: Information regarding credit worthiness (like Schufa-Score).\n",
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "SCHUFA" : "#/components/schemas/SchufaRating"
+    }
+  }
 };
             defs["CubicMeter"] = {
   "required" : [ "value" ],
@@ -2964,6 +3206,14 @@
   "description" : "A cursor refers to a random string of characters which marks a specific item in a collection of data.\n\nThe cursor will always point to the item, however it will be invalidated if the item is deleted or removed.\n"
 };
             defs["Cycle"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/CycleKey"
+    }
+  }
+};
+            defs["CycleKey"] = {
   "type" : "string",
   "description" : "DE: Mögliche Zykluswerte (nicht abschließende Aufzählung), z.B. MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL. <br/> EN: Open ended enum contains possible cycle values, possible values are MONTHLY, QUARTERLY, HALF_YEARLY, ANNUAL.\n",
   "example" : "ANNUAL",
@@ -2973,8 +3223,10 @@
   "type" : "object",
   "properties" : {
     "bic" : {
-      "type" : "string",
-      "description" : "DE: BIC-Code des Darlehensgebers. <br/> EN: BIC code of loaner.\n"
+      "description" : "DE: BIC-Code des Darlehensgebers. <br/> EN: BIC code of loaner.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Bic"
+      } ]
     },
     "name" : {
       "type" : "string",
@@ -2997,6 +3249,7 @@
   "description" : "DE: Details über bereits existierende Kreditausgaben. <br/>\nEN: Information about periodical expenses associated with existing loans.\n"
 };
             defs["DebtId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
     "value" : {
@@ -3012,18 +3265,29 @@
     "$ref" : "#/components/schemas/OwnEstateFinancingNeed"
   }, {
     "properties" : {
+      "reason" : {
+        "type" : "string",
+        "default" : "DEBT_RESCHEDULING"
+      },
       "additionalLoan" : {
         "$ref" : "#/components/schemas/EstateAdditionalLoan"
       }
     }
   } ]
 };
+            defs["DetailType"] = {
+  "type" : "string",
+  "description" : "DE: Kategorie des Kalkulkationwertes (nicht abschließende Aufzählung), z.B. ENTRY, SUB_TOTAL. <br/> EN: Calculated value category - open ended enum contains property type details, possible values are ENTRY, SUB_TOTAL.\n",
+  "example" : "ENTRY",
+  "x-extensible-enum" : [ "ENTRY", "SUB_TOTAL" ]
+};
             defs["Duration"] = {
   "required" : [ "unit", "value" ],
   "type" : "object",
   "properties" : {
     "value" : {
-      "type" : "integer"
+      "type" : "integer",
+      "format" : "int32"
     },
     "unit" : {
       "type" : "string",
@@ -3065,7 +3329,7 @@
   } ]
 };
             defs["Estate"] = {
-  "required" : [ "address", "id", "type" ],
+  "required" : [ "id", "type" ],
   "type" : "object",
   "properties" : {
     "id" : {
@@ -3118,7 +3382,6 @@
   }
 };
             defs["EstateAcquisitionCosts"] = {
-  "required" : [ "costsNotary", "purchaseTax" ],
   "type" : "object",
   "properties" : {
     "brokerage" : {
@@ -3170,16 +3433,27 @@
       "type" : "string"
     },
     "usage" : {
-      "type" : "string",
-      "description" : "DE: Zusätzliche Verwendung der Hypothek (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER. <br/> EN: Open ended enum contains possible estate additional loan usages, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER.\n",
-      "example" : "OPERATIONAL_COSTS",
-      "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTYC", "CONSTRUCTION", "RENOVATION", "OTHER" ]
+      "$ref" : "#/components/schemas/EstateAdditionalLoanUsage"
     }
   },
   "description" : "DE: Information über ein bestehendes Darlehen (Hypothek). <br/>\nEN: Information about the already existing mortgage.\n"
 };
+            defs["EstateAdditionalLoanUsage"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/EstateAdditionalLoanUsageKey"
+    }
+  }
+};
+            defs["EstateAdditionalLoanUsageKey"] = {
+  "type" : "string",
+  "description" : "DE: Zusätzliche Verwendung der Hypothek (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER. <br/> EN: Open ended enum contains possible estate additional loan usages, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, CONSTRUCTION, RENOVATION, OTHER.\n",
+  "example" : "OPERATIONAL_COSTS",
+  "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTYC", "CONSTRUCTION", "RENOVATION", "OTHER" ]
+};
             defs["EstateBuildingCosts"] = {
-  "required" : [ "construction", "landPrice" ],
+  "required" : [ "construction" ],
   "type" : "object",
   "properties" : {
     "landPrice" : {
@@ -3668,6 +3942,42 @@
   },
   "description" : "DE: Zusätzliches regelmäßiges Einkommen durch bzw. für Kinder / Familie. <br/> EN: Additional periodical income for children / family.\n"
 };
+            defs["FinancialBurdenDetail"] = {
+  "type" : "object",
+  "properties" : {
+    "index" : {
+      "type" : "integer",
+      "description" : "DE: Reihenfolge Index innerhalb Belastungsplan. <br/>\nEN: Order index within financial burden.\n"
+    },
+    "deadline" : {
+      "description" : "DE: Stichtag für die Belastung. <br/>\nEN: Burden deadline.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/ISODate"
+      } ]
+    },
+    "occasion" : {
+      "type" : "string",
+      "description" : "DE: Anlass der Belastung. <br/>\nEN: Burden reason.\n"
+    },
+    "description" : {
+      "type" : "string",
+      "description" : "DE: Beschreibung der Belastung. <br/>\nEN: Burden description.\n"
+    },
+    "deltaLiquidity" : {
+      "description" : "DE: Deltaliquidität. <br/>\nEN: Delta liquidity.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/EuroAmount"
+      } ]
+    },
+    "residualLiquidity" : {
+      "description" : "DE: Restliquidität. <br/>\nEN: Residual liquidity.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/EuroAmount"
+      } ]
+    }
+  },
+  "description" : "DE: Detailierte Information über den Belastungsplan innerhalb der Haushaltsrechnung.<br/>\nEN: Detailed information about financial burden within household calculation.\n"
+};
             defs["FinancialDebt"] = {
   "type" : "object",
   "description" : "DE: Informationen über (finanzielle) Schulden vor Beginn der angefragten Finanzierung. <br/> EN: Financial debts information before the financing process.\n",
@@ -3768,9 +4078,10 @@
   }
 };
             defs["FinancialStandingId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
-    "id" : {
+    "value" : {
       "type" : "string"
     }
   },
@@ -3928,7 +4239,7 @@
         "$ref" : "#/components/schemas/Estate"
       }
     },
-    "financialStanding" : {
+    "financialStandings" : {
       "minItems" : 1,
       "type" : "array",
       "items" : {
@@ -3972,6 +4283,7 @@
   }
 };
             defs["FinancingApplicationId"] = {
+  "required" : [ "value" ],
   "type" : "object",
   "properties" : {
     "value" : {
@@ -4029,6 +4341,14 @@
   } ]
 };
             defs["FinancingApplicationStatus"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/FinancingApplicationStatusKey"
+    }
+  }
+};
+            defs["FinancingApplicationStatusKey"] = {
   "type" : "string",
   "description" : "DE: Status des Finanzierungsantrages. <br/> EN: Status of the application.\n",
   "x-extensible-enum" : [ "QUALIFIED_FOR_SUBMISSION", "SUBMITTED" ]
@@ -4050,8 +4370,12 @@
   } ]
 };
             defs["FinancingDetails"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
+    "type" : {
+      "type" : "string"
+    },
     "payoutDate" : {
       "description" : "DE: Auszahlungsdatum. <br/>\nEN: Payout date.\n",
       "allOf" : [ {
@@ -4068,13 +4392,31 @@
       "$ref" : "#/components/schemas/LoanQuota"
     }
   },
-  "description" : "DE: Detailierte Information über das Finanzierungvorhaben. <br/>\nEN: Detailed information about the financing process.\n"
+  "description" : "DE: Detailierte Information über das Finanzierungvorhaben. <br/>\nEN: Detailed information about the financing process.\n",
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "OWN" : "#/components/schemas/OwnEstateFinancingDetails",
+      "FOREIGN" : "#/components/schemas/ForeignEstateFinancingDetails"
+    }
+  }
 };
             defs["FinancingNeed"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
     "additionalCosts" : {
       "$ref" : "#/components/schemas/EstateAdditionalCosts"
+    },
+    "type" : {
+      "type" : "string"
+    }
+  },
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "OWN" : "#/components/schemas/OwnEstateFinancingNeed",
+      "FOREIGN" : "#/components/schemas/ForeignEstateFinancingNeed"
     }
   }
 };
@@ -4140,9 +4482,17 @@
   "description" : "DE: Referenz zum Finanzierungsangebot. <br/> EN: Reference to the financing offer.\n"
 };
             defs["FinancingOfferStatus"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/FinancingOfferStatusKey"
+    }
+  }
+};
+            defs["FinancingOfferStatusKey"] = {
   "type" : "string",
   "description" : "DE: Status des Finanzierungsangebots. <br/>\nEN: Financing offer status.\n",
-  "enum" : [ "ACCEPTED", "REJECTED" ]
+  "x-extensible-enum" : [ "ACCEPTED", "REJECTED" ]
 };
             defs["FinancingStructures"] = {
   "type" : "object",
@@ -4381,6 +4731,10 @@
     "$ref" : "#/components/schemas/FinancingDetails"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "FOREIGN"
+      },
       "newOwners" : {
         "type" : "array",
         "description" : "DE: Eigentümer zum Zeitpunkt der Finanzierung (Erste Abteilung des Grundbuchblattes). <br/> EN: Owner at the time of financing (First Section of the Land Register Page)\n",
@@ -4398,12 +4752,27 @@
   } ]
 };
             defs["ForeignEstateFinancingNeed"] = {
-  "required" : [ "estateAcquisitionCosts" ],
+  "required" : [ "reason" ],
   "type" : "object",
+  "discriminator" : {
+    "propertyName" : "reason",
+    "mapping" : {
+      "BUILD" : "#/components/schemas/BuildEstateFinancing",
+      "BUY_EXISTING" : "#/components/schemas/BuyExistingEstateFinancing",
+      "BUY_NEW" : "#/components/schemas/BuyNewEstateFinancing"
+    }
+  },
   "allOf" : [ {
     "$ref" : "#/components/schemas/FinancingNeed"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "FOREIGN"
+      },
+      "reason" : {
+        "type" : "string"
+      },
       "estateAcquisitionCosts" : {
         "$ref" : "#/components/schemas/EstateAcquisitionCosts"
       }
@@ -4420,12 +4789,28 @@
   "description" : "DE: Das Darlehen soll erst nach einer bestimmten Vorlaufzeit ausgezahlt werden. <br/> EN: Loan shall be released.\n"
 };
             defs["FreeLancerJobType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/FreeLancerJobTypeKey"
+    }
+  }
+};
+            defs["FreeLancerJobTypeKey"] = {
   "type" : "string",
   "description" : "DE: Freiberufliche Tätigkeit des Antragstellers (nicht abschließende Aufzählung). <br/> EN: open ended enum contains alues for the freelancer job types, possible values are CARER, AMBORDERLY, ADVOCATE, APOTHECARY, ARCHITECT, PHYSICIAN, UNDERTAKER, ACCOUNTANT, REVISOR, FED_DP_COMMISSIONER, DECORATOR, DIETICIAN, INTERPRET, ERGOTHERAPIST, NUTRITIONIST, GEOGRAPHER, CONSULTANT, IT_CONSULT, FINANCSERV, PHOTOGRAPH, DESIGNER, MIDWIFE, HEALERMASSEUR, HEALER, HISTORIAN, COMPUTER_SPEC, ENGINEER, INSOLVENCY_ADMIN, JOURNALIST, PHYSIOTHER, ORDERLY, NURSE, MUSICIAN, CONSTRUCTOR, THERAPIST, MASSEUR, PARAMEDIC, NOTARY, OPTICIAN, OPERA_SINGER, HR_ADVISR, PSYCHOLOG, PSYCHOTHER, PHYSTHERAP, INTER_DECORATOR, RADIO_ANNOUNCER, EXPERT, TOWN_PLANER, STRUCT_ENG, TAX_ADVISR, TAX_AGENT, VETERINARY, TRANSLATOR, UNDER_ADVISR, AUDITOR, DENTAL_TECH, DENTIST, OTHER.\n",
   "example" : "ARCHITECT",
-  "x-extensible-enum" : [ "CARER", "AMBORDERLY", "ADVOCATE", "APOTHECARY", "ARCHITECT", "PHYSICIAN", "UNDERTAKER", "ACCOUNTANT", "REVISOR", "FED_DP_COMMISSIONER", "DECORATOR", "DIETICIAN", "INTERPRET", "ERGOTHERAPIST", "NUTRITIONIST", "GEOGRAPHER", "CONSULTANT", "IT_CONSULT", "FINANCSERV", "PHOTOGRAPH", "DESIGNER", "MIDWIFE", "HEALERMASSEUR", "HEALER", "HISTORIAN", "COMPUTER_SPEC", "ENGINEER", "INSOLVENCY_ADMIN", "JOURNALIST", "PHYSIOTHER", "ORDERLY", "NURSE", "MUSICIAN", "CONSTRUCTOR", "THERAPIST", "MASSEUR", "PARAMEDIC", "NOTARY", "OPTICIAN", "OPERA_SINGER", "HR_ADVISR", "PSYCHOLOG", "PSYCHOTHER", "PHYSTHERAP", "INTER_DECORATOR", "RADIO_ANNOUNCER", "EXPERT", "TOWN_PLANER", "STRUCT_ENG", "TAX_ADVISR", "TAX_AGENT", "VETERINARY", "TRANSLATOR", "UNDER_ADVISR", "AUDITOR", "DENTAL_TECH", "DENTIST", "OTHER" ]
+  "x-extensible-enum" : [ "CARER", "AMBORDERLY", "ADVOCATE", "APOTHECARY", "ARCHITECT", "PHYSICIAN", "UNDERTAKER", "ACCOUNTANT", "REVISOR", "FED_DP_COMMISSIONER", "DECORATOR", "DIETICIAN", "INTERPRET", "ERGOTHERAPIST", "NUTRITIONIST", "GEOGRAPHER", "CONSULTANT", "IT_CONSULT", "FINANCSERV", "PHOTOGRAPH", "DESIGNER", "MIDWIFE", "HEALERMASSEUR", "HEALER", "HISTORIAN", "COMPUTER_SPEC", "ENGINEER", "INSOLVENCY_ADMIN", "JOURNALIST", "PHYSIOTHER", "ORDERLY", "NURSE", "MUSICIAN", "CONSTRUCTOR", "THERAPIST", "MASSEUR", "PARAMEDIC", "NOTARY", "OPTICIAN", "OPERA_SINGER", "HR_ADVISR", "PSYCHOLOG", "PSYCHOTHER", "PHYSTHERAP", "INTER_DECORATOR", "RADIO_ANNOUNCER", "EXPERT", "TOWN_PLANER", "STRUCT_ENG", "TAX_ADVISR", "TAX_AGENT", "VETERINARY", "TRANSLATOR", "UNDER_ADVISR", "AUDITOR", "DENTAL_TECH", "DENTIST", "BROKER", "OTHER" ]
 };
             defs["Furnishing"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/FurnishingKey"
+    }
+  }
+};
+            defs["FurnishingKey"] = {
   "type" : "string",
   "description" : "DE: Beurteilung der Austattung der Immobilie (nicht abschließende Aufzählung). Einflussfaktoren sind z. B. verwendete Böden, etc. <br/> EN: Open ended enum contains property configuration (furnishing) details, possible values are (SIMPLE, GOOD, VERY_GOOD).\n",
   "example" : "SIMPLE",
@@ -4528,6 +4913,10 @@
     "$ref" : "#/components/schemas/RealEstateRating"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "HOUSE"
+      },
       "landValueEvaluation" : {
         "$ref" : "#/components/schemas/LandValueEvaluation"
       }
@@ -4563,6 +4952,32 @@
   },
   "description" : "DE: Informationen zum Haushalt. <br/> EN: Information regarding a Household and it's inhabitants.\n"
 };
+            defs["HouseholdCalculation"] = {
+  "type" : "object",
+  "description" : "DE: Information zu der Haushalt Kalkulation <br/>\nEN: Information about the household calculation.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Calculation"
+  }, {
+    "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "HOUSEHOLD"
+      },
+      "details" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/CalculationDetail"
+        }
+      },
+      "financialBurden" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/FinancialBurdenDetail"
+        }
+      }
+    }
+  } ]
+};
             defs["Households"] = {
   "type" : "object",
   "properties" : {
@@ -4576,15 +4991,20 @@
   "description" : "A wrapper Type to hold a set of households associated with the financing application.\n"
 };
             defs["HouseholdsQuery"] = {
-  "minItems" : 1,
-  "type" : "array",
-  "description" : "A wrapper Type to hold a set of households associated with the financing application.\n",
-  "items" : {
-    "$ref" : "#/components/schemas/Household"
-  }
+  "type" : "object",
+  "properties" : {
+    "data" : {
+      "minItems" : 1,
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/Household"
+      }
+    }
+  },
+  "description" : "A wrapper Type to hold a set of households associated with the financing application.\n"
 };
             defs["HousingExpense"] = {
-  "required" : [ "costs", "currentHousingSituation" ],
+  "required" : [ "currentHousingSituation" ],
   "type" : "object",
   "properties" : {
     "currentHousingSituation" : {
@@ -4604,6 +5024,14 @@
   "description" : "DE: Informationen zu Wohnungsausgaben. <br/> EN: Information regarding housing expenses.\n"
 };
             defs["HousingSituation"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/HousingSituationKey"
+    }
+  }
+};
+            defs["HousingSituationKey"] = {
   "type" : "string",
   "description" : "DE: Art der derzeitigen Wohnsituation (nicht abschließende Aufzaehlung), z.B. (RENT=zur Miete, RATE=im Eigentum mit Darlehensrate, DEBT_FREE=im abbezahlten Eigentum, PARENTS=mietfrei bei den Eltern/Partner, OWN_PROPERTY=im Eigentum, FIRST_APPLICANT=in einer Eigentumswohnung). <br/> EN: Open ended enum contains value for the current housing/accomodation types, possible values are (RENT, RATE, DEBT_FREE, PARENTS, OWN_PROPERTY, FIRST_APPLICANT).\n",
   "example" : "RENT",
@@ -4617,8 +5045,19 @@
             defs["ISODateTime"] = {
   "type" : "string",
   "description" : "DE: Datum, Syntax nach <a href=\"https://tools.ietf.org/html/rfc3339#section-5.6\">RFC 3339</a><br/> EN: Date according to <a href=\"https://tools.ietf.org/html/rfc3339#section-5.6\">RFC 3339</a>\n",
-  "format" : "date-time",
-  "example" : "2019-12-29T10:22:50Z"
+  "format" : "date-time"
+};
+            defs["Iban"] = {
+  "required" : [ "value" ],
+  "type" : "object",
+  "properties" : {
+    "value" : {
+      "pattern" : "^[A-Z]{2}[0-9]{3,32}$",
+      "type" : "string",
+      "example" : "DE46500210000010130383"
+    }
+  },
+  "description" : "DE: IBAN <br/> EN: The International Bank Account Number\n"
 };
             defs["Income"] = {
   "type" : "object",
@@ -4727,6 +5166,14 @@
   "description" : "A wrapper Type to hold a set of financing informer involved in the consultation phase.\n"
 };
             defs["Inhabitants"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/InhabitantsKey"
+    }
+  }
+};
+            defs["InhabitantsKey"] = {
   "type" : "string",
   "description" : "DE: Anzahl Einwohner im Ort (nicht abschließende Aufzählung), z.B. UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000. <br/> EN: open ended enum contains umber of inhabitants in the city, possible values are UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000.\n",
   "example" : "UP_TO_1000",
@@ -4947,12 +5394,28 @@
   } ]
 };
             defs["KfwCallType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/KfwCallTypeKey"
+    }
+  }
+};
+            defs["KfwCallTypeKey"] = {
   "type" : "string",
   "description" : "DE: Art der KFW-Reservierung (nicht abschließende Aufzählung), z.B. LIGHT, PLUS. <br/> EN: Open ended enum contains Kfw reservation process call type, possible values are LIGHT, PLUS.\n",
   "example" : "PLUS",
   "x-extensible-enum" : [ "LIGHT", "PLUS" ]
 };
             defs["KfwProgram"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/KfwProgramKey"
+    }
+  }
+};
+            defs["KfwProgramKey"] = {
   "type" : "string",
   "description" : "DE: KFW-Förderprogramm (nicht abschließende Aufzählung), z.B. Wohneigen, Wohn159, Energie153-40, Energie151, Energie152, Energie167. <br/> EN: Open ended enum contains possible programs for Kfw, possible values are Wohneigen, Wohn159, Energie153-40, Energie151, Energie152, Energie167.\n",
   "example" : "Wohneigen",
@@ -5081,7 +5544,35 @@
     }
   }
 };
+            defs["LendingValueCalculation"] = {
+  "type" : "object",
+  "description" : "DE: Information zu der Kalkulation <br/>\nEN: Information about the calculation.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Calculation"
+  }, {
+    "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "LENDING_VALUE"
+      },
+      "details" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/CalculationDetail"
+        }
+      }
+    }
+  } ]
+};
             defs["LessorType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/LessorTypeKey"
+    }
+  }
+};
+            defs["LessorTypeKey"] = {
   "type" : "string",
   "description" : "DE: Erbbaurechtgeber (nicht abschließende Aufzählung), z.B. CHURCH, CITY, INDIVIDUAL, COMPANY, OTHER. <br/> EN: open ended enum contains building lease owner, possible values are CHURCH, CITY, INDIVIDUAL, COMPANY, OTHER.\n",
   "example" : "CHURCH",
@@ -5196,6 +5687,97 @@
     }
   }
 };
+            defs["LoanConditionGeneral"] = {
+  "type" : "object",
+  "properties" : {
+    "loanId" : {
+      "$ref" : "#/components/schemas/LoanId"
+    },
+    "loanAmount" : {
+      "description" : "DE: Darlehnsbetrag. <br/>\nEN: Loan amount.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/EuroAmount"
+      } ]
+    },
+    "loanQuota" : {
+      "description" : "DE: Darlehnsquote (Prozentsatz) <br/>\nEN: Loan quota (percentage).\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Percentage"
+      } ]
+    },
+    "mixedEffectiveRate" : {
+      "description" : "DE: Mischzins (effektiv). <br/>\nEN: Mixed effective rate.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalPercentage"
+      } ]
+    },
+    "baserateIssueDate" : {
+      "description" : "DE: Einstandsdatum. <br/>\nEN: Base rate issue date.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/ISODate"
+      } ]
+    },
+    "burden" : {
+      "description" : "DE: Periodische Rate (z.B. monatliche Rate). <br/>\nEN: Periodical payment amount (e.g. rate per month).\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+      } ]
+    },
+    "paymentTime" : {
+      "$ref" : "#/components/schemas/PaymentTime"
+    }
+  },
+  "description" : "DE: Allgemeine Information zu einem Darlehen (Konditionskalkulation). <br/>\nEN: General loan information (conditions calculation).\n"
+};
+            defs["LoanConditionInfo"] = {
+  "type" : "object",
+  "properties" : {
+    "loan" : {
+      "$ref" : "#/components/schemas/LoanConditionGeneral"
+    },
+    "details" : {
+      "type" : "array",
+      "description" : "DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>\nEN: Information about single entry within condition calculation.\n",
+      "items" : {
+        "$ref" : "#/components/schemas/AdditionalInfo"
+      }
+    },
+    "summary" : {
+      "$ref" : "#/components/schemas/LoanConditionSummary"
+    }
+  },
+  "description" : "DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>\nEN: Information about single loan which is a part of condition calculation.\n"
+};
+            defs["LoanConditionSummary"] = {
+  "type" : "object",
+  "properties" : {
+    "effectiveRate" : {
+      "description" : "DE: Effektiver Zins. <br/>\nEN: Effective interest rate.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalPercentage"
+      } ]
+    },
+    "nominalRate" : {
+      "description" : "DE: Sollzins <br/>\nEN: Nominal rate.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalPercentage"
+      } ]
+    },
+    "trueEffectiveRate" : {
+      "description" : "DE: Summe effektiver Bestandteile. <br/>\nEN: True effective rate.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalPercentage"
+      } ]
+    },
+    "additionalInfo" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/AdditionalInfo"
+      }
+    }
+  },
+  "description" : "DE: Zusammenfassung von Informationen zu einzelnem Darlehen (Konditionskalkulation). <br/>\nEN: Summary information about single loan (conditions calculation).\n"
+};
             defs["LoanId"] = {
   "type" : "object",
   "properties" : {
@@ -5255,10 +5837,7 @@
   "type" : "object",
   "properties" : {
     "type" : {
-      "type" : "string",
-      "description" : "DE: Ursprung des Wertes der Darlehensquote (nicht abschließende Aufzählung), z.B. CALCULATED, EXTERNAL. <br/> EN: Open ended enum contains loan quota values, possible values are CALCULATED, EXTERNAL.\n",
-      "example" : "CALCULATED",
-      "x-extensible-enum" : [ "CALCULATED", "EXTERNAL" ]
+      "$ref" : "#/components/schemas/LoanQuotaType"
     },
     "lendingValue" : {
       "description" : "DE: Beleihungswert. <br/>\nEN: Lending value.\n",
@@ -5280,6 +5859,20 @@
     }
   },
   "description" : "DE: Wert und Prozentsatz für die Darlehensquote. <br/> EN: Value and percentage for a loan quota\n"
+};
+            defs["LoanQuotaType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/LoanQuotaTypeKey"
+    }
+  }
+};
+            defs["LoanQuotaTypeKey"] = {
+  "type" : "string",
+  "description" : "DE: Ursprung des Wertes der Darlehensquote (nicht abschließende Aufzählung), z.B. CALCULATED, EXTERNAL. <br/> EN: Open ended enum contains loan quota values, possible values are CALCULATED, EXTERNAL.\n",
+  "example" : "CALCULATED",
+  "x-extensible-enum" : [ "CALCULATED", "EXTERNAL" ]
 };
             defs["LoanType"] = {
   "type" : "string",
@@ -5383,16 +5976,32 @@
   "x-extensible-enum" : [ "ANNUITAET", "W_RIESTER", "ZWIFI", "FLEX_PLUS", "FLEX", "FORWARD", "KOMBI", "KONSTANT", "KONST_KOMBI", "VERSICHER ==> Ist das ein \"Zinszahlungsdarlehen\" / wenn ja umbennen, wenn nein was dann?", "VOLLTILGER", "OTHER" ]
 };
             defs["MaritalPropertyStatus"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/MaritalPropertyStatusKey"
+    }
+  }
+};
+            defs["MaritalPropertyStatusKey"] = {
   "type" : "string",
   "description" : "DE: Beschreibung des ehelichen Güterstandes (nicht abschließende Aufzählung, zum Beispiel: COMMUNITY_OF_ACQUESTS_AND_GAINS = ZUGEWINNGEMEINSCHAFT, SEPARATION_OF_PROPERTY = GÜTERTRENNUNG, ABSOLUTE_COMMUNITY_PROPERTY = GÜTERGEMEINSCHAFT). <br/> EN: Open ended enum contains values for the matrimonial property, possible values are COMMUNITY_OF_ACQUESTS_AND_GAINS, SEPARATE_PROPERTY, ABSOLUTE_COMMUNITY_PROPERTY.\n",
   "example" : "COMMUNITY_OF_ACQUESTS_AND_GAINS",
   "x-extensible-enum" : [ "COMMUNITY_OF_ACQUESTS_AND_GAINS", "SEPARATE_PROPERTY", "ABSOLUTE_COMMUNITY_PROPERTY" ]
 };
             defs["MaritalStatus"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/MaritalStatusKey"
+    }
+  }
+};
+            defs["MaritalStatusKey"] = {
   "type" : "string",
   "description" : "DE: Familienstand des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: SINGLE = LEDIG, MARRIED = VERHEIRATET, REGISTERED_PARTNERSHIP = EINGETRAGENE LEBENSPARTNERSCHAFT, WIDOWED = VERWITWET, DIVORCED = GESCHIEDEN, SEPARATED=GETRENNT). <br/> EN: Open ended enum contains values for the marital status, possible values are SINGLE, MARRIED, REGISTERED_PARTNER, WIDOWED, DIVORCED, SEPARATED.\n",
   "example" : "SINGLE",
-  "x-extensible-enum" : [ "SINGLE", "MARRIED", "REGISTERED_PARTNER", "WIDOWED", "DIVORCED", "SEPARATED" ]
+  "x-extensible-enum" : [ "SINGLE", "MARRIED", "REGISTERED_PARTNER", "WIDOWED", "DIVORCED", "SEPARATED", "COHABITING" ]
 };
             defs["MarketValueEvaluation"] = {
   "required" : [ "marketValue" ],
@@ -5414,16 +6023,26 @@
   "description" : "DE: Information über eine externe Marktbewertung. <br/> EN: Information about external market value evaluation.\n"
 };
             defs["ModernisationScope"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ModernisationScopeKey"
+    }
+  }
+};
+            defs["ModernisationScopeKey"] = {
   "type" : "string",
   "description" : "DE: Umfang der Modernisierung (nicht abschließende Aufzählung), z.B. (COMPLETE=komplett, PARTIAL=teilweise, UNKNOWN=unbekannt). <br/> EN: Open ended enum contains scope of the modernisation, possible values are (COMPLETE, PARTIAL, UNKNOWN).\n",
   "example" : "COMPLETE",
   "x-extensible-enum" : [ "COMPLETE", "PARTIAL", "UNKNOWN" ]
 };
             defs["ModernisationType"] = {
-  "type" : "string",
-  "description" : "DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER).\n",
-  "example" : "ELECTRIC",
-  "x-extensible-enum" : [ "ELECTRIC", "FASSADE", "FLOOR_PLAN", "FLOORING", "HEATING", "INSTALLATION", "INSULATION", "ROOF", "SANITARY", "WINDOW", "OTHER" ]
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ModernisationTypeKey"
+    }
+  }
 };
             defs["ModernisationTypeAndScope"] = {
   "required" : [ "modernisationType" ],
@@ -5437,6 +6056,12 @@
     }
   },
   "description" : "DE: Information über den Typ und Umfang der Modernisierung. <br/>\nEN: Information about the type and scope of the modernisation.\n"
+};
+            defs["ModernisationTypeKey"] = {
+  "type" : "string",
+  "description" : "DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER).\n",
+  "example" : "ELECTRIC",
+  "x-extensible-enum" : [ "ELECTRIC", "FASSADE", "FLOOR_PLAN", "FLOORING", "HEATING", "INSTALLATION", "INSULATION", "ROOF", "SANITARY", "WINDOW", "OTHER" ]
 };
             defs["ModifyFinancingApplicationCommand"] = {
   "required" : [ "operation" ],
@@ -5472,23 +6097,42 @@
   }
 };
             defs["Nationality"] = {
-  "required" : [ "countryCode", "type" ],
+  "required" : [ "country", "type" ],
   "type" : "object",
   "properties" : {
-    "countryCode" : {
-      "pattern" : "^[A-Z]{2}$",
-      "type" : "string",
-      "description" : "DE: Staatsangehörigkeit des Antragstellers nach ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). <br/> EN: Official ISO_3166-1_alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code of the nationality.\n",
-      "example" : "DE"
+    "country" : {
+      "description" : "DE: Staatsangehörigkeit des Antragstellers. <br/> EN: Country of the nationality.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/CountryCode"
+      } ]
     },
     "type" : {
-      "type" : "string",
-      "description" : "DE: Art der Staatsbürgerschaft (nicht abschließende Aufzählung, zum Beispiel FIRST = Erste Staatsbürgerschaft, SECOND = Zweite Staatsbürgerschaft). <br/> EN: Open ended enum contains values for the Nationality, possible values are (FIRST, SECOND, THIRD).\n",
-      "x-extensible-enum" : [ "FIRST", "SECOND", "THIRD" ]
+      "$ref" : "#/components/schemas/NationalityType"
     }
   }
 };
+            defs["NationalityType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/NationalityTypeKey"
+    }
+  }
+};
+            defs["NationalityTypeKey"] = {
+  "type" : "string",
+  "description" : "DE: Art der Staatsbürgerschaft (nicht abschließende Aufzählung, zum Beispiel FIRST = Erste Staatsbürgerschaft, SECOND = Zweite Staatsbürgerschaft). <br/> EN: Open ended enum contains values for the Nationality, possible values are (FIRST, SECOND, THIRD).\n",
+  "x-extensible-enum" : [ "FIRST", "SECOND", "THIRD" ]
+};
             defs["Neighbourhood"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/NeighbourhoodKey"
+    }
+  }
+};
+            defs["NeighbourhoodKey"] = {
   "type" : "string",
   "description" : "DE: Umgebung (nicht abschließende Aufzählung), z.B. RESIDENTIAL_COMPLETE=reines_Wohngebiet, COMMERCIAL_MAINLY=ueberwiegend_Gewerbegebiet, MIXED=Mischgebiet, INDUSTRIAL=Industriegebiet, OUTSIDE_CITY=Einzellage_außerhalb_des_Ortes. <br/> EN: Open ended enum contains neighbourhood details, possible values are RESIDENTIAL, COMMERCIAL, MIXED, INDUSTRIAL, OUTSIDE .\n",
   "example" : "RESIDENTIAL",
@@ -5710,6 +6354,10 @@
     "$ref" : "#/components/schemas/OwnEstateFinancingNeed"
   }, {
     "properties" : {
+      "reason" : {
+        "type" : "string",
+        "default" : "OTHER_CAPITAL"
+      },
       "neededLoan" : {
         "$ref" : "#/components/schemas/OtherCapitalNeededLoan"
       }
@@ -5727,13 +6375,24 @@
       } ]
     },
     "usage" : {
-      "type" : "string",
-      "description" : "DE: Zusätzlicher Kapitalbedarf (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING. <br/>\nEN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.\n",
-      "example" : "OPERATIONAL_COSTS",
-      "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTY", "RESIDENTIAL_USE", "RENEWABLE_ENERGY", "DISBURSMENT_COOWNERS", "DISBURSMENT_HEIRS", "OTHER", "RECONSTRUCTION", "BUY", "CONSTRUCTION", "BUY_CONSTRUCTION", "SUPPLEMENTARY_FINANCING" ]
+      "$ref" : "#/components/schemas/OtherCapitalNeededLoanUsage"
     }
   },
   "description" : "DE: Details über das Darlehen, welches zur Kapitalbeschaffung benötigt wird. <br/>\nEN: Details about the loan needed for raising capital.\n"
+};
+            defs["OtherCapitalNeededLoanUsage"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/OtherCapitalNeededLoanUsageKey"
+    }
+  }
+};
+            defs["OtherCapitalNeededLoanUsageKey"] = {
+  "type" : "string",
+  "description" : "DE: Zusätzlicher Kapitalbedarf (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING. <br/>\nEN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.\n",
+  "example" : "OPERATIONAL_COSTS",
+  "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTY", "RESIDENTIAL_USE", "RENEWABLE_ENERGY", "DISBURSMENT_COOWNERS", "DISBURSMENT_HEIRS", "OTHER", "RECONSTRUCTION", "BUY", "CONSTRUCTION", "BUY_CONSTRUCTION", "SUPPLEMENTARY_FINANCING" ]
 };
             defs["OtherEquity"] = {
   "type" : "object",
@@ -5752,9 +6411,6 @@
   "type" : "object",
   "properties" : {
     "value" : {
-      "$ref" : "#/components/schemas/PeriodicalEuroAmount"
-    },
-    "additional" : {
       "$ref" : "#/components/schemas/PeriodicalEuroAmount"
     },
     "description" : {
@@ -5793,6 +6449,10 @@
     "$ref" : "#/components/schemas/FinancingDetails"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "OWN"
+      },
       "acquisitionYear" : {
         "description" : "DE: Jahr der Zahlung / Jahr der Fertigstellung. <br/> EN: Purchase / completion year.\n",
         "allOf" : [ {
@@ -5803,11 +6463,27 @@
   } ]
 };
             defs["OwnEstateFinancingNeed"] = {
+  "required" : [ "reason" ],
   "type" : "object",
+  "discriminator" : {
+    "propertyName" : "reason",
+    "mapping" : {
+      "DEBT_RESCHEDULING" : "#/components/schemas/DebtReschedulingFinancing",
+      "OTHER_CAPITAL" : "#/components/schemas/OtherCapitalFinancing",
+      "RENOVATE" : "#/components/schemas/RenovateEstateFinancing"
+    }
+  },
   "allOf" : [ {
     "$ref" : "#/components/schemas/FinancingNeed"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "OWN"
+      },
+      "reason" : {
+        "type" : "string"
+      },
       "renovationCosts" : {
         "description" : "DE: Werterhaltende Maßnahmen <br/> EN: Value-conserving actions\n",
         "allOf" : [ {
@@ -5909,8 +6585,7 @@
   "type" : "object",
   "properties" : {
     "type" : {
-      "type" : "string",
-      "x-extensible-enum" : [ "OUTSIDE_PARKING_SPACE", "UNDERGOUND_GARAGE", "DUPLEX_GARAGE", "CARPORT_GARAGE", "SEPARATE_GARAGE", "DOUBLE_GARAGE" ]
+      "$ref" : "#/components/schemas/ParkingSpaceType"
     },
     "pitchNumber" : {
       "type" : "string",
@@ -5918,12 +6593,34 @@
     },
     "count" : {
       "type" : "integer",
-      "description" : "DE: Anzahl Parkplätze von diesem Typ. <br/> EN: Number of parking spaces of this type.\n"
+      "description" : "DE: Anzahl Parkplätze von diesem Typ. <br/> EN: Number of parking spaces of this type.\n",
+      "format" : "int32"
     }
   },
   "description" : "DE: Information über den Parkplatz. <br/> EN: Information about the parking space.\n"
 };
+            defs["ParkingSpaceType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ParkingSpaceTypeKey"
+    }
+  }
+};
+            defs["ParkingSpaceTypeKey"] = {
+  "type" : "string",
+  "example" : "DUPLEX_GARAGE",
+  "x-extensible-enum" : [ "OUTSIDE_PARKING_SPACE", "UNDERGROUND_GARAGE", "DUPLEX_GARAGE", "CARPORT_GARAGE", "SEPARATE_GARAGE", "DOUBLE_GARAGE" ]
+};
             defs["PaymentTime"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/PaymentTimeKey"
+    }
+  }
+};
+            defs["PaymentTimeKey"] = {
   "type" : "string",
   "description" : "DE: Mögliche Zahlungszeit-Arten (nicht abschließende Aufzählung), z.B. ADVANCE=Vorschüssig, ARREARS=Nachschüssig. <br/> EN: Open ended enum contains possible payment time types, possible values are ADVANCE, ARREARS.\n",
   "example" : "ADVANCE",
@@ -6067,6 +6764,17 @@
       "allOf" : [ {
         "$ref" : "#/components/schemas/ISODate"
       } ]
+    },
+    "birthPlace" : {
+      "type" : "string",
+      "description" : "DE: Geburtsort der Person. <br/> EN: The birth place of the person.\n",
+      "example" : "London"
+    },
+    "birthCountry" : {
+      "description" : "DE: Geburtsland der Person. <br/> EN: BirthCountry of the person.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/CountryCode"
+      } ]
     }
   },
   "description" : "DE: Personendaten einer Person. <br/> EN: Personal data of a person.\n"
@@ -6081,10 +6789,7 @@
       "enum" : [ "M", "F" ]
     },
     "title" : {
-      "type" : "string",
-      "description" : "DE: Akademischer Titel des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: DR, PH_D, PD_DR, PROF, PROF_DR). <br/> EN: Open ended enum contains possible title values, possible values are DR, PH_D, PD_DR, PROF, PROF_DR.\n",
-      "example" : "DIPL_ING",
-      "x-extensible-enum" : [ "DR", "PH_D", "PD_DR", "PROF", "PROF_DR" ]
+      "$ref" : "#/components/schemas/Title"
     },
     "firstName" : {
       "type" : "string",
@@ -6118,14 +6823,47 @@
   } ]
 };
             defs["Phone"] = {
+  "required" : [ "phoneNumber", "type" ],
   "type" : "object",
   "properties" : {
     "phoneNumber" : {
       "type" : "string",
       "description" : "DE: Mobil- oder Festnetztelefonnummer des Antragstellers. <br/> EN: Mobile or landline telephone number of the customer.\n",
       "example" : "+49 160 123456"
+    },
+    "type" : {
+      "$ref" : "#/components/schemas/PhoneType"
+    },
+    "reachable" : {
+      "$ref" : "#/components/schemas/PhoneReachability"
     }
   }
+};
+            defs["PhoneReachability"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/PhoneReachabilityKey"
+    }
+  }
+};
+            defs["PhoneReachabilityKey"] = {
+  "type" : "string",
+  "description" : "DE: Erreichbarkeit unter dieser Telefonnumer (nicht abschließende Aufzählung, zum Beispiel: DAYTIME = tagsüber, EVENING = abends). <br/> EN: Reachable by this phone number, possible values are DAYTIME, EVENING.\n",
+  "x-extensible-enum" : [ "DAYTIME", "EVENING" ]
+};
+            defs["PhoneType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/PhoneTypeKey"
+    }
+  }
+};
+            defs["PhoneTypeKey"] = {
+  "type" : "string",
+  "description" : "DE: Art der Telefonnummer (nicht abschließende Aufzählung, zum Beispiel: MOBILE = Mobilfunknummer, LANDLINE = Festnetznummer, UNSPECIFIED = nicht angegeben). <br/> EN: Type of the phone number, possible values are MOBILE, LANDLINE, UNSPECIFIED.\n",
+  "x-extensible-enum" : [ "MOBILE", "LANDLINE", "UNSPECIFIED" ]
 };
             defs["PlannedModernisation"] = {
   "required" : [ "planedCosts" ],
@@ -6191,12 +6929,28 @@
   } ]
 };
             defs["Prefabrication"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/PrefabricationKey"
+    }
+  }
+};
+            defs["PrefabricationKey"] = {
   "type" : "string",
   "description" : "DE: Besonderheiten der Bauart (nicht abschließende Aufzählung), z.B NORMAL=keine_Besonderheiten, PREFABRICATED_Fertighaus, BAREBONES_HOUSE_Ausbauhaus, CONSTRUCTION_KIT_Bausatzhaus . <br/> EN: Open ended enum contains special construction design, possible values are NO_SPECIFICS, PREFABRICATED_HOUSE, GROW_HOUSE, SELF_BUILD_HOUSE .\n",
   "example" : "NO_SPECIFICS",
   "x-extensible-enum" : [ "NO_SPECIFICS", "PREFABRICATED_HOUSE", "GROW_HOUSE", "SELF_BUILD_HOUSE" ]
 };
             defs["PreviousOwner"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/PreviousOwnerKey"
+    }
+  }
+};
+            defs["PreviousOwnerKey"] = {
   "type" : "string",
   "description" : "DE: Vorheriger Immobilienbesitzer (nicht abschließende Aufzählung), z.B. THIRD_PERSON, FAMILY_MEMBER. <br/> EN: Open ended enum contains previous owner of the estate, possible values are THIRD_PERSON, FAMILY_MEMBER.\n",
   "example" : "THIRD_PERSON",
@@ -6283,7 +7037,7 @@
         "$ref" : "#/components/schemas/PropertiesRegisterInventory"
       }
     },
-    "owner" : {
+    "owners" : {
       "type" : "array",
       "description" : "DE: Derzeitige Eigentümer (Erste Abteilung des Grundbuchblattes). <br/> EN: Current owners (first section of the land register sheet).\n",
       "items" : {
@@ -6737,14 +7491,27 @@
   "description" : "DE: Bürgschaften für die Immobilie. <br/> EN: Guarantees associated with the real estate.\n"
 };
             defs["RealEstatePropertyCondition"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/RealEstatePropertyConditionKey"
+    }
+  }
+};
+            defs["RealEstatePropertyConditionKey"] = {
   "type" : "string",
   "description" : "DE: Zustand des Gebäudes (nicht abschließende Aufzählung), z.B. IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW. <br/> EN: open ended enum contains general condition of the real estate, possible values are IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW\n",
   "example" : "IN_RENOVATION_NEED",
   "x-extensible-enum" : [ "IN_TOTAL_RENOVATION_NEED", "IN_EXTENSIVE_MODERNISATION_NEEED", "IN_RENOVATION_NEED", "IN_MODERNISATION_NEED", "WELL_KEPT", "AS_NEW" ]
 };
             defs["RealEstateRating"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
+    "type" : {
+      "type" : "string",
+      "default" : "DEFAULT"
+    },
     "marketValue" : {
       "description" : "DE: Geschätzter Marktwert. <br/> EN: Estimated market value.\n",
       "allOf" : [ {
@@ -6758,7 +7525,14 @@
       } ]
     }
   },
-  "description" : "DE: Information laut Immobilionbewertung. <br/> EN: Information from estate evaluation\n"
+  "description" : "DE: Information laut Immobilionbewertung. <br/> EN: Information from estate evaluation\n",
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "HOUSE" : "#/components/schemas/HouseRating",
+      "DEFAULT" : "#/components/schemas/RealEstateRating"
+    }
+  }
 };
             defs["Recommendation"] = {
   "type" : "object",
@@ -6775,7 +7549,6 @@
   "description" : "DE: Empfehlung des Beraters. <br/> EN: Financing advisor recommendations.\n"
 };
             defs["RegisterCover"] = {
-  "required" : [ "registerCity", "registerCourt", "registerPage", "registerVolume" ],
   "type" : "object",
   "properties" : {
     "registerCourt" : {
@@ -6851,9 +7624,7 @@
   "type" : "object",
   "properties" : {
     "legalBasis" : {
-      "type" : "string",
-      "description" : "DE: Relevante Rechtsnorm (nicht abschließende Aufzählung), z.B. (34_C_GEWO, 34_I_GEWO siehe auch (https://www.gesetze-im-internet.de/gewo/)). <br/> EN: Open ended enum contains the relevant legal norm, possible values are (34_C_GEWO, 34_I_GEWO).\n",
-      "x-extensible-enum" : [ "34_C_GEWO", "34_I_GEWO" ]
+      "$ref" : "#/components/schemas/RegulatoryAuthorityLegalBasis"
     },
     "name" : {
       "type" : "string",
@@ -6870,7 +7641,26 @@
   },
   "description" : "DE: Die Zuständige Aufsichtsbehörde der Firma. <br/> EN: Responsible supervisory authority of the company.\n"
 };
+            defs["RegulatoryAuthorityLegalBasis"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/RegulatoryAuthorityLegalBasisKey"
+    }
+  }
+};
+            defs["RegulatoryAuthorityLegalBasisKey"] = {
+  "type" : "string",
+  "description" : "DE: Relevante Rechtsnorm (nicht abschließende Aufzählung), z.B. (34_C_GEWO, 34_I_GEWO siehe auch (https://www.gesetze-im-internet.de/gewo/)). <br/> EN: Open ended enum contains the relevant legal norm, possible values are (34_C_GEWO, 34_I_GEWO).\n",
+  "x-extensible-enum" : [ "34_C_GEWO", "34_I_GEWO" ]
+};
             defs["RenovateEstateFinancing"] = {
+  "properties" : {
+    "reason" : {
+      "type" : "string",
+      "default" : "RENOVATE"
+    }
+  },
   "description" : "DE: Finanzierungsrelevante Information zum Umbau / Modernisierung. <br/>\nEN: Financing-relevant information for the refurbishment / modernisation.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/OwnEstateFinancingNeed"
@@ -6943,9 +7733,7 @@
   "type" : "object",
   "properties" : {
     "type" : {
-      "type" : "string",
-      "description" : "DE: Rolle der zuständigen Person (nicht abschließende Aufzählung), z.B. (PROCESSOR=Ansprechpartner, MANAGER=Führungskraft). <br/> EN: Open ended enum contains the role of the responsible person , possible values are (PROCESSOR, MANAGER)\n",
-      "x-extensible-enum" : [ "PROCESSOR", "MANAGER" ]
+      "$ref" : "#/components/schemas/ResponsiblePersonType"
     },
     "personName" : {
       "$ref" : "#/components/schemas/PersonName"
@@ -6954,6 +7742,19 @@
       "$ref" : "#/components/schemas/Contact"
     }
   }
+};
+            defs["ResponsiblePersonType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/ResponsiblePersonTypeKey"
+    }
+  }
+};
+            defs["ResponsiblePersonTypeKey"] = {
+  "type" : "string",
+  "description" : "DE: Rolle der zuständigen Person (nicht abschließende Aufzählung), z.B. (PROCESSOR=Ansprechpartner, MANAGER=Führungskraft). <br/> EN: Open ended enum contains the role of the responsible person , possible values are (PROCESSOR, MANAGER)\n",
+  "x-extensible-enum" : [ "PROCESSOR", "MANAGER" ]
 };
             defs["RevokeSubmissionCommand"] = {
   "required" : [ "reason", "revokedOn" ],
@@ -6983,7 +7784,7 @@
   } ]
 };
             defs["Salary"] = {
-  "required" : [ "net", "numberOfPayments" ],
+  "required" : [ "net" ],
   "type" : "object",
   "properties" : {
     "gross" : {
@@ -7028,13 +7829,17 @@
   "type" : "object",
   "description" : "DE: Bewertung der Kreditwürdigkeit des Antragstellers durch die Schufa. <br/> EN: Rating of the credit worthiness by Schufa.\n",
   "allOf" : [ {
-    "$ref" : "#/components/schemas/WorthinessRating"
+    "$ref" : "#/components/schemas/CreditWorthiness"
   }, {
     "properties" : {
       "type" : {
         "type" : "string",
         "description" : "DE: Kreditwürdigkeitsbeurteilung der Schufa. <br/> EN: Worthiness Ratings of the applicant rated by Schufa.\n",
         "default" : "SCHUFA"
+      },
+      "hasNegativeSchufaEntry" : {
+        "type" : "boolean",
+        "description" : "DE: WAHR, wenn ein negativer Schufa-Krediteintrag vorhanden ist. <br/> EN: TRUE, if there is a negative schufa entry.\n"
       },
       "ratingStep" : {
         "type" : "string",
@@ -7097,10 +7902,7 @@
   "type" : "object",
   "properties" : {
     "method" : {
-      "type" : "string",
-      "description" : "DE: Berechnungsmethode für das Einkommen (nicht abschließende Aufzaehlung), z.B. (CUSTOMER_SPECIFICATION=Kundenangabe, PROFIT_AND_LOSS_ACCOUNT=Gewinn- und Verlustrechnung, NO_METHOD). <br/> EN: Open ended enum contains method for profit calculation, possible values are (CUSTOMER_SPECIFICATION, PROFIT_AND_LOSS_ACCOUNT, NO_METHOD).\n",
-      "example" : "CUSTOMER_SPECIFICATION",
-      "x-extensible-enum" : [ "CUSTOMER_SPECIFICATION", "PROFIT_AND_LOSS_ACCOUNT", "NO_METHOD" ]
+      "$ref" : "#/components/schemas/SelfEmploymentIncomeMethod"
     },
     "description" : {
       "type" : "string",
@@ -7153,6 +7955,20 @@
   },
   "description" : "DE: Informationen zum Einkommen aus selbständiger Tätigkeit für ein Jahr <br/> EN: Describes the self employment income information for a year.\n"
 };
+            defs["SelfEmploymentIncomeMethod"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/SelfEmploymentIncomeMethodKey"
+    }
+  }
+};
+            defs["SelfEmploymentIncomeMethodKey"] = {
+  "type" : "string",
+  "description" : "DE: Berechnungsmethode für das Einkommen (nicht abschließende Aufzaehlung), z.B. (CUSTOMER_SPECIFICATION=Kundenangabe, PROFIT_AND_LOSS_ACCOUNT=Gewinn- und Verlustrechnung, NO_METHOD). <br/> EN: Open ended enum contains method for profit calculation, possible values are (CUSTOMER_SPECIFICATION, PROFIT_AND_LOSS_ACCOUNT, NO_METHOD).\n",
+  "example" : "CUSTOMER_SPECIFICATION",
+  "x-extensible-enum" : [ "CUSTOMER_SPECIFICATION", "PROFIT_AND_LOSS_ACCOUNT", "NO_METHOD" ]
+};
             defs["ShareHolding"] = {
   "type" : "object",
   "properties" : {
@@ -7199,7 +8015,7 @@
   } ]
 };
             defs["SolvencyCreditDebt"] = {
-  "required" : [ "residualDebt", "type" ],
+  "required" : [ "type" ],
   "type" : "object",
   "description" : "DE: Raten- und Leasingkredite. <br/> EN: Installment and leasing credits.\n",
   "allOf" : [ {
@@ -7236,6 +8052,10 @@
     "$ref" : "#/components/schemas/SpecialRealEstateCharacteristics"
   }, {
     "properties" : {
+      "type" : {
+        "type" : "string",
+        "default" : "HOUSE"
+      },
       "farm" : {
         "type" : "boolean",
         "description" : "DE: Bauernhof. <br/> EN: Farm.\n"
@@ -7244,14 +8064,27 @@
   } ]
 };
             defs["SpecialPropertyType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/SpecialPropertyTypeKey"
+    }
+  }
+};
+            defs["SpecialPropertyTypeKey"] = {
   "type" : "string",
   "description" : "DE: Sondereigentumstyp (nicht abschließende Aufzählung), z.B. BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE. <br/> EN: open ended enum contains unit Property details, possible values are (BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE)\n",
   "example" : "BASEMENT",
   "x-extensible-enum" : [ "BASEMENT", "HOBBY", "DRYING_ROOM", "ATTIC", "OFFICE", "APARTMENT", "ALL_ROOMS", "GARAGE", "OUT_PARK", "UG_PARK", "DUPLEX_PARK", "GROUND", "TOWNHOUSE_CORNER", "TOWNHOUSE_CENTER", "SEMIDETACHED_HOUSE" ]
 };
             defs["SpecialRealEstateCharacteristics"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
+    "type" : {
+      "type" : "string",
+      "default" : "DEFAULT"
+    },
     "careProperty" : {
       "type" : "boolean",
       "description" : "DE: Betreutes Wohnen. <br/> EN: Assisted living.\n"
@@ -7269,7 +8102,14 @@
       "description" : "DE: Objekt unter Denkmalschutz. <br/> EN: Estate under monument protection.\n"
     }
   },
-  "description" : "DE: Spezielle Nutzung der Immobilie. <br/> EN: Special use of property.\n"
+  "description" : "DE: Spezielle Nutzung der Immobilie. <br/> EN: Special use of property.\n",
+  "discriminator" : {
+    "propertyName" : "type",
+    "mapping" : {
+      "HOUSE" : "#/components/schemas/SpecialHouseCharacteristics",
+      "DEFAULT" : "#/components/schemas/SpecialRealEstateCharacteristics"
+    }
+  }
 };
             defs["SpecialRepayment"] = {
   "required" : [ "type" ],
@@ -7306,6 +8146,14 @@
   "description" : "DE: Angabe in Quadratmetern. <br/> EN: Specification in square metres.\n"
 };
             defs["StatSource"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/StatSourceKey"
+    }
+  }
+};
+            defs["StatSourceKey"] = {
   "type" : "string",
   "description" : "DE: Infoquelle fuer den aktuellen Marktwert des Gebäudes oder Grundstuecks, z.B. MAP=Bodenrichtwertkarte, GSD, EVAL_COM=Gutachterausschuss, HVB, IMMOSCOUT, IMMOPOOL, LBS_LOCA=LBS_Zweigstelle, PLOETZ, IVD_SPIEGEL, BANK_LOCAL=Bank_vor_Ort, CITY, SPGNET=Sprengnetter, ING=ING_Objektbewertung, OTHER. <br/> EN: Open ended enum contains source for the current market or land value evaluation, possible values are MAP, GSD, EVAL_COM, HVB, IMMOSCOUT, IMMOPOOL, LBS_LOCAL, PLOETZ, IVD_SPIEGEL, BANK_LOCAL, CITY, SPGNET, ING, OTHER.\n",
   "example" : "MAP",
@@ -7581,6 +8429,13 @@
     },
     "handover" : {
       "$ref" : "#/components/schemas/Handover"
+    },
+    "calculation" : {
+      "uniqueItems" : true,
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/Calculation"
+      }
     }
   }
 };
@@ -7668,6 +8523,14 @@
   } ]
 };
             defs["SuspendedRepaymentProductType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/SuspendedRepaymentProductTypeKey"
+    }
+  }
+};
+            defs["SuspendedRepaymentProductTypeKey"] = {
   "type" : "string",
   "description" : "DE: Art des Tilgungssurrogats (nicht abschließende Aufzählung), z.B. DT_KAP_LV, DT_KAP_RV, BRIT_KAP_LV, BRIT_KAP_RV, FONDS_LV, FONDS_RV, FONDS_SPAR, BAU_SPAR, OTHER. <br/> EN: Open ended enum contains type of repayment surrogate, possible values are DT_KAP_LV, DT_KAP_RV, BRIT_KAP_LV, BRIT_KAP_RV, FONDS_LV, FONDS_RV, FONDS_SPAR, BAU_SPAR, OTHER.\n",
   "example" : "DT_KAP_LV",
@@ -7691,6 +8554,20 @@
       }
     }
   } ]
+};
+            defs["Title"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/TitleKey"
+    }
+  }
+};
+            defs["TitleKey"] = {
+  "type" : "string",
+  "description" : "DE: Akademischer Titel des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: DR, PH_D, PD_DR, PROF, PROF_DR). <br/> EN: Open ended enum contains possible title values, possible values are DR, PH_D, PD_DR, PROF, PROF_DR.\n",
+  "example" : "PROF_DR",
+  "x-extensible-enum" : [ "DR", "PH_D", "PD_DR", "PROF", "PROF_DR" ]
 };
             defs["UnavailableEquity"] = {
   "required" : [ "investmentAmount", "investmentType" ],
@@ -7760,6 +8637,14 @@
   "description" : "DE: Kosten für das Tilgungssurrogat in den Folgeperioden. <br/> EN: Upcoming payments for repayment surrogate product.\n"
 };
             defs["Utilization"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/UtilizationKey"
+    }
+  }
+};
+            defs["UtilizationKey"] = {
   "type" : "string",
   "description" : "DE: Nutzung des Ojektes (nicht abschließende Aufzählung), z.B. SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT. <br/> EN: Open ended enum contains utilization of the property, possible values are SELF_OCCUPIED, PARTLY_RENT_OUT, RENT_OUT.\n",
   "example" : "SELF_OCCUPIED",
@@ -7853,6 +8738,14 @@
   "description" : "DE: Information über Darlehen die zu Hypothek hinzugefügt werden. <br/>\nEN: Information about existing loans added to the mortgage.\n"
 };
             defs["VentureRelevantLoanType"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/VentureRelevantLoanTypeKey"
+    }
+  }
+};
+            defs["VentureRelevantLoanTypeKey"] = {
   "type" : "string",
   "description" : "DE: Bestehender Darlehenstyp (nicht abschließende Aufzählung), z.B. EMPLOYMENT=Arbeitgeberdarlehen, PRIVATE=Privatdarlehen, MORTGAGE_SAVING_PLAN=Bauspardarlehen, PUBLIC=Öffentliche Darlehen, OTHER=Sonstige Darlehen. <br/> EN: Open ended enum contains existing loan debt type, possible values are (EMPLOYMENT, PRIVATE, MORTGAGE_SAVING_PLAN, PUBLIC, OTHER)\n",
   "example" : "EMPLOYMENT",
@@ -7873,23 +8766,6 @@
     }
   },
   "description" : "Description of the invalid field value"
-};
-            defs["WorthinessRating"] = {
-  "required" : [ "type" ],
-  "type" : "object",
-  "properties" : {
-    "type" : {
-      "type" : "string",
-      "description" : "DE: Art der Ermittlung der Kreditwürdigkeitsbeurteilung (nicht abschließende Aufzählung, zum Beispiel: Schufa). <br/> EN: Open ended enum contains possible Worthiness Ratings, possible values are SCHUFA.\n",
-      "x-extensible-enum" : [ "SCHUFA" ]
-    }
-  },
-  "discriminator" : {
-    "propertyName" : "type",
-    "mapping" : {
-      "SCHUFA" : "#/components/schemas/SchufaRating"
-    }
-  }
 };
             defs["Year"] = {
   "required" : [ "value" ],
@@ -7979,12 +8855,6 @@
                     <li data-group="FinancingApplication" data-name="getFinanceStandingsForApplicant" class="">
                       <a href="#api-FinancingApplication-getFinanceStandingsForApplicant">getFinanceStandingsForApplicant</a>
                     </li>
-                    <li data-group="FinancingApplication" data-name="getFinancingApplicationAdvisorById" class="">
-                      <a href="#api-FinancingApplication-getFinancingApplicationAdvisorById">getFinancingApplicationAdvisorById</a>
-                    </li>
-                    <li data-group="FinancingApplication" data-name="getFinancingApplicationAdvisors" class="">
-                      <a href="#api-FinancingApplication-getFinancingApplicationAdvisors">getFinancingApplicationAdvisors</a>
-                    </li>
                     <li data-group="FinancingApplication" data-name="getFinancingApplicationById" class="">
                       <a href="#api-FinancingApplication-getFinancingApplicationById">getFinancingApplicationById</a>
                     </li>
@@ -8013,6 +8883,9 @@
                   <li class="nav-header" data-group="Submissions"><a href="#api-Submissions">API Methods - Submissions</a></li>
                     <li data-group="Submissions" data-name="getSubmissionById" class="">
                       <a href="#api-Submissions-getSubmissionById">getSubmissionById</a>
+                    </li>
+                    <li data-group="Submissions" data-name="getSubmissionCalculationByType" class="">
+                      <a href="#api-Submissions-getSubmissionCalculationByType">getSubmissionCalculationByType</a>
                     </li>
                     <li data-group="Submissions" data-name="getSubmissionCreditLoanById" class="">
                       <a href="#api-Submissions-getSubmissionCreditLoanById">getSubmissionCreditLoanById</a>
@@ -18422,1095 +19295,6 @@ By default is set to &#x60;FALSE&#x60; where only a **ref** to the sub-resources
                         </article>
                       </div>
                       <hr>
-                    <div id="api-FinancingApplication-getFinancingApplicationAdvisorById">
-                      <article id="api-FinancingApplication-getFinancingApplicationAdvisorById-0" data-group="User" data-name="getFinancingApplicationAdvisorById" data-version="0">
-                        <div class="pull-left">
-                          <h1>getFinancingApplicationAdvisorById</h1>
-                          <p>Get a specific mortgage advisor</p>
-                        </div>
-                        <div class="pull-right"></div>
-                        <div class="clearfix"></div>
-                        <p></p>
-                        <p class="marked">Delivers detailed information for a financing advisor by his id.</p>
-                        <p></p>
-                        <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/v2/financing-applications/{financingApplicationId}/advisors/{advisorId}</span></code></pre>
-                        <p>
-                          <h3>Usage and SDK Samples</h3>
-                        </p>
-                        <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-java">Java</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisorById-0-python">Python</a></li>
-                        </ul>
-
-                        <div class="tab-content">
-                          <div class="tab-pane active" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-curl">
-                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
- -H "Authorization: Bearer [[accessToken]]"\
--H "Accept: application/json"\
-"https://api-test.interhyp.de/submission/v2/financing-applications/{financingApplicationId}/advisors/{advisorId}"</code></pre>
-                          </div>
-                          <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-java">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.FinancingApplicationApi;
-
-import java.io.File;
-import java.util.*;
-
-public class FinancingApplicationApiExample {
-
-    public static void main(String[] args) {
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
-
-
-        FinancingApplicationApi apiInstance = new FinancingApplicationApi();
-        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-        String advisorId = advisorId_example; // String | Id for the requested advisor
-        try {
-            Advisor result = apiInstance.getFinancingApplicationAdvisorById(financingApplicationId, advisorId);
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling FinancingApplicationApi#getFinancingApplicationAdvisorById");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-
-                          <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-android">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.FinancingApplicationApi;
-
-public class FinancingApplicationApiExample {
-
-    public static void main(String[] args) {
-        FinancingApplicationApi apiInstance = new FinancingApplicationApi();
-        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-        String advisorId = advisorId_example; // String | Id for the requested advisor
-        try {
-            Advisor result = apiInstance.getFinancingApplicationAdvisorById(financingApplicationId, advisorId);
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling FinancingApplicationApi#getFinancingApplicationAdvisorById");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-  <!--
-  <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-groovy">
-  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-  </div> -->
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-String *financingApplicationId = financingApplicationId_example; // Id of the financing application
-String *advisorId = advisorId_example; // Id for the requested advisor
-
-FinancingApplicationApi *apiInstance = [[FinancingApplicationApi alloc] init];
-
-// Get a specific mortgage advisor
-[apiInstance getFinancingApplicationAdvisorByIdWith:financingApplicationId
-    advisorId:advisorId
-              completionHandler: ^(Advisor output, NSError* error) {
-                            if (output) {
-                                NSLog(@"%@", output);
-                            }
-                            if (error) {
-                                NSLog(@"Error: %@", error);
-                            }
-                        }];
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var InterhypSubmissionApi = require('interhyp_submission_api');
-var defaultClient = InterhypSubmissionApi.ApiClient.instance;
-
-
-var api = new InterhypSubmissionApi.FinancingApplicationApi()
-var financingApplicationId = financingApplicationId_example; // {{String}} Id of the financing application
-var advisorId = advisorId_example; // {{String}} Id for the requested advisor
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-api.getFinancingApplicationAdvisorById(financingApplicationId, advisorId, callback);
-</code></pre>
-                            </div>
-
-                            <!--<div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-angular">
-              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-            </div>-->
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-csharp">
-                              <pre class="prettyprint"><code class="language-cs">using System;
-using System.Diagnostics;
-using IO.Swagger.Api;
-using IO.Swagger.Client;
-using IO.Swagger.Model;
-
-namespace Example
-{
-    public class getFinancingApplicationAdvisorByIdExample
-    {
-        public void main()
-        {
-
-
-            var apiInstance = new FinancingApplicationApi();
-            var financingApplicationId = financingApplicationId_example;  // String | Id of the financing application
-            var advisorId = advisorId_example;  // String | Id for the requested advisor
-
-            try
-            {
-                // Get a specific mortgage advisor
-                Advisor result = apiInstance.getFinancingApplicationAdvisorById(financingApplicationId, advisorId);
-                Debug.WriteLine(result);
-            }
-            catch (Exception e)
-            {
-                Debug.Print("Exception when calling FinancingApplicationApi.getFinancingApplicationAdvisorById: " + e.Message );
-            }
-        }
-    }
-}
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-php">
-                              <pre class="prettyprint"><code class="language-php"><&#63;php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-$api_instance = new Swagger\Client\ApiFinancingApplicationApi();
-$financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-$advisorId = advisorId_example; // String | Id for the requested advisor
-
-try {
-    $result = $api_instance->getFinancingApplicationAdvisorById($financingApplicationId, $advisorId);
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisorById: ', $e->getMessage(), PHP_EOL;
-}
-?></code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-perl">
-                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
-use WWW::SwaggerClient::Configuration;
-use WWW::SwaggerClient::FinancingApplicationApi;
-
-
-my $api_instance = WWW::SwaggerClient::FinancingApplicationApi->new();
-my $financingApplicationId = financingApplicationId_example; # String | Id of the financing application
-my $advisorId = advisorId_example; # String | Id for the requested advisor
-
-eval { 
-    my $result = $api_instance->getFinancingApplicationAdvisorById(financingApplicationId => $financingApplicationId, advisorId => $advisorId);
-    print Dumper($result);
-};
-if ($@) {
-    warn "Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisorById: $@\n";
-}</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisorById-0-python">
-                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
-import time
-import swagger_client
-from swagger_client.rest import ApiException
-from pprint import pprint
-
-
-# create an instance of the API class
-api_instance = swagger_client.FinancingApplicationApi()
-financingApplicationId = financingApplicationId_example # String | Id of the financing application
-advisorId = advisorId_example # String | Id for the requested advisor
-
-try: 
-    # Get a specific mortgage advisor
-    api_response = api_instance.get_financing_application_advisor_by_id(financingApplicationId, advisorId)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisorById: %s\n" % e)</code></pre>
-                            </div>
-                          </div>
-
-                          <h2>Parameters</h2>
-
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
-                                <tr>
-                                  <th width="150px">Name</th>
-                                  <th>Description</th>
-                                </tr>
-                                  <tr><td style="width:150px;">financingApplicationId*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_getFinancingApplicationAdvisorById_financingApplicationId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      String
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          Id of the financing application
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">advisorId*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_getFinancingApplicationAdvisorById_advisorId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      String
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          Id for the requested advisor
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                            </table>
-
-
-
-
-
-                          <h2>Responses</h2>
-                            <h3> Status: 200 - Requested advisor is returned </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisorById-200-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisorById-200-schema">
-                                  <div id='responses-getFinancingApplicationAdvisorById-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Requested advisor is returned",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/Advisor"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisorById-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisorById-200-schema-200');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisorById-200-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 400 - Error indicates missing or wrong request parameters. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisorById-400-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisorById-400-schema">
-                                  <div id='responses-getFinancingApplicationAdvisorById-400-schema-400' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates missing or wrong request parameters.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisorById-400-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisorById-400-schema-400');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisorById-400-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 401 - Error indicates no access to the required resource. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisorById-401-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisorById-401-schema">
-                                  <div id='responses-getFinancingApplicationAdvisorById-401-schema-401' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates no access to the required resource.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/OAuthProblem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisorById-401-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisorById-401-schema-401');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisorById-401-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 404 - Error indicates that a requested advisor resource was not found. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisorById-404-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisorById-404-schema">
-                                  <div id='responses-getFinancingApplicationAdvisorById-404-schema-404' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates that a requested advisor resource was not found.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisorById-404-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisorById-404-schema-404');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisorById-404-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 500 - Unexpected Error </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisorById-500-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisorById-500-schema">
-                                  <div id='responses-getFinancingApplicationAdvisorById-500-schema-500' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Unexpected Error",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisorById-500-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisorById-500-schema-500');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisorById-500-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                        </article>
-                      </div>
-                      <hr>
-                    <div id="api-FinancingApplication-getFinancingApplicationAdvisors">
-                      <article id="api-FinancingApplication-getFinancingApplicationAdvisors-0" data-group="User" data-name="getFinancingApplicationAdvisors" data-version="0">
-                        <div class="pull-left">
-                          <h1>getFinancingApplicationAdvisors</h1>
-                          <p>Get consultation advisors</p>
-                        </div>
-                        <div class="pull-right"></div>
-                        <div class="clearfix"></div>
-                        <p></p>
-                        <p class="marked">Delivers detailed information about the consultation advisors associated with this submission.
-
-This endpoint utilizes *Expansion* feature, where *by default* only basic information shall be returned. In order to access more full details, two options are available
-
-  - follow provided links in order to navigate to submission sub-resources (i.e /v2/submissions/{submissionId}/overview)
-
-  - initiate the call with request parameter &#x60;embed&#x60; set to *TRUE* (i.e /v2/submissions/{submissionId}?embed&#x3D;true)
-
-Please refer to *Expansion* section for more details.</p>
-                        <p></p>
-                        <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/v2/financing-applications/{financingApplicationId}/advisors</span></code></pre>
-                        <p>
-                          <h3>Usage and SDK Samples</h3>
-                        </p>
-                        <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-java">Java</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-FinancingApplication-getFinancingApplicationAdvisors-0-python">Python</a></li>
-                        </ul>
-
-                        <div class="tab-content">
-                          <div class="tab-pane active" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-curl">
-                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
- -H "Authorization: Bearer [[accessToken]]"\
--H "Accept: application/json"\
-"https://api-test.interhyp.de/submission/v2/financing-applications/{financingApplicationId}/advisors?embed="</code></pre>
-                          </div>
-                          <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-java">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.FinancingApplicationApi;
-
-import java.io.File;
-import java.util.*;
-
-public class FinancingApplicationApiExample {
-
-    public static void main(String[] args) {
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
-
-
-        FinancingApplicationApi apiInstance = new FinancingApplicationApi();
-        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-        Boolean embed = true; // Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
-        try {
-            Advisors result = apiInstance.getFinancingApplicationAdvisors(financingApplicationId, embed);
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling FinancingApplicationApi#getFinancingApplicationAdvisors");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-
-                          <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-android">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.FinancingApplicationApi;
-
-public class FinancingApplicationApiExample {
-
-    public static void main(String[] args) {
-        FinancingApplicationApi apiInstance = new FinancingApplicationApi();
-        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-        Boolean embed = true; // Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
-        try {
-            Advisors result = apiInstance.getFinancingApplicationAdvisors(financingApplicationId, embed);
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling FinancingApplicationApi#getFinancingApplicationAdvisors");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-  <!--
-  <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-groovy">
-  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-  </div> -->
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-String *financingApplicationId = financingApplicationId_example; // Id of the financing application
-Boolean *embed = true; // Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size (optional)
-
-FinancingApplicationApi *apiInstance = [[FinancingApplicationApi alloc] init];
-
-// Get consultation advisors
-[apiInstance getFinancingApplicationAdvisorsWith:financingApplicationId
-    embed:embed
-              completionHandler: ^(Advisors output, NSError* error) {
-                            if (output) {
-                                NSLog(@"%@", output);
-                            }
-                            if (error) {
-                                NSLog(@"Error: %@", error);
-                            }
-                        }];
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var InterhypSubmissionApi = require('interhyp_submission_api');
-var defaultClient = InterhypSubmissionApi.ApiClient.instance;
-
-
-var api = new InterhypSubmissionApi.FinancingApplicationApi()
-var financingApplicationId = financingApplicationId_example; // {{String}} Id of the financing application
-var opts = { 
-  'embed': true // {{Boolean}} Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
-};
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-api.getFinancingApplicationAdvisors(financingApplicationId, opts, callback);
-</code></pre>
-                            </div>
-
-                            <!--<div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-angular">
-              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-            </div>-->
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-csharp">
-                              <pre class="prettyprint"><code class="language-cs">using System;
-using System.Diagnostics;
-using IO.Swagger.Api;
-using IO.Swagger.Client;
-using IO.Swagger.Model;
-
-namespace Example
-{
-    public class getFinancingApplicationAdvisorsExample
-    {
-        public void main()
-        {
-
-
-            var apiInstance = new FinancingApplicationApi();
-            var financingApplicationId = financingApplicationId_example;  // String | Id of the financing application
-            var embed = true;  // Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size (optional) 
-
-            try
-            {
-                // Get consultation advisors
-                Advisors result = apiInstance.getFinancingApplicationAdvisors(financingApplicationId, embed);
-                Debug.WriteLine(result);
-            }
-            catch (Exception e)
-            {
-                Debug.Print("Exception when calling FinancingApplicationApi.getFinancingApplicationAdvisors: " + e.Message );
-            }
-        }
-    }
-}
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-php">
-                              <pre class="prettyprint"><code class="language-php"><&#63;php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-$api_instance = new Swagger\Client\ApiFinancingApplicationApi();
-$financingApplicationId = financingApplicationId_example; // String | Id of the financing application
-$embed = true; // Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
-
-try {
-    $result = $api_instance->getFinancingApplicationAdvisors($financingApplicationId, $embed);
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisors: ', $e->getMessage(), PHP_EOL;
-}
-?></code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-perl">
-                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
-use WWW::SwaggerClient::Configuration;
-use WWW::SwaggerClient::FinancingApplicationApi;
-
-
-my $api_instance = WWW::SwaggerClient::FinancingApplicationApi->new();
-my $financingApplicationId = financingApplicationId_example; # String | Id of the financing application
-my $embed = true; # Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
-
-eval { 
-    my $result = $api_instance->getFinancingApplicationAdvisors(financingApplicationId => $financingApplicationId, embed => $embed);
-    print Dumper($result);
-};
-if ($@) {
-    warn "Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisors: $@\n";
-}</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-FinancingApplication-getFinancingApplicationAdvisors-0-python">
-                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
-import time
-import swagger_client
-from swagger_client.rest import ApiException
-from pprint import pprint
-
-
-# create an instance of the API class
-api_instance = swagger_client.FinancingApplicationApi()
-financingApplicationId = financingApplicationId_example # String | Id of the financing application
-embed = true # Boolean | Flag to expand or embed sub-resources in the response resource.
-
-By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size (optional)
-
-try: 
-    # Get consultation advisors
-    api_response = api_instance.get_financing_application_advisors(financingApplicationId, embed=embed)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling FinancingApplicationApi->getFinancingApplicationAdvisors: %s\n" % e)</code></pre>
-                            </div>
-                          </div>
-
-                          <h2>Parameters</h2>
-
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
-                                <tr>
-                                  <th width="150px">Name</th>
-                                  <th>Description</th>
-                                </tr>
-                                  <tr><td style="width:150px;">financingApplicationId*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_getFinancingApplicationAdvisors_financingApplicationId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      String
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          Id of the financing application
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                            </table>
-
-
-
-
-                            <div class="methodsubtabletitle">Query parameters</div>
-                            <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                              </tr>
-                                <tr><td style="width:150px;">embed</td>
-                                <td>
-                                
-                                
-                                    <div id="d2e199_getFinancingApplicationAdvisors_embed">
-                                        <div class="json-schema-view">
-                                            <div class="primitive">
-                                                <span class="type">
-                                                    Boolean
-                                                </span>
-                                
-                                                    <div class="inner description">
-                                                        Flag to expand or embed sub-resources in the response resource.
-
-By default is set to &#x60;FALSE&#x60; where only a **ref** to the sub-resources will be returned. By set it to &#x60;TRUE&#x60; the sub-resources content will be embedded in the response which might affect the payload size
-                                                    </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                </tr>
-                            </table>
-
-                          <h2>Responses</h2>
-                            <h3> Status: 200 - Requested financing advisors associated with this financing application are returned. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisors-200-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisors-200-schema">
-                                  <div id='responses-getFinancingApplicationAdvisors-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Requested financing advisors associated with this financing application are returned.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/Advisors"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisors-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisors-200-schema-200');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisors-200-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 400 - Error indicates missing or wrong request parameters. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisors-400-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisors-400-schema">
-                                  <div id='responses-getFinancingApplicationAdvisors-400-schema-400' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates missing or wrong request parameters.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisors-400-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisors-400-schema-400');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisors-400-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 401 - Error indicates no access to the required resource. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisors-401-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisors-401-schema">
-                                  <div id='responses-getFinancingApplicationAdvisors-401-schema-401' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates no access to the required resource.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/OAuthProblem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisors-401-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisors-401-schema-401');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisors-401-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 404 - Error indicates that a requested submission resource was not found. </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisors-404-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisors-404-schema">
-                                  <div id='responses-getFinancingApplicationAdvisors-404-schema-404' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Error indicates that a requested submission resource was not found.",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisors-404-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisors-404-schema-404');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisors-404-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                            <h3> Status: 500 - Unexpected Error </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-getFinancingApplicationAdvisors-500-schema">Schema</a>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-getFinancingApplicationAdvisors-500-schema">
-                                  <div id='responses-getFinancingApplicationAdvisors-500-schema-500' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Unexpected Error",
-  "content" : {
-    "application/json" : {
-      "schema" : {
-        "$ref" : "#/components/schemas/RFC7807Problem"
-      }
-    }
-  }
-};
-                                        var schema = schemaWrapper.content["application/json"].schema;
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else {
-                                          schemaWrapper.components = {};
-                                          schemaWrapper.components.schemas = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        //console.log(JSON.stringify(schema));
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-getFinancingApplicationAdvisors-500-schema-data').val(stringify(schema));
-                                        var result = $('#responses-getFinancingApplicationAdvisors-500-schema-500');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-getFinancingApplicationAdvisors-500-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-
-                        </article>
-                      </div>
-                      <hr>
                     <div id="api-FinancingApplication-getFinancingApplicationById">
                       <article id="api-FinancingApplication-getFinancingApplicationById-0" data-group="User" data-name="getFinancingApplicationById" data-version="0">
                         <div class="pull-left">
@@ -24311,6 +24095,541 @@ By default is set to &#x60;FALSE&#x60; where only a **ref** to the sub-resources
                         </article>
                       </div>
                       <hr>
+                    <div id="api-Submissions-getSubmissionCalculationByType">
+                      <article id="api-Submissions-getSubmissionCalculationByType-0" data-group="User" data-name="getSubmissionCalculationByType" data-version="0">
+                        <div class="pull-left">
+                          <h1>getSubmissionCalculationByType</h1>
+                          <p>Get calculation data</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Delivers calculation basics for specified calculation type.
+Calculation type options:
+  - CONDITION (Konditionskalkulation)
+
+  - HOUSEHOLD (HH-Rechnung)
+
+  - LENDING_VALUE (Beleihungswert)</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/v2/submissions/{submissionId}/calculations/{calculationType}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Submissions-getSubmissionCalculationByType-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Submissions-getSubmissionCalculationByType-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Submissions-getSubmissionCalculationByType-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+ -H "Authorization: Bearer [[accessToken]]"\
+-H "Accept: application/json"\
+"https://api-test.interhyp.de/submission/v2/submissions/{submissionId}/calculations/{calculationType}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.SubmissionsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class SubmissionsApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+
+        SubmissionsApi apiInstance = new SubmissionsApi();
+        String submissionId = submissionId_example; // String | Id for the requested submission.
+        String calculationType = calculationType_example; // String | Subtype of the calculation data.
+        try {
+            Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling SubmissionsApi#getSubmissionCalculationByType");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.SubmissionsApi;
+
+public class SubmissionsApiExample {
+
+    public static void main(String[] args) {
+        SubmissionsApi apiInstance = new SubmissionsApi();
+        String submissionId = submissionId_example; // String | Id for the requested submission.
+        String calculationType = calculationType_example; // String | Subtype of the calculation data.
+        try {
+            Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling SubmissionsApi#getSubmissionCalculationByType");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+String *submissionId = submissionId_example; // Id for the requested submission.
+String *calculationType = calculationType_example; // Subtype of the calculation data.
+
+SubmissionsApi *apiInstance = [[SubmissionsApi alloc] init];
+
+// Get calculation data
+[apiInstance getSubmissionCalculationByTypeWith:submissionId
+    calculationType:calculationType
+              completionHandler: ^(Calculation output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var InterhypSubmissionApi = require('interhyp_submission_api');
+var defaultClient = InterhypSubmissionApi.ApiClient.instance;
+
+
+var api = new InterhypSubmissionApi.SubmissionsApi()
+var submissionId = submissionId_example; // {{String}} Id for the requested submission.
+var calculationType = calculationType_example; // {{String}} Subtype of the calculation data.
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.getSubmissionCalculationByType(submissionId, calculationType, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class getSubmissionCalculationByTypeExample
+    {
+        public void main()
+        {
+
+
+            var apiInstance = new SubmissionsApi();
+            var submissionId = submissionId_example;  // String | Id for the requested submission.
+            var calculationType = calculationType_example;  // String | Subtype of the calculation data.
+
+            try
+            {
+                // Get calculation data
+                Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling SubmissionsApi.getSubmissionCalculationByType: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+$api_instance = new Swagger\Client\ApiSubmissionsApi();
+$submissionId = submissionId_example; // String | Id for the requested submission.
+$calculationType = calculationType_example; // String | Subtype of the calculation data.
+
+try {
+    $result = $api_instance->getSubmissionCalculationByType($submissionId, $calculationType);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling SubmissionsApi->getSubmissionCalculationByType: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::SubmissionsApi;
+
+
+my $api_instance = WWW::SwaggerClient::SubmissionsApi->new();
+my $submissionId = submissionId_example; # String | Id for the requested submission.
+my $calculationType = calculationType_example; # String | Subtype of the calculation data.
+
+eval { 
+    my $result = $api_instance->getSubmissionCalculationByType(submissionId => $submissionId, calculationType => $calculationType);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling SubmissionsApi->getSubmissionCalculationByType: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Submissions-getSubmissionCalculationByType-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+
+# create an instance of the API class
+api_instance = swagger_client.SubmissionsApi()
+submissionId = submissionId_example # String | Id for the requested submission.
+calculationType = calculationType_example # String | Subtype of the calculation data.
+
+try: 
+    # Get calculation data
+    api_response = api_instance.get_submission_calculation_by_type(submissionId, calculationType)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling SubmissionsApi->getSubmissionCalculationByType: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">submissionId*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_getSubmissionCalculationByType_submissionId">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          Id for the requested submission.
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                                  <tr><td style="width:150px;">calculationType*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_getSubmissionCalculationByType_calculationType">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          Subtype of the calculation data.
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Requested calculation data is returned </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getSubmissionCalculationByType-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getSubmissionCalculationByType-200-schema">
+                                  <div id='responses-getSubmissionCalculationByType-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Requested calculation data is returned",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/Calculation"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getSubmissionCalculationByType-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getSubmissionCalculationByType-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getSubmissionCalculationByType-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 400 - Error indicates missing or wrong request parameters. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getSubmissionCalculationByType-400-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getSubmissionCalculationByType-400-schema">
+                                  <div id='responses-getSubmissionCalculationByType-400-schema-400' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates missing or wrong request parameters.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getSubmissionCalculationByType-400-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getSubmissionCalculationByType-400-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getSubmissionCalculationByType-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 401 - Error indicates no access to the required resource. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getSubmissionCalculationByType-401-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getSubmissionCalculationByType-401-schema">
+                                  <div id='responses-getSubmissionCalculationByType-401-schema-401' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates no access to the required resource.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/OAuthProblem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getSubmissionCalculationByType-401-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getSubmissionCalculationByType-401-schema-401');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getSubmissionCalculationByType-401-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 404 - Error indicates that a requested submission resource was not found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getSubmissionCalculationByType-404-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getSubmissionCalculationByType-404-schema">
+                                  <div id='responses-getSubmissionCalculationByType-404-schema-404' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates that a requested submission resource was not found",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getSubmissionCalculationByType-404-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getSubmissionCalculationByType-404-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getSubmissionCalculationByType-404-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 500 - Unexpected error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getSubmissionCalculationByType-500-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getSubmissionCalculationByType-500-schema">
+                                  <div id='responses-getSubmissionCalculationByType-500-schema-500' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Unexpected error",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getSubmissionCalculationByType-500-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getSubmissionCalculationByType-500-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getSubmissionCalculationByType-500-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
                     <div id="api-Submissions-getSubmissionCreditLoanById">
                       <article id="api-Submissions-getSubmissionCreditLoanById-0" data-group="User" data-name="getSubmissionCreditLoanById" data-version="0">
                         <div class="pull-left">
@@ -24325,7 +24644,7 @@ By default is set to &#x60;FALSE&#x60; where only a **ref** to the sub-resources
 A Credit Loan represents specific financing structure component.</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/v2/submissions/{submissionId}/creditLoans/{creditLoanId}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/v2/submissions/{submissionId}/credit-loans/{creditLoanId}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
@@ -24348,7 +24667,7 @@ A Credit Loan represents specific financing structure component.</p>
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"https://api-test.interhyp.de/submission/v2/submissions/{submissionId}/creditLoans/{creditLoanId}"</code></pre>
+"https://api-test.interhyp.de/submission/v2/submissions/{submissionId}/credit-loans/{creditLoanId}"</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Submissions-getSubmissionCreditLoanById-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -28207,7 +28526,7 @@ except ApiException as e:
           <div id="footer">
             <div id="api-_footer">
               <p>Suggestions, contact, support and error reporting;
-                  <div class="app-desc">Information URL: <a href="https://helloreverb.com">https://helloreverb.com</a></div>
+                  <div class="app-desc">Information URL: <a href="https://www.interhyp.de">https://www.interhyp.de</a></div>
                   <div class="app-desc">Contact Info: <a href="support_submission_api@interhyp.de">support_submission_api@interhyp.de</a></div>
               </p>
                 <div class="license-info">Interhyp AG</div>
