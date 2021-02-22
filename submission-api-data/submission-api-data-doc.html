@@ -689,6 +689,68 @@
   <script>
     // Script section to load models into a JS Var
     var defs = {}
+            defs["AbortEditingFinancingApplicationLegacyCommand"] = {
+  "required" : [ "editingInfo" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifyFinancingApplicationLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "ABORT_EDITING"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      },
+      "submissions" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/SubmissionId"
+        }
+      }
+    }
+  } ]
+};
+            defs["AbortEditingSubmissionLegacyCommand"] = {
+  "required" : [ "editingInfo" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifySubmissionLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "ABORT_EDITING"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      }
+    }
+  } ]
+};
+            defs["AcceptSubmissionLegacyStatus"] = {
+  "required" : [ "sendContractDate" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "ACCEPT"
+      },
+      "sendContractDate" : {
+        "$ref" : "#/components/schemas/ISODate"
+      },
+      "loans" : {
+        "$ref" : "#/components/schemas/LegacyStatusLoans"
+      }
+    }
+  } ]
+};
             defs["AdditionalInfo"] = {
   "type" : "object",
   "properties" : {
@@ -904,7 +966,7 @@
   } ]
 };
             defs["AllOfAreaInfoAreaTotal"] = {
-  "description" : "DE: Gesamtfläche. <br/>\nEN: Total space.\n",
+  "description" : "DE: Wohnfläche. <br/>\nEN: Living space.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/SquareMeter"
   } ]
@@ -917,6 +979,12 @@
 };
             defs["AllOfAreaInfoCommercialAreaForOwnUse"] = {
   "description" : "DE: Gewerbliche Fläche für Eigenbedarf. <br/>\nEN: Commercial space for own use.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/SquareMeter"
+  } ]
+};
+            defs["AllOfAreaInfoLandSize"] = {
+  "description" : "DE: Grundstücksgröße. <br/>\nEN: Property space.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/SquareMeter"
   } ]
@@ -1224,6 +1292,30 @@
     "$ref" : "#/components/schemas/ApplicantIdRef"
   } ]
 };
+            defs["AllOfFinancialStandingSummaryReserves"] = {
+  "description" : "DE: Rücklagen\nEN: Total reserves after financing\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/EuroAmount"
+  } ]
+};
+            defs["AllOfFinancialStandingSummarySurplus"] = {
+  "description" : "DE: Haushaltsüberschus- Restliquidität nach Finanzierung\nEN: Remaining liquidity after financing\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
+            defs["AllOfFinancialStandingSummaryTotalExpenses"] = {
+  "description" : "DE: Ausgaben\nEN: Total expenses\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
+            defs["AllOfFinancialStandingSummaryTotalIncome"] = {
+  "description" : "DE: Nettoeinkommen\nEN: Total net income\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+  } ]
+};
             defs["AllOfFinancialVentureItemEmbedded"] = {
   "description" : "DE: Komplette Information über das Finanzierungsvorhaben. <br/>\nEN: Complete information about the financing venture.\n",
   "allOf" : [ {
@@ -1446,31 +1538,55 @@
     "$ref" : "#/components/schemas/EuroAmount"
   } ]
 };
-            defs["AllOfLoanConditionGeneralBaserateIssueDate"] = {
+            defs["AllOfLoanConditionDetailAmount"] = {
+  "description" : "DE: Darlehensbetrag. <br/>\nEN: Loan amount.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/EuroAmount"
+  } ]
+};
+            defs["AllOfLoanConditionDetailInitialAmortisationRate"] = {
+  "description" : "DE: Initiale Tilgungsrate (Prozent). <br/>\nEN: Initial amortisation rate (percent).\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Percentage"
+  } ]
+};
+            defs["AllOfLoanConditionDetailMaturity"] = {
+  "description" : "DE: Dauer der Sollzinsbindung. <br/>\nEN: Duration of interest rate maturity.\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Duration"
+  } ]
+};
+            defs["AllOfLoanConditionDetailPayout"] = {
+  "description" : "DE: Auszahlung (Prozent). <br/>\nEN: Payout  (percent).\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Percentage"
+  } ]
+};
+            defs["AllOfLoanConditionGeneralInfoBaserateIssueDate"] = {
   "description" : "DE: Einstandsdatum. <br/>\nEN: Base rate issue date.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/ISODate"
   } ]
 };
-            defs["AllOfLoanConditionGeneralBurden"] = {
+            defs["AllOfLoanConditionGeneralInfoBurden"] = {
   "description" : "DE: Periodische Rate (z.B. monatliche Rate). <br/>\nEN: Periodical payment amount (e.g. rate per month).\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/PeriodicalEuroAmount"
   } ]
 };
-            defs["AllOfLoanConditionGeneralLoanAmount"] = {
-  "description" : "DE: Darlehnsbetrag. <br/>\nEN: Loan amount.\n",
+            defs["AllOfLoanConditionGeneralInfoLoanAmount"] = {
+  "description" : "DE: Gesamter Darlehnsbetrag. <br/>\nEN: Total loan amount.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/EuroAmount"
   } ]
 };
-            defs["AllOfLoanConditionGeneralLoanQuota"] = {
+            defs["AllOfLoanConditionGeneralInfoLoanQuota"] = {
   "description" : "DE: Darlehnsquote (Prozentsatz) <br/>\nEN: Loan quota (percentage).\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/Percentage"
   } ]
 };
-            defs["AllOfLoanConditionGeneralMixedEffectiveRate"] = {
+            defs["AllOfLoanConditionGeneralInfoMixedEffectiveRate"] = {
   "description" : "DE: Mischzins (effektiv). <br/>\nEN: Mixed effective rate.\n",
   "allOf" : [ {
     "$ref" : "#/components/schemas/PeriodicalPercentage"
@@ -2010,7 +2126,7 @@
   "type" : "string",
   "description" : "DE: Lage des Appartments im Gebäude (nicht abschließende Aufzählung), zum Beispiel: BASEMENT=Untergeschoss, GROUND_FLOOR=Erdgeschoss, UPPER_FLOOR=Obergeschoss/Erster Stock, SECOND_FLOOR=Zweiter Stock etc. <br/> EN: open ended enum contains position of the apartment in the building, possible values are BASEMENT, GROUND_FLOOR, UPPER_FLOOR, SECOND_FLOOR, THIRD_FLOOR, FOURTH_FLOOR, FIFTH_FLOOR, SIXTH_FLOOR_OR_HIGHER\n",
   "example" : "BASEMENT",
-  "x-extensible-enum" : [ "BASEMENT", "GROUND_FLOOR", "UPPER_FLOOR", "SECOND_FLOOR", "THIRD_FLOOR", "FOURTH_FLOOR", "FIFTH_FLOOR", "THIRD_FOURTH_OR_FIFTH_FLOOR", "SIXTH_FLOOR_OR_HIGHER" ]
+  "x-extensible-enum" : [ "BASEMENT", "GROUND_FLOOR", "UPPER_FLOOR", "SECOND_FLOOR", "THIRD_FLOOR", "FOURTH_FLOOR", "FIFTH_FLOOR", "THIRD_FOURTH_OR_FIFTH_FLOOR", "SIXTH_FLOOR_OR_HIGHER", "OTHER" ]
 };
             defs["Applicant"] = {
   "required" : [ "id", "person" ],
@@ -2150,6 +2266,7 @@
   }
 };
             defs["ApplicantRelationship"] = {
+  "required" : [ "relationType" ],
   "type" : "object",
   "properties" : {
     "applicants" : {
@@ -2178,7 +2295,7 @@
             defs["ApplicantRelationshipTypeKey"] = {
   "type" : "string",
   "description" : "DE: Beziehungsart (nicht abschließende Aufzählung) z.B. (MARRIED=mit Ehepartner/in, REGISTERED_PARTNERSHIP=eingetragenem Lebenspartner/in, PARTNERSHIP=Lebenspartner/in). <br/>\nEN: Open ended enum contains values for relation type, possible values are (MARRIED, REGISTERED_PARTNERSHIP, PARTNERSHIP)\n",
-  "x-extensible-enum" : [ "MARRIED,", "REGISTERED_PARTNERSHIP,", "PARTNERSHIP" ]
+  "x-extensible-enum" : [ "MARRIED,", "REGISTERED_PARTNERSHIP,", "PARTNERSHIP", "OTHER" ]
 };
             defs["ApplicantRelationships"] = {
   "type" : "object",
@@ -2242,7 +2359,13 @@
       } ]
     },
     "areaTotal" : {
-      "description" : "DE: Gesamtfläche. <br/>\nEN: Total space.\n",
+      "description" : "DE: Wohnfläche. <br/>\nEN: Living space.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/SquareMeter"
+      } ]
+    },
+    "landSize" : {
+      "description" : "DE: Grundstücksgröße. <br/>\nEN: Property space.\n",
       "allOf" : [ {
         "$ref" : "#/components/schemas/SquareMeter"
       } ]
@@ -2262,6 +2385,24 @@
   },
   "description" : "DE: Information über die gesamte Wohn- und Nutzfläche. <br/> EN: Information about the total residential and useable area.\n"
 };
+            defs["AssignLoanPartnerProcessorCommand"] = {
+  "required" : [ "processor" ],
+  "type" : "object",
+  "description" : "Assign a processor to the submission",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifySubmissionCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "ASSIGN_PROCESSOR"
+      },
+      "processor" : {
+        "$ref" : "#/components/schemas/LoanPartnerProcessor"
+      }
+    }
+  } ]
+};
             defs["AtticDetail"] = {
   "type" : "object",
   "properties" : {
@@ -2274,7 +2415,7 @@
   "type" : "string",
   "description" : "DE: Details zum Dachgeschoss (nicht abschließende Aufzählung), z.B DEVELOPED=ausgebaut, UPGRADEABLE=ausbaufähig, NOT_UPGRADEABLE=nicht_ausbaufähig. <br/> EN: open ended enum contains attic details, possible values are DEVELOPED, UPGRADEABLE, NOT_UPGRADEABLE.\n",
   "example" : "DEVELOPED",
-  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "UPGRADEABLE", "NOT_UPGRADEABLE" ]
+  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "UPGRADEABLE", "NOT_UPGRADEABLE", "OTHER" ]
 };
             defs["AuctionInfo"] = {
   "type" : "object",
@@ -2310,7 +2451,7 @@
   "type" : "string",
   "description" : "DE: Typ des Nachrangdarlehens (nicht abschließende Aufzählung), z.B. DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL. <br/> EN: Open ended enum contains auxiliary loan product types, possible values are DSL_PRIVAT, OYAK_ANKER, HANSEATIC_ALL.\n",
   "example" : "HANSEATIC_ALL",
-  "x-extensible-enum" : [ "DSL_PRIVAT", "HANSEATIC_ALL", "OYAK_ANKER" ]
+  "x-extensible-enum" : [ "DSL_PRIVAT", "HANSEATIC_ALL", "OYAK_ANKER", "OTHER" ]
 };
             defs["AuxiliaryIncome"] = {
   "required" : [ "income" ],
@@ -2400,7 +2541,7 @@
   "type" : "string",
   "description" : "DE: Details zum Keller (nicht abschließende Aufzählung), z.B DEVELOPED=voll_unterkellert, PARTIALY_DEVELOPED=teil_unterkellert, NONE=nicht_unterkellert. <br/> EN: Open ended enum contains basement details, possible values are DEVELOPED, PARTIALY_DEVELOPED, NONE.\n",
   "example" : "DEVELOPED",
-  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "NONE" ]
+  "x-extensible-enum" : [ "DEVELOPED", "PARTIALLY_DEVELOPED", "NONE", "OTHER" ]
 };
             defs["Bic"] = {
   "required" : [ "value" ],
@@ -2688,11 +2829,55 @@
   },
   "description" : "DE: Detailierte Information über einen Eintrag in der Kalkulation.<br/>\nEN: Detailed information about single entry in the calculation.\n"
 };
+            defs["CalculationItem"] = {
+  "type" : "object",
+  "properties" : {
+    "context" : {
+      "type" : "array",
+      "description" : "DE: Kalkulation nach Art des Darlehens. <br/>\nEN: A set of financing structure contexts, which are associated with this calculation (i.e `Main` or `Nachrang` component)..\n",
+      "items" : {
+        "$ref" : "#/components/schemas/LoanType"
+      }
+    },
+    "calculation" : {
+      "$ref" : "#/components/schemas/Calculation"
+    }
+  }
+};
             defs["CalculationType"] = {
   "type" : "string",
   "description" : "DE: Kalkulationstyp (nicht abschließende Aufzählung), z.B. HOUSEHOLD=Haushaltsrechnung, CONDITION=Konditionskalkulation, LENDING_VALUE=Beleihungswert-Kalkulation <br/> EN: Calculation type - open ended enum contains property type details, possible values are HOUSEHOLD, CONDITION, LENDING_VALUE\n",
   "example" : "HOUSEHOLD",
   "x-extensible-enum" : [ "HOUSEHOLD", "CONDITION", "LENDING_VALUE" ]
+};
+            defs["Calculations"] = {
+  "type" : "object",
+  "properties" : {
+    "calculations" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/CalculationItem"
+      }
+    }
+  },
+  "description" : "A wrapper Type to hold a set of calculations.\n"
+};
+            defs["CancelSubmissionLegacyStatus"] = {
+  "required" : [ "cancelContractDate" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "CANCEL"
+      },
+      "cancelContractDate" : {
+        "$ref" : "#/components/schemas/ISODate"
+      }
+    }
+  } ]
 };
             defs["CapitalIncome"] = {
   "type" : "object",
@@ -2783,7 +2968,54 @@
   "type" : "string",
   "description" : "DE: Abschnittstyp in der Abteilung III des Grundbuches (nicht abschließende Aufzählung), z.B. LETTER, BOOK <br/> EN: Open ended enum contains type of section III of the land register, possible values are (LETTER, BOOK).\n",
   "example" : "LETTER",
-  "x-extensible-enum" : [ "LETTER", "BOOK" ]
+  "x-extensible-enum" : [ "LETTER", "BOOK", "OTHER" ]
+};
+            defs["ChangeSubmissionStatusLegacyCommand"] = {
+  "required" : [ "status" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!\nThis command is intended to change the submission status\n",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifySubmissionLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "CHANGE_STATUS"
+      },
+      "data" : {
+        "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+      }
+    }
+  } ]
+};
+            defs["ChangeSubmissionStatusLegacyCommandData"] = {
+  "type" : "object",
+  "properties" : {
+    "remark" : {
+      "type" : "string"
+    },
+    "changedOn" : {
+      "$ref" : "#/components/schemas/ISODateTime"
+    },
+    "origin" : {
+      "$ref" : "#/components/schemas/LegacyStatusChangeOrigin"
+    },
+    "status" : {
+      "$ref" : "#/components/schemas/LegacyStatusType"
+    }
+  },
+  "discriminator" : {
+    "propertyName" : "status",
+    "mapping" : {
+      "ACCEPT" : "#/components/schemas/AcceptSubmissionLegacyStatus",
+      "CANCEL" : "#/components/schemas/CancelSubmissionLegacyStatus",
+      "CONTRACT_SIGN" : "#/components/schemas/ContractSignSubmissionLegacyStatus",
+      "INWORK" : "#/components/schemas/InworkSubmissionLegacyStatus",
+      "ONHOLD" : "#/components/schemas/OnholdSubmissionLegacyStatus",
+      "REJECT" : "#/components/schemas/RejectSubmissionLegacyStatus",
+      "CONFIRM" : "#/components/schemas/ConfirmSubmissionLegacyStatus"
+    }
+  }
 };
             defs["Client"] = {
   "type" : "object",
@@ -2922,11 +3154,37 @@
         "type" : "string",
         "default" : "CONDITION"
       },
-      "loans" : {
+      "loan" : {
+        "$ref" : "#/components/schemas/LoanConditionGeneralInfo"
+      },
+      "details" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/LoanConditionInfo"
+          "$ref" : "#/components/schemas/LoanConditionDetail"
         }
+      }
+    }
+  } ]
+};
+            defs["ConfirmSubmissionLegacyStatus"] = {
+  "required" : [ "confirmedAt", "loans" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "CONFIRM"
+      },
+      "signContractDate" : {
+        "$ref" : "#/components/schemas/ISODate"
+      },
+      "confirmedAt" : {
+        "$ref" : "#/components/schemas/ISODateTime"
+      },
+      "loans" : {
+        "$ref" : "#/components/schemas/LegacyStatusLoans"
       }
     }
   } ]
@@ -3049,6 +3307,26 @@
     }
   }
 };
+            defs["ContractSignSubmissionLegacyStatus"] = {
+  "required" : [ "signContractDate" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "CONTRACT_SIGN"
+      },
+      "signContractDate" : {
+        "$ref" : "#/components/schemas/ISODate"
+      },
+      "loans" : {
+        "$ref" : "#/components/schemas/LegacyStatusLoans"
+      }
+    }
+  } ]
+};
             defs["Correspondence"] = {
   "type" : "object",
   "properties" : {
@@ -3161,6 +3439,24 @@
     }
   },
   "description" : "A wrapper Type to hold a set of submission credit loans.\n"
+};
+            defs["CreditLoansEdit"] = {
+  "required" : [ "loans" ],
+  "type" : "object",
+  "properties" : {
+    "loans" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/CreditLoan"
+      }
+    },
+    "offerId" : {
+      "$ref" : "#/components/schemas/OfferId"
+    },
+    "calculations" : {
+      "$ref" : "#/components/schemas/Calculations"
+    }
+  }
 };
             defs["CreditWorthiness"] = {
   "required" : [ "type" ],
@@ -3292,6 +3588,99 @@
     "unit" : {
       "type" : "string",
       "enum" : [ "YEARS", "MONTHS", "DAYS" ]
+    }
+  }
+};
+            defs["EditFinancingApplicationLegacyCommand"] = {
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifyFinancingApplicationLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "EDIT"
+      },
+      "financingApplication" : {
+        "$ref" : "#/components/schemas/FinancingApplicationCommandData"
+      },
+      "submissionRequest" : {
+        "$ref" : "#/components/schemas/EditSubmissionRequest"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      }
+    }
+  } ]
+};
+            defs["EditSubmissionLegacyCommand"] = {
+  "required" : [ "editingInfo", "financingApplication", "loans", "submissionId" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifySubmissionLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "EDIT"
+      },
+      "submissionId" : {
+        "$ref" : "#/components/schemas/SubmissionId"
+      },
+      "financingApplication" : {
+        "$ref" : "#/components/schemas/FinancingApplicationCommandData"
+      },
+      "loans" : {
+        "$ref" : "#/components/schemas/CreditLoansEdit"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      }
+    }
+  } ]
+};
+            defs["EditSubmissionRequest"] = {
+  "type" : "object",
+  "properties" : {
+    "submitted" : {
+      "$ref" : "#/components/schemas/SubmissionDate"
+    },
+    "submittedBy" : {
+      "$ref" : "#/components/schemas/Advisor"
+    },
+    "submissionRequestComponents" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/EditSubmissionRequestComponent"
+      }
+    }
+  }
+};
+            defs["EditSubmissionRequestComponent"] = {
+  "type" : "object",
+  "properties" : {
+    "submissionId" : {
+      "$ref" : "#/components/schemas/SubmissionId"
+    },
+    "submissionRequestComponent" : {
+      "$ref" : "#/components/schemas/SubmissionRequestComponent"
+    }
+  }
+};
+            defs["EditingInfo"] = {
+  "required" : [ "at", "by" ],
+  "type" : "object",
+  "properties" : {
+    "at" : {
+      "$ref" : "#/components/schemas/ISODateTime"
+    },
+    "by" : {
+      "$ref" : "#/components/schemas/Advisor"
+    },
+    "reason" : {
+      "type" : "string"
     }
   }
 };
@@ -4120,6 +4509,35 @@
   },
   "description" : "A Reference to a specific FinancialStanding.\n\nThis reference consists of a link leads directly to the resource and an Id which could be used to reconstruct the url.\n"
 };
+            defs["FinancialStandingSummary"] = {
+  "type" : "object",
+  "properties" : {
+    "totalIncome" : {
+      "description" : "DE: Nettoeinkommen\nEN: Total net income\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+      } ]
+    },
+    "totalExpenses" : {
+      "description" : "DE: Ausgaben\nEN: Total expenses\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+      } ]
+    },
+    "surplus" : {
+      "description" : "DE: Haushaltsüberschus- Restliquidität nach Finanzierung\nEN: Remaining liquidity after financing\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/PeriodicalEuroAmount"
+      } ]
+    },
+    "reserves" : {
+      "description" : "DE: Rücklagen\nEN: Total reserves after financing\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/EuroAmount"
+      } ]
+    }
+  }
+};
             defs["FinancialStandingType"] = {
   "type" : "string",
   "description" : "DE: Finanzstatus (nicht abschließende Aufzählung), z.B. (EQUITY, DEBT, INCOME, EXPENSE). <br/> EN: Open ended enum contains possible types financial standing, possible values are (EQUITY, DEBT, INCOME, EXPENSE).\n",
@@ -4135,9 +4553,28 @@
       "items" : {
         "$ref" : "#/components/schemas/FinancialStandingItem"
       }
+    },
+    "summary" : {
+      "$ref" : "#/components/schemas/FinancialStandingSummary"
     }
   },
   "description" : "Wrapper Type holds set of Financial Standings.\n"
+};
+            defs["FinancialStandingsCommand"] = {
+  "required" : [ "details" ],
+  "type" : "object",
+  "properties" : {
+    "details" : {
+      "minItems" : 1,
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/FinancialStanding"
+      }
+    },
+    "summary" : {
+      "$ref" : "#/components/schemas/FinancialStandingSummary"
+    }
+  }
 };
             defs["FinancialVentureItem"] = {
   "required" : [ "_href", "mortgageProperty", "reason" ],
@@ -4204,7 +4641,7 @@
   }
 };
             defs["FinancingApplicationCommandData"] = {
-  "required" : [ "applicants", "consultation", "estates", "financialStanding", "offers", "venture" ],
+  "required" : [ "applicants", "consultation", "estates", "financialStandings", "offers", "venture" ],
   "type" : "object",
   "properties" : {
     "status" : {
@@ -4240,11 +4677,7 @@
       }
     },
     "financialStandings" : {
-      "minItems" : 1,
-      "type" : "array",
-      "items" : {
-        "$ref" : "#/components/schemas/FinancialStanding"
-      }
+      "$ref" : "#/components/schemas/FinancialStandingsCommand"
     },
     "venture" : {
       "$ref" : "#/components/schemas/FinancingVenture"
@@ -4814,7 +5247,7 @@
   "type" : "string",
   "description" : "DE: Beurteilung der Austattung der Immobilie (nicht abschließende Aufzählung). Einflussfaktoren sind z. B. verwendete Böden, etc. <br/> EN: Open ended enum contains property configuration (furnishing) details, possible values are (SIMPLE, GOOD, VERY_GOOD).\n",
   "example" : "SIMPLE",
-  "x-extensible-enum" : [ "SIMPLE", "GOOD", "VERY_GOOD" ]
+  "x-extensible-enum" : [ "SIMPLE", "GOOD", "VERY_GOOD", "OTHER" ]
 };
             defs["Handover"] = {
   "type" : "object",
@@ -4963,6 +5396,9 @@
         "type" : "string",
         "default" : "HOUSEHOLD"
       },
+      "summary" : {
+        "$ref" : "#/components/schemas/FinancialStandingSummary"
+      },
       "details" : {
         "type" : "array",
         "items" : {
@@ -5035,7 +5471,7 @@
   "type" : "string",
   "description" : "DE: Art der derzeitigen Wohnsituation (nicht abschließende Aufzaehlung), z.B. (RENT=zur Miete, RATE=im Eigentum mit Darlehensrate, DEBT_FREE=im abbezahlten Eigentum, PARENTS=mietfrei bei den Eltern/Partner, OWN_PROPERTY=im Eigentum, FIRST_APPLICANT=in einer Eigentumswohnung). <br/> EN: Open ended enum contains value for the current housing/accomodation types, possible values are (RENT, RATE, DEBT_FREE, PARENTS, OWN_PROPERTY, FIRST_APPLICANT).\n",
   "example" : "RENT",
-  "x-extensible-enum" : [ "RENT", "RATE", "DEBT_FREE", "PARENTS", "OWN_PROPERTY", "FIRST_APPLICANT" ]
+  "x-extensible-enum" : [ "RENT", "RATE", "DEBT_FREE", "PARENTS", "OWN_PROPERTY", "FIRST_APPLICANT", "OTHER" ]
 };
             defs["ISODate"] = {
   "type" : "string",
@@ -5045,7 +5481,8 @@
             defs["ISODateTime"] = {
   "type" : "string",
   "description" : "DE: Datum, Syntax nach <a href=\"https://tools.ietf.org/html/rfc3339#section-5.6\">RFC 3339</a><br/> EN: Date according to <a href=\"https://tools.ietf.org/html/rfc3339#section-5.6\">RFC 3339</a>\n",
-  "format" : "date-time"
+  "format" : "date-time",
+  "example" : "2019-12-29T10:22:50Z"
 };
             defs["Iban"] = {
   "required" : [ "value" ],
@@ -5177,7 +5614,7 @@
   "type" : "string",
   "description" : "DE: Anzahl Einwohner im Ort (nicht abschließende Aufzählung), z.B. UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000. <br/> EN: open ended enum contains umber of inhabitants in the city, possible values are UP_TO_1000, UP_TO_10000, UP_TO_50000, UP_TO_100000, UP_TO_200000, UP_TO_500000, UP_TO_1000000, MORE_THEN_1000000.\n",
   "example" : "UP_TO_1000",
-  "x-extensible-enum" : [ "UP_TO_1000", "UP_TO_10000", "UP_TO_50000", "UP_TO_100000", "UP_TO_200000", "UP_TO_500000", "UP_TO_1000000", "MORE_THEN_1000000" ]
+  "x-extensible-enum" : [ "UP_TO_1000", "UP_TO_10000", "UP_TO_50000", "UP_TO_100000", "UP_TO_200000", "UP_TO_500000", "UP_TO_1000000", "MORE_THEN_1000000", "OTHER" ]
 };
             defs["InitialSubmissionEstimate"] = {
   "type" : "object",
@@ -5260,7 +5697,7 @@
   "type" : "string",
   "description" : "DE: Art der Sollzinsbindung(nicht abschließende Aufzählung), z.B. FIXED_PERIOD, VARIABLE. <br/> EN: Open ended enum contains types of the interest maturity, possible values are FIXED_PERIOD, VARIABLE.\n",
   "example" : "FIXED_PERIOD",
-  "x-extensible-enum" : [ "FIXED_PERIOD", "VARIABLE" ]
+  "x-extensible-enum" : [ "FIXED_PERIOD", "VARIABLE", "OTHER" ]
 };
             defs["InterestRate"] = {
   "type" : "object",
@@ -5347,6 +5784,19 @@
   },
   "description" : "DE: Vermögenswerte, welche (operativ) in die Finanzierung aufgenommen werden sollen. <br/> EN: Operational (venture) assets used in the financing process.\n"
 };
+            defs["InworkSubmissionLegacyStatus"] = {
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "INWORK"
+      }
+    }
+  } ]
+};
             defs["JobInformation"] = {
   "type" : "object",
   "properties" : {
@@ -5383,9 +5833,19 @@
         "type" : "string",
         "default" : "JOINT_OWNERSHIP_INVENTORY"
       },
+      "commonPropertyShare" : {
+        "type" : "number",
+        "description" : "DE: Miteigentumsanteil (https://de.wikipedia.org/wiki/Miteigentumsanteil). EN: Co-ownership share (https://de.wikipedia.org/wiki/Miteigentumsanteil).\n",
+        "format" : "double"
+      },
+      "commonPropertyTotal" : {
+        "type" : "number",
+        "description" : "DE: Summe der Miteigentumsanteile. EN: Total Co-ownership share.\n",
+        "format" : "double"
+      },
       "inventoryUnitProperties" : {
         "type" : "array",
-        "description" : "DE: Sammlung von Sondereigentümen(https://de.wikipedia.org/wiki/Sondereigentum) die mit diesem Miteigentum verbunden sind. <br/> EN: Collection of special properties (inventory units) associated with this co-ownership.\n",
+        "description" : "DE: Sammlung von Sondereigentümen (https://de.wikipedia.org/wiki/Sondereigentum) die mit diesem Miteigentum verbunden sind. <br/> EN: Collection of special properties (inventory units) associated with this co-ownership.\n",
         "items" : {
           "$ref" : "#/components/schemas/InventorySpecialProperty"
         }
@@ -5405,7 +5865,7 @@
   "type" : "string",
   "description" : "DE: Art der KFW-Reservierung (nicht abschließende Aufzählung), z.B. LIGHT, PLUS. <br/> EN: Open ended enum contains Kfw reservation process call type, possible values are LIGHT, PLUS.\n",
   "example" : "PLUS",
-  "x-extensible-enum" : [ "LIGHT", "PLUS" ]
+  "x-extensible-enum" : [ "LIGHT", "PLUS", "OTHER" ]
 };
             defs["KfwProgram"] = {
   "type" : "object",
@@ -5544,6 +6004,80 @@
     }
   }
 };
+            defs["LegacyStatusChangeKey"] = {
+  "type" : "string",
+  "description" : "EN: Source system that can trigger legacy status change, possible values are PARTNER_PORTAL, LEGACY_IHK.\n",
+  "x-extensible-enum" : [ "PARTNER_PORTAL", "LEGACY_IHK" ]
+};
+            defs["LegacyStatusChangeOrigin"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/LegacyStatusChangeKey"
+    }
+  }
+};
+            defs["LegacyStatusLoan"] = {
+  "type" : "object",
+  "properties" : {
+    "seq" : {
+      "type" : "integer",
+      "format" : "int32"
+    },
+    "loanId" : {
+      "$ref" : "#/components/schemas/LoanId"
+    },
+    "contractNumber" : {
+      "type" : "string"
+    },
+    "amount" : {
+      "$ref" : "#/components/schemas/EuroAmount"
+    },
+    "maturity" : {
+      "$ref" : "#/components/schemas/InterestMaturity"
+    },
+    "nominalRate" : {
+      "$ref" : "#/components/schemas/PeriodicalPercentage"
+    },
+    "amortisation" : {
+      "$ref" : "#/components/schemas/PeriodicalPercentage"
+    },
+    "effectiveRate" : {
+      "$ref" : "#/components/schemas/PeriodicalPercentage"
+    },
+    "fixedUntil" : {
+      "$ref" : "#/components/schemas/ISODate"
+    },
+    "sotiDesc" : {
+      "type" : "string"
+    },
+    "sotiPercentage" : {
+      "$ref" : "#/components/schemas/PeriodicalPercentage"
+    },
+    "commission" : {
+      "$ref" : "#/components/schemas/Percentage"
+    },
+    "kfwProduct" : {
+      "type" : "string"
+    }
+  }
+};
+            defs["LegacyStatusLoans"] = {
+  "type" : "object",
+  "properties" : {
+    "items" : {
+      "minItems" : 1,
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/LegacyStatusLoan"
+      }
+    }
+  }
+};
+            defs["LegacyStatusType"] = {
+  "type" : "string",
+  "x-extensible-enum" : [ "ACCEPT", "CANCEL", "CONTRACT_SIGN", "INWORK", "ONHOLD", "REJECT" ]
+};
             defs["LendingValueCalculation"] = {
   "type" : "object",
   "description" : "DE: Information zu der Kalkulation <br/>\nEN: Information about the calculation.\n",
@@ -5554,6 +6088,9 @@
       "type" : {
         "type" : "string",
         "default" : "LENDING_VALUE"
+      },
+      "lendingValue" : {
+        "$ref" : "#/components/schemas/LoanQuota"
       },
       "details" : {
         "type" : "array",
@@ -5579,7 +6116,6 @@
   "x-extensible-enum" : [ "CHURCH", "CITY", "INDIVIDUAL", "COMPANY", "OTHER" ]
 };
             defs["LiabilityDebt"] = {
-  "required" : [ "guarantee" ],
   "type" : "object",
   "properties" : {
     "guarantee" : {
@@ -5632,6 +6168,11 @@
   "properties" : {
     "id" : {
       "$ref" : "#/components/schemas/LoanId"
+    },
+    "seq" : {
+      "type" : "integer",
+      "format" : "int32",
+      "deprecated" : true
     },
     "type" : {
       "$ref" : "#/components/schemas/LoanType"
@@ -5687,14 +6228,57 @@
     }
   }
 };
-            defs["LoanConditionGeneral"] = {
+            defs["LoanConditionDetail"] = {
   "type" : "object",
   "properties" : {
     "loanId" : {
       "$ref" : "#/components/schemas/LoanId"
     },
+    "loanType" : {
+      "$ref" : "#/components/schemas/LoanType"
+    },
+    "amount" : {
+      "description" : "DE: Darlehensbetrag. <br/>\nEN: Loan amount.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/EuroAmount"
+      } ]
+    },
+    "payout" : {
+      "description" : "DE: Auszahlung (Prozent). <br/>\nEN: Payout  (percent).\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Percentage"
+      } ]
+    },
+    "maturity" : {
+      "description" : "DE: Dauer der Sollzinsbindung. <br/>\nEN: Duration of interest rate maturity.\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Duration"
+      } ]
+    },
+    "initialAmortisationRate" : {
+      "description" : "DE: Initiale Tilgungsrate (Prozent). <br/>\nEN: Initial amortisation rate (percent).\n",
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Percentage"
+      } ]
+    },
+    "additionalInfo" : {
+      "type" : "array",
+      "description" : "DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>\nEN: Information about single entry within condition calculation.\n",
+      "items" : {
+        "$ref" : "#/components/schemas/AdditionalInfo"
+      }
+    },
+    "summary" : {
+      "$ref" : "#/components/schemas/LoanConditionSummary"
+    }
+  },
+  "description" : "DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>\nEN: Information about single loan which is a part of condition calculation.\n"
+};
+            defs["LoanConditionGeneralInfo"] = {
+  "type" : "object",
+  "properties" : {
     "loanAmount" : {
-      "description" : "DE: Darlehnsbetrag. <br/>\nEN: Loan amount.\n",
+      "description" : "DE: Gesamter Darlehnsbetrag. <br/>\nEN: Total loan amount.\n",
       "allOf" : [ {
         "$ref" : "#/components/schemas/EuroAmount"
       } ]
@@ -5727,26 +6311,7 @@
       "$ref" : "#/components/schemas/PaymentTime"
     }
   },
-  "description" : "DE: Allgemeine Information zu einem Darlehen (Konditionskalkulation). <br/>\nEN: General loan information (conditions calculation).\n"
-};
-            defs["LoanConditionInfo"] = {
-  "type" : "object",
-  "properties" : {
-    "loan" : {
-      "$ref" : "#/components/schemas/LoanConditionGeneral"
-    },
-    "details" : {
-      "type" : "array",
-      "description" : "DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>\nEN: Information about single entry within condition calculation.\n",
-      "items" : {
-        "$ref" : "#/components/schemas/AdditionalInfo"
-      }
-    },
-    "summary" : {
-      "$ref" : "#/components/schemas/LoanConditionSummary"
-    }
-  },
-  "description" : "DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>\nEN: Information about single loan which is a part of condition calculation.\n"
+  "description" : "DE: Allgemeine Information zu den Darlehen (Konditionskalkulation). <br/>\nEN: General loan information (conditions calculation).\n"
 };
             defs["LoanConditionSummary"] = {
   "type" : "object",
@@ -5833,7 +6398,55 @@
   },
   "description" : "DE: Bezeichnung / Name der Einheit des Kreditgebers, welche den Kreditantrag bearbeitet. <br/> EN: Name of the loan partner processing unit.\n"
 };
+            defs["LoanPartnerProcessor"] = {
+  "required" : [ "processorId", "processorName" ],
+  "properties" : {
+    "processorId" : {
+      "$ref" : "#/components/schemas/LoanPartnerProcessorId"
+    },
+    "processorName" : {
+      "$ref" : "#/components/schemas/LoanPartnerProcessorName"
+    },
+    "processorEmail" : {
+      "$ref" : "#/components/schemas/LoanPartnerProcessorEmail"
+    }
+  },
+  "description" : "DE: Der (Kredit-)Bearbeiter. <br/> EN: The loan partner processor.\n"
+};
+            defs["LoanPartnerProcessorEmail"] = {
+  "properties" : {
+    "email" : {
+      "type" : "string"
+    }
+  },
+  "description" : "DE: E-Mail Adresse des (Kredit-)Bearbeiters. <br/> EN: E-Mail address of the loan partner processor.\n"
+};
+            defs["LoanPartnerProcessorId"] = {
+  "required" : [ "value" ],
+  "properties" : {
+    "value" : {
+      "type" : "string"
+    }
+  },
+  "description" : "DE: ID des (Kredit-)Bearbeiters. <br/> EN: Id of the loan partner processor.\n"
+};
+            defs["LoanPartnerProcessorName"] = {
+  "required" : [ "userName" ],
+  "properties" : {
+    "userName" : {
+      "type" : "string"
+    },
+    "firstName" : {
+      "type" : "string"
+    },
+    "lastName" : {
+      "type" : "string"
+    }
+  },
+  "description" : "DE: Username, Vor- und Nachname des (Kredit-)Bearbeiters. <br/> EN: Username, first- and lastname of the loan partner processor.\n"
+};
             defs["LoanQuota"] = {
+  "required" : [ "type" ],
   "type" : "object",
   "properties" : {
     "type" : {
@@ -5878,7 +6491,7 @@
   "type" : "string",
   "description" : "DE: Art des Darlehens (nicht abschließende Aufzählung), z.B. MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN. <br/> EN: Open ended enum contains possible loan types, possible values are MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN.\n",
   "example" : "MAIN_LOAN",
-  "x-extensible-enum" : [ "MAIN_LOAN", "AUXILIARY_LOAN", "KFW_PROMOTION_LOAN" ]
+  "x-extensible-enum" : [ "MAIN_LOAN", "AUXILIARY_LOAN", "KFW_PROMOTION_LOAN", "OTHER" ]
 };
             defs["LoanTypes"] = {
   "required" : [ "loanTypes" ],
@@ -5987,7 +6600,7 @@
   "type" : "string",
   "description" : "DE: Beschreibung des ehelichen Güterstandes (nicht abschließende Aufzählung, zum Beispiel: COMMUNITY_OF_ACQUESTS_AND_GAINS = ZUGEWINNGEMEINSCHAFT, SEPARATION_OF_PROPERTY = GÜTERTRENNUNG, ABSOLUTE_COMMUNITY_PROPERTY = GÜTERGEMEINSCHAFT). <br/> EN: Open ended enum contains values for the matrimonial property, possible values are COMMUNITY_OF_ACQUESTS_AND_GAINS, SEPARATE_PROPERTY, ABSOLUTE_COMMUNITY_PROPERTY.\n",
   "example" : "COMMUNITY_OF_ACQUESTS_AND_GAINS",
-  "x-extensible-enum" : [ "COMMUNITY_OF_ACQUESTS_AND_GAINS", "SEPARATE_PROPERTY", "ABSOLUTE_COMMUNITY_PROPERTY" ]
+  "x-extensible-enum" : [ "COMMUNITY_OF_ACQUESTS_AND_GAINS", "SEPARATE_PROPERTY", "ABSOLUTE_COMMUNITY_PROPERTY", "OTHER" ]
 };
             defs["MaritalStatus"] = {
   "type" : "object",
@@ -6001,7 +6614,7 @@
   "type" : "string",
   "description" : "DE: Familienstand des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: SINGLE = LEDIG, MARRIED = VERHEIRATET, REGISTERED_PARTNERSHIP = EINGETRAGENE LEBENSPARTNERSCHAFT, WIDOWED = VERWITWET, DIVORCED = GESCHIEDEN, SEPARATED=GETRENNT). <br/> EN: Open ended enum contains values for the marital status, possible values are SINGLE, MARRIED, REGISTERED_PARTNER, WIDOWED, DIVORCED, SEPARATED.\n",
   "example" : "SINGLE",
-  "x-extensible-enum" : [ "SINGLE", "MARRIED", "REGISTERED_PARTNER", "WIDOWED", "DIVORCED", "SEPARATED", "COHABITING" ]
+  "x-extensible-enum" : [ "SINGLE", "MARRIED", "REGISTERED_PARTNER", "WIDOWED", "DIVORCED", "SEPARATED", "COHABITING", "OTHER" ]
 };
             defs["MarketValueEvaluation"] = {
   "required" : [ "marketValue" ],
@@ -6080,19 +6693,57 @@
     }
   }
 };
+            defs["ModifyFinancingApplicationLegacyCommand"] = {
+  "required" : [ "operation" ],
+  "type" : "object",
+  "properties" : {
+    "operation" : {
+      "type" : "string",
+      "x-extensible-enum" : [ "START_EDITING", "ABORT_EDITING", "EDIT" ]
+    }
+  },
+  "discriminator" : {
+    "propertyName" : "operation",
+    "mapping" : {
+      "START_EDITING" : "#/components/schemas/StartEditingFinancingApplicationLegacyCommand",
+      "ABORT_EDITING" : "#/components/schemas/AbortEditingFinancingApplicationLegacyCommand",
+      "EDIT" : "#/components/schemas/EditFinancingApplicationLegacyCommand"
+    }
+  }
+};
             defs["ModifySubmissionCommand"] = {
   "required" : [ "operation" ],
   "type" : "object",
   "properties" : {
     "operation" : {
       "type" : "string",
-      "x-extensible-enum" : [ "REVOKE" ]
+      "x-extensible-enum" : [ "REVOKE", "ASSIGN_PROCESSOR" ]
     }
   },
   "discriminator" : {
     "propertyName" : "operation",
     "mapping" : {
-      "REVOKE" : "#/components/schemas/RevokeSubmissionCommand"
+      "REVOKE" : "#/components/schemas/RevokeSubmissionCommand",
+      "ASSIGN_PROCESSOR" : "#/components/schemas/AssignLoanPartnerProcessorCommand"
+    }
+  }
+};
+            defs["ModifySubmissionLegacyCommand"] = {
+  "required" : [ "operation" ],
+  "type" : "object",
+  "properties" : {
+    "operation" : {
+      "type" : "string",
+      "x-extensible-enum" : [ "START_EDITING", "ABORT_EDITING", "EDIT", "CHANGE_STATUS" ]
+    }
+  },
+  "discriminator" : {
+    "propertyName" : "operation",
+    "mapping" : {
+      "START_EDITING" : "#/components/schemas/StartEditingSubmissionLegacyCommand",
+      "ABORT_EDITING" : "#/components/schemas/AbortEditingSubmissionLegacyCommand",
+      "EDIT" : "#/components/schemas/EditSubmissionLegacyCommand",
+      "CHANGE_STATUS" : "#/components/schemas/ChangeSubmissionStatusLegacyCommand"
     }
   }
 };
@@ -6136,7 +6787,7 @@
   "type" : "string",
   "description" : "DE: Umgebung (nicht abschließende Aufzählung), z.B. RESIDENTIAL_COMPLETE=reines_Wohngebiet, COMMERCIAL_MAINLY=ueberwiegend_Gewerbegebiet, MIXED=Mischgebiet, INDUSTRIAL=Industriegebiet, OUTSIDE_CITY=Einzellage_außerhalb_des_Ortes. <br/> EN: Open ended enum contains neighbourhood details, possible values are RESIDENTIAL, COMMERCIAL, MIXED, INDUSTRIAL, OUTSIDE .\n",
   "example" : "RESIDENTIAL",
-  "x-extensible-enum" : [ "RESIDENTIAL", "COMMERCIAL", "MIXED", "INDUSTRIAL", "OUTSIDE" ]
+  "x-extensible-enum" : [ "RESIDENTIAL", "COMMERCIAL", "MIXED", "INDUSTRIAL", "OUTSIDE", "OTHER" ]
 };
             defs["NewSubmission"] = {
   "type" : "object",
@@ -6291,6 +6942,42 @@
     }
   }
 };
+            defs["OnHoldReason"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/OnHoldReasonKey"
+    }
+  }
+};
+            defs["OnHoldReasonKey"] = {
+  "type" : "string",
+  "x-extensible-enum" : [ "DOCUMENTS", "INFOS", "BY_CUSTOMER", "ONHOLD", "EXPERTISE", "ORIG_CONTR", "REJ_SOON", "FIN_APPROV", "MIN_DOCS" ]
+};
+            defs["OnholdSubmissionLegacyStatus"] = {
+  "required" : [ "onHoldReason", "predictedDaysPost", "predictedOffHoldDate" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "ONHOLD"
+      },
+      "predictedOffHoldDate" : {
+        "$ref" : "#/components/schemas/ISODate"
+      },
+      "predictedDaysPost" : {
+        "type" : "integer",
+        "format" : "int32"
+      },
+      "onHoldReason" : {
+        "$ref" : "#/components/schemas/OnHoldReason"
+      }
+    }
+  } ]
+};
             defs["OpenPropertySale"] = {
   "type" : "object",
   "description" : "DE: Information zur Zwischenfinanzierung in Zusammenhang mit einem Immobilienverkauf. <br/> EN: Information about bridging debt associated with property sale.\n",
@@ -6327,7 +7014,8 @@
     "externalId" : {
       "$ref" : "#/components/schemas/ExternalId"
     }
-  }
+  },
+  "description" : "DE: Enthält die Information über Datenquelle und Daten-Identifikator aus dem externen System. <br/> EN: Contains information about Data source and data identifier in the external system.\n"
 };
             defs["OriginalPurchase"] = {
   "type" : "object",
@@ -6392,7 +7080,7 @@
   "type" : "string",
   "description" : "DE: Zusätzlicher Kapitalbedarf (nicht abschließende Aufzählung), z.B. OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING. <br/>\nEN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.\n",
   "example" : "OPERATIONAL_COSTS",
-  "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTY", "RESIDENTIAL_USE", "RENEWABLE_ENERGY", "DISBURSMENT_COOWNERS", "DISBURSMENT_HEIRS", "OTHER", "RECONSTRUCTION", "BUY", "CONSTRUCTION", "BUY_CONSTRUCTION", "SUPPLEMENTARY_FINANCING" ]
+  "x-extensible-enum" : [ "OPERATIONAL_COSTS", "REPAY_ANOTHER_LOAN", "PREPAYMENT_PENALTY", "RESIDENTIAL_USE", "RENEWABLE_ENERGY", "DISBURSMENT_COOWNERS", "DISBURSMENT_HEIRS", "OTHER", "RECONSTRUCTION", "BUY", "CONSTRUCTION", "BUY_CONSTRUCTION", "SUPPLEMENTARY_FINANCING", "OTHER" ]
 };
             defs["OtherEquity"] = {
   "type" : "object",
@@ -6924,6 +7612,12 @@
     "properties" : {
       "rating" : {
         "$ref" : "#/components/schemas/LandValueEvaluation"
+      },
+      "landSize" : {
+        "description" : "DE: Grundstücksgröße. <br/>\nEN: Property space.\n",
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/SquareMeter"
+        } ]
       }
     }
   } ]
@@ -6940,7 +7634,7 @@
   "type" : "string",
   "description" : "DE: Besonderheiten der Bauart (nicht abschließende Aufzählung), z.B NORMAL=keine_Besonderheiten, PREFABRICATED_Fertighaus, BAREBONES_HOUSE_Ausbauhaus, CONSTRUCTION_KIT_Bausatzhaus . <br/> EN: Open ended enum contains special construction design, possible values are NO_SPECIFICS, PREFABRICATED_HOUSE, GROW_HOUSE, SELF_BUILD_HOUSE .\n",
   "example" : "NO_SPECIFICS",
-  "x-extensible-enum" : [ "NO_SPECIFICS", "PREFABRICATED_HOUSE", "GROW_HOUSE", "SELF_BUILD_HOUSE" ]
+  "x-extensible-enum" : [ "NO_SPECIFICS", "PREFABRICATED_HOUSE", "GROW_HOUSE", "SELF_BUILD_HOUSE", "OTHER" ]
 };
             defs["PreviousOwner"] = {
   "type" : "object",
@@ -7502,7 +8196,7 @@
   "type" : "string",
   "description" : "DE: Zustand des Gebäudes (nicht abschließende Aufzählung), z.B. IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW. <br/> EN: open ended enum contains general condition of the real estate, possible values are IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW\n",
   "example" : "IN_RENOVATION_NEED",
-  "x-extensible-enum" : [ "IN_TOTAL_RENOVATION_NEED", "IN_EXTENSIVE_MODERNISATION_NEEED", "IN_RENOVATION_NEED", "IN_MODERNISATION_NEED", "WELL_KEPT", "AS_NEW" ]
+  "x-extensible-enum" : [ "IN_TOTAL_RENOVATION_NEED", "IN_EXTENSIVE_MODERNISATION_NEEED", "IN_RENOVATION_NEED", "IN_MODERNISATION_NEED", "WELL_KEPT", "AS_NEW", "OTHER" ]
 };
             defs["RealEstateRating"] = {
   "required" : [ "type" ],
@@ -7654,6 +8348,38 @@
   "description" : "DE: Relevante Rechtsnorm (nicht abschließende Aufzählung), z.B. (34_C_GEWO, 34_I_GEWO siehe auch (https://www.gesetze-im-internet.de/gewo/)). <br/> EN: Open ended enum contains the relevant legal norm, possible values are (34_C_GEWO, 34_I_GEWO).\n",
   "x-extensible-enum" : [ "34_C_GEWO", "34_I_GEWO" ]
 };
+            defs["RejectReason"] = {
+  "type" : "object",
+  "properties" : {
+    "key" : {
+      "$ref" : "#/components/schemas/RejectReasonKey"
+    }
+  }
+};
+            defs["RejectReasonKey"] = {
+  "type" : "string",
+  "x-extensible-enum" : [ "OBJ_CRAFT", "GRND_PRICE", "BAD_UTILIZE", "BAD_STATE", "LUX_HOBBY", "CREDIT_NEG", "REL_DEBIT", "HH_INC_TO_VOL", "HH_CREDITS", "HH_NO_DEDUCT", "HH_HI_INCOME", "HH_EXPENSES", "HH_NEG_BAL", "SCHUFA_NEG", "SCHUFA_SCOR", "INTERN_RED", "FRAME", "LOW_EQUITY", "DEBT_RATIO", "JOB_AMOUNT", "RENT_RISK", "PROBATION", "SHORT_SE", "SECTION2", "SECTION3", "EXIST_CUST", "MANIPULATE", "EVIDENCE", "UNKNOWN", "CONTRACT", "OTHER" ]
+};
+            defs["RejectSubmissionLegacyStatus"] = {
+  "required" : [ "rejectReason" ],
+  "type" : "object",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ChangeSubmissionStatusLegacyCommandData"
+  }, {
+    "properties" : {
+      "status" : {
+        "type" : "string",
+        "default" : "REJECT"
+      },
+      "rejectSolution" : {
+        "type" : "string"
+      },
+      "rejectReason" : {
+        "$ref" : "#/components/schemas/RejectReason"
+      }
+    }
+  } ]
+};
             defs["RenovateEstateFinancing"] = {
   "properties" : {
     "reason" : {
@@ -7759,6 +8485,7 @@
             defs["RevokeSubmissionCommand"] = {
   "required" : [ "reason", "revokedOn" ],
   "type" : "object",
+  "description" : "This command is only used for internal purposes!",
   "allOf" : [ {
     "$ref" : "#/components/schemas/ModifySubmissionCommand"
   }, {
@@ -7967,7 +8694,7 @@
   "type" : "string",
   "description" : "DE: Berechnungsmethode für das Einkommen (nicht abschließende Aufzaehlung), z.B. (CUSTOMER_SPECIFICATION=Kundenangabe, PROFIT_AND_LOSS_ACCOUNT=Gewinn- und Verlustrechnung, NO_METHOD). <br/> EN: Open ended enum contains method for profit calculation, possible values are (CUSTOMER_SPECIFICATION, PROFIT_AND_LOSS_ACCOUNT, NO_METHOD).\n",
   "example" : "CUSTOMER_SPECIFICATION",
-  "x-extensible-enum" : [ "CUSTOMER_SPECIFICATION", "PROFIT_AND_LOSS_ACCOUNT", "NO_METHOD" ]
+  "x-extensible-enum" : [ "CUSTOMER_SPECIFICATION", "PROFIT_AND_LOSS_ACCOUNT", "NO_METHOD", "OTHER" ]
 };
             defs["ShareHolding"] = {
   "type" : "object",
@@ -8075,7 +8802,7 @@
   "type" : "string",
   "description" : "DE: Sondereigentumstyp (nicht abschließende Aufzählung), z.B. BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE. <br/> EN: open ended enum contains unit Property details, possible values are (BASEMENT, HOBBY, DRYING_ROOM, ATTIC, OFFICE, APARTMENT, ALL_ROOMS, GARAGE, OUT_PARK, UG_PARK, DUPLEX_PARK, GROUND, TOWNHOUSE_CORNER, TOWNHOUSE_CENTER, SEMIDETACHED_HOUSE)\n",
   "example" : "BASEMENT",
-  "x-extensible-enum" : [ "BASEMENT", "HOBBY", "DRYING_ROOM", "ATTIC", "OFFICE", "APARTMENT", "ALL_ROOMS", "GARAGE", "OUT_PARK", "UG_PARK", "DUPLEX_PARK", "GROUND", "TOWNHOUSE_CORNER", "TOWNHOUSE_CENTER", "SEMIDETACHED_HOUSE" ]
+  "x-extensible-enum" : [ "BASEMENT", "HOBBY", "DRYING_ROOM", "ATTIC", "OFFICE", "APARTMENT", "ALL_ROOMS", "GARAGE", "OUT_PARK", "UG_PARK", "DUPLEX_PARK", "GROUND", "TOWNHOUSE_CORNER", "TOWNHOUSE_CENTER", "SEMIDETACHED_HOUSE", "OTHER" ]
 };
             defs["SpecialRealEstateCharacteristics"] = {
   "required" : [ "type" ],
@@ -8145,6 +8872,48 @@
   },
   "description" : "DE: Angabe in Quadratmetern. <br/> EN: Specification in square metres.\n"
 };
+            defs["StartEditingFinancingApplicationLegacyCommand"] = {
+  "required" : [ "editingInfo" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifyFinancingApplicationLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "START_EDITING"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      },
+      "submissions" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/SubmissionId"
+        }
+      }
+    }
+  } ]
+};
+            defs["StartEditingSubmissionLegacyCommand"] = {
+  "required" : [ "editingInfo" ],
+  "type" : "object",
+  "description" : "This command is only used for internal purposes!",
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/ModifySubmissionLegacyCommand"
+  }, {
+    "properties" : {
+      "operation" : {
+        "type" : "string",
+        "default" : "START_EDITING"
+      },
+      "editingInfo" : {
+        "$ref" : "#/components/schemas/EditingInfo"
+      }
+    }
+  } ]
+};
             defs["StatSource"] = {
   "type" : "object",
   "properties" : {
@@ -8185,6 +8954,9 @@
     },
     "creditLoans" : {
       "$ref" : "#/components/schemas/CreditLoans"
+    },
+    "originInfo" : {
+      "$ref" : "#/components/schemas/OriginInfo"
     }
   },
   "description" : "DE: Ein Kreditantrag enthält alle relevanten Informationen für eine Kreditentscheidung. <br/>\nEN: A submission holds all the information in order to help the financing partners during credit decision phase.\n"
@@ -8567,7 +9339,7 @@
   "type" : "string",
   "description" : "DE: Akademischer Titel des Antragstellers (nicht abschließende Aufzählung, zum Beispiel: DR, PH_D, PD_DR, PROF, PROF_DR). <br/> EN: Open ended enum contains possible title values, possible values are DR, PH_D, PD_DR, PROF, PROF_DR.\n",
   "example" : "PROF_DR",
-  "x-extensible-enum" : [ "DR", "PH_D", "PD_DR", "PROF", "PROF_DR" ]
+  "x-extensible-enum" : [ "DR", "PH_D", "PD_DR", "PROF", "PROF_DR", "OTHER" ]
 };
             defs["UnavailableEquity"] = {
   "required" : [ "investmentAmount", "investmentType" ],
@@ -8876,6 +9648,13 @@
                     <li data-group="FinancingApplication" data-name="modifyFinancingApplication" class="">
                       <a href="#api-FinancingApplication-modifyFinancingApplication">modifyFinancingApplication</a>
                     </li>
+                  <li class="nav-header" data-group="LegacySubmission"><a href="#api-LegacySubmission">API Methods - LegacySubmission</a></li>
+                    <li data-group="LegacySubmission" data-name="modifyFinancingApplicationLegacy" class="">
+                      <a href="#api-LegacySubmission-modifyFinancingApplicationLegacy">modifyFinancingApplicationLegacy</a>
+                    </li>
+                    <li data-group="LegacySubmission" data-name="modifySubmissionLegacy" class="">
+                      <a href="#api-LegacySubmission-modifySubmissionLegacy">modifySubmissionLegacy</a>
+                    </li>
                   <li class="nav-header" data-group="Protocol"><a href="#api-Protocol">API Methods - Protocol</a></li>
                     <li data-group="Protocol" data-name="getProtocolBySubmissionId" class="">
                       <a href="#api-Protocol-getProtocolBySubmissionId">getProtocolBySubmissionId</a>
@@ -8921,7 +9700,7 @@
         <div id="header">
           <div id="api-_">
             <h2 id="welcome-to-apidoc">API and SDK Documentation</h2>
-              <div class="app-desc">Version: 2.0.0</div>
+              <div class="app-desc">Version: 1.0.0</div>
             <hr>
             <div><p>This document describes the RESTful API and resources provided by Interhyp AG.<p> The RESTful API provides access to resources associated with submission process via <em>URI</em> paths, a client application will make an HTTP request using standard HTTP methods like <em>GET, PUT, POST and DELETE</em> and parse the response in <em>JSON</em> format.<p></p>
 <h2>API Audience <br/></h2>
@@ -22967,6 +23746,1083 @@ except ApiException as e:
                       </div>
                       <hr>
                   </section>
+                <section id="api-LegacySubmission">
+                  <h1>LegacySubmission</h1>
+                    <div id="api-LegacySubmission-modifyFinancingApplicationLegacy">
+                      <article id="api-LegacySubmission-modifyFinancingApplicationLegacy-0" data-group="User" data-name="modifyFinancingApplicationLegacy" data-version="0">
+                        <div class="pull-left">
+                          <h1>modifyFinancingApplicationLegacy</h1>
+                          <p>Endpoint for legacy financing application commands.</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">This endpoint gives a possibility to modify an existing financing application asynchronously by creating a legacy command to perform this operation, as a result a *command id* shall be returned.
+
+This Endpoint is for internal uses and servers a legacy status handling. The Endpoint will reach End Of Life in further minor releases.
+</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/v2/financing-applications/{financingApplicationId}/legacy-commands</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-java">Java</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifyFinancingApplicationLegacy-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X POST\
+ -H "Authorization: Bearer [[accessToken]]"\
+-H "Accept: application/json"\
+-H "Content-Type: application/json"\
+"https://api-test.interhyp.de/submission/v2/financing-applications/{financingApplicationId}/legacy-commands"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.LegacySubmissionApi;
+
+import java.io.File;
+import java.util.*;
+
+public class LegacySubmissionApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+
+        LegacySubmissionApi apiInstance = new LegacySubmissionApi();
+        ModifyFinancingApplicationLegacyCommand body = ; // ModifyFinancingApplicationLegacyCommand | 
+        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
+        try {
+            CommandId result = apiInstance.modifyFinancingApplicationLegacy(body, financingApplicationId);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling LegacySubmissionApi#modifyFinancingApplicationLegacy");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.LegacySubmissionApi;
+
+public class LegacySubmissionApiExample {
+
+    public static void main(String[] args) {
+        LegacySubmissionApi apiInstance = new LegacySubmissionApi();
+        ModifyFinancingApplicationLegacyCommand body = ; // ModifyFinancingApplicationLegacyCommand | 
+        String financingApplicationId = financingApplicationId_example; // String | Id of the financing application
+        try {
+            CommandId result = apiInstance.modifyFinancingApplicationLegacy(body, financingApplicationId);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling LegacySubmissionApi#modifyFinancingApplicationLegacy");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+ModifyFinancingApplicationLegacyCommand *body = ; // 
+String *financingApplicationId = financingApplicationId_example; // Id of the financing application
+
+LegacySubmissionApi *apiInstance = [[LegacySubmissionApi alloc] init];
+
+// Endpoint for legacy financing application commands.
+[apiInstance modifyFinancingApplicationLegacyWith:body
+    financingApplicationId:financingApplicationId
+              completionHandler: ^(CommandId output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var InterhypSubmissionApi = require('interhyp_submission_api');
+var defaultClient = InterhypSubmissionApi.ApiClient.instance;
+
+
+var api = new InterhypSubmissionApi.LegacySubmissionApi()
+var body = ; // {{ModifyFinancingApplicationLegacyCommand}} 
+var financingApplicationId = financingApplicationId_example; // {{String}} Id of the financing application
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.modifyFinancingApplicationLegacy(bodyfinancingApplicationId, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class modifyFinancingApplicationLegacyExample
+    {
+        public void main()
+        {
+
+
+            var apiInstance = new LegacySubmissionApi();
+            var body = new ModifyFinancingApplicationLegacyCommand(); // ModifyFinancingApplicationLegacyCommand | 
+            var financingApplicationId = financingApplicationId_example;  // String | Id of the financing application
+
+            try
+            {
+                // Endpoint for legacy financing application commands.
+                CommandId result = apiInstance.modifyFinancingApplicationLegacy(body, financingApplicationId);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling LegacySubmissionApi.modifyFinancingApplicationLegacy: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+$api_instance = new Swagger\Client\ApiLegacySubmissionApi();
+$body = ; // ModifyFinancingApplicationLegacyCommand | 
+$financingApplicationId = financingApplicationId_example; // String | Id of the financing application
+
+try {
+    $result = $api_instance->modifyFinancingApplicationLegacy($body, $financingApplicationId);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling LegacySubmissionApi->modifyFinancingApplicationLegacy: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::LegacySubmissionApi;
+
+
+my $api_instance = WWW::SwaggerClient::LegacySubmissionApi->new();
+my $body = WWW::SwaggerClient::Object::ModifyFinancingApplicationLegacyCommand->new(); # ModifyFinancingApplicationLegacyCommand | 
+my $financingApplicationId = financingApplicationId_example; # String | Id of the financing application
+
+eval { 
+    my $result = $api_instance->modifyFinancingApplicationLegacy(body => $body, financingApplicationId => $financingApplicationId);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling LegacySubmissionApi->modifyFinancingApplicationLegacy: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifyFinancingApplicationLegacy-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+
+# create an instance of the API class
+api_instance = swagger_client.LegacySubmissionApi()
+body =  # ModifyFinancingApplicationLegacyCommand | 
+financingApplicationId = financingApplicationId_example # String | Id of the financing application
+
+try: 
+    # Endpoint for legacy financing application commands.
+    api_response = api_instance.modify_financing_application_legacy(body, financingApplicationId)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling LegacySubmissionApi->modifyFinancingApplicationLegacy: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">financingApplicationId*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_modifyFinancingApplicationLegacy_financingApplicationId">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          Id of the financing application
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <td>
+                                
+                                
+                                <script>
+                                $(document).ready(function() {
+                                  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/ModifyFinancingApplicationLegacyCommand"
+      }
+    }
+  },
+  "required" : true
+};
+                                  var schema = schemaWrapper.content["application/json"].schema;
+                                  if (schema.$ref != null) {
+                                    schema = defsParser.$refs.get(schema.$ref);
+                                  } else {
+                                    schemaWrapper.components = {};
+                                    schemaWrapper.components.schemas = Object.assign({}, defs);
+                                    $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                      console.log(err);
+                                    });
+                                  }
+                                
+                                  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+                                  var result = $('#d2e199_modifyFinancingApplicationLegacy_body');
+                                  result.empty();
+                                  result.append(view.render());
+                                });
+                                </script>
+                                <div id="d2e199_modifyFinancingApplicationLegacy_body"></div>
+                                </td>
+                                </tr>
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 201 - Reference to the created resource. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifyFinancingApplicationLegacy-201-schema">Schema</a>
+                                </li>
+
+                                <li class="">
+                                  <a data-toggle="tab" href="#responses-modifyFinancingApplicationLegacy-201-headers">Headers</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifyFinancingApplicationLegacy-201-schema">
+                                  <div id='responses-modifyFinancingApplicationLegacy-201-schema-201' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Reference to the created resource.",
+  "headers" : {
+    "Location" : {
+      "style" : "simple",
+      "explode" : false,
+      "schema" : {
+        "type" : "string",
+        "description" : "DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource\n",
+        "example" : "http://some-domain/some/link/to/somewhere"
+      }
+    }
+  },
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/CommandId"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifyFinancingApplicationLegacy-201-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifyFinancingApplicationLegacy-201-schema-201');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifyFinancingApplicationLegacy-201-schema-data' type='hidden' value=''></input>
+                                </div>
+                                <div class="tab-pane" id="responses-modifyFinancingApplicationLegacy-201-headers">
+                                    <table>
+                                        <tr>
+                                            <th width="150px">Name</th>
+                                            <th width="100px">Type</th>
+                                            <th width="100px">Format</th>
+                                            <th>Description</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Location</td>
+                                            <td>String</td>
+                                            <td></td>
+                                            <td>DE: Link zu einer spezifischen Ressource &lt;br/&gt; EN: Link to retrieve a specific resource
+</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h3> Status: 400 - Error indicates missing or wrong request parameters. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifyFinancingApplicationLegacy-400-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifyFinancingApplicationLegacy-400-schema">
+                                  <div id='responses-modifyFinancingApplicationLegacy-400-schema-400' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates missing or wrong request parameters.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifyFinancingApplicationLegacy-400-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifyFinancingApplicationLegacy-400-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifyFinancingApplicationLegacy-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 401 - Error indicates no access to the required resource. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifyFinancingApplicationLegacy-401-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifyFinancingApplicationLegacy-401-schema">
+                                  <div id='responses-modifyFinancingApplicationLegacy-401-schema-401' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates no access to the required resource.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/OAuthProblem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifyFinancingApplicationLegacy-401-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifyFinancingApplicationLegacy-401-schema-401');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifyFinancingApplicationLegacy-401-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 500 - Unexpected Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifyFinancingApplicationLegacy-500-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifyFinancingApplicationLegacy-500-schema">
+                                  <div id='responses-modifyFinancingApplicationLegacy-500-schema-500' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Unexpected Error",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifyFinancingApplicationLegacy-500-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifyFinancingApplicationLegacy-500-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifyFinancingApplicationLegacy-500-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-LegacySubmission-modifySubmissionLegacy">
+                      <article id="api-LegacySubmission-modifySubmissionLegacy-0" data-group="User" data-name="modifySubmissionLegacy" data-version="0">
+                        <div class="pull-left">
+                          <h1>modifySubmissionLegacy</h1>
+                          <p>Endpoint for legacy submission commands.</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">This endpoint gives a possibility to modify an existing submission asynchronously by creating a legacy command to perform this operation, as a result a *command id* shall be returned.
+
+This Endpoint is for internal uses and servers a legacy status handling. The Endpoint will reach End Of Life in further minor releases.
+</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/v2/submissions/{submissionId}/legacy-commands</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-java">Java</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-LegacySubmission-modifySubmissionLegacy-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-LegacySubmission-modifySubmissionLegacy-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X POST\
+ -H "Authorization: Bearer [[accessToken]]"\
+-H "Accept: application/json"\
+-H "Content-Type: application/json"\
+"https://api-test.interhyp.de/submission/v2/submissions/{submissionId}/legacy-commands"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.LegacySubmissionApi;
+
+import java.io.File;
+import java.util.*;
+
+public class LegacySubmissionApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+
+        LegacySubmissionApi apiInstance = new LegacySubmissionApi();
+        ModifySubmissionLegacyCommand body = ; // ModifySubmissionLegacyCommand | 
+        String submissionId = submissionId_example; // String | Id for the requested submission.
+        try {
+            CommandId result = apiInstance.modifySubmissionLegacy(body, submissionId);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling LegacySubmissionApi#modifySubmissionLegacy");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.LegacySubmissionApi;
+
+public class LegacySubmissionApiExample {
+
+    public static void main(String[] args) {
+        LegacySubmissionApi apiInstance = new LegacySubmissionApi();
+        ModifySubmissionLegacyCommand body = ; // ModifySubmissionLegacyCommand | 
+        String submissionId = submissionId_example; // String | Id for the requested submission.
+        try {
+            CommandId result = apiInstance.modifySubmissionLegacy(body, submissionId);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling LegacySubmissionApi#modifySubmissionLegacy");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+ModifySubmissionLegacyCommand *body = ; // 
+String *submissionId = submissionId_example; // Id for the requested submission.
+
+LegacySubmissionApi *apiInstance = [[LegacySubmissionApi alloc] init];
+
+// Endpoint for legacy submission commands.
+[apiInstance modifySubmissionLegacyWith:body
+    submissionId:submissionId
+              completionHandler: ^(CommandId output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var InterhypSubmissionApi = require('interhyp_submission_api');
+var defaultClient = InterhypSubmissionApi.ApiClient.instance;
+
+
+var api = new InterhypSubmissionApi.LegacySubmissionApi()
+var body = ; // {{ModifySubmissionLegacyCommand}} 
+var submissionId = submissionId_example; // {{String}} Id for the requested submission.
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.modifySubmissionLegacy(bodysubmissionId, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class modifySubmissionLegacyExample
+    {
+        public void main()
+        {
+
+
+            var apiInstance = new LegacySubmissionApi();
+            var body = new ModifySubmissionLegacyCommand(); // ModifySubmissionLegacyCommand | 
+            var submissionId = submissionId_example;  // String | Id for the requested submission.
+
+            try
+            {
+                // Endpoint for legacy submission commands.
+                CommandId result = apiInstance.modifySubmissionLegacy(body, submissionId);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling LegacySubmissionApi.modifySubmissionLegacy: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+$api_instance = new Swagger\Client\ApiLegacySubmissionApi();
+$body = ; // ModifySubmissionLegacyCommand | 
+$submissionId = submissionId_example; // String | Id for the requested submission.
+
+try {
+    $result = $api_instance->modifySubmissionLegacy($body, $submissionId);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling LegacySubmissionApi->modifySubmissionLegacy: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::LegacySubmissionApi;
+
+
+my $api_instance = WWW::SwaggerClient::LegacySubmissionApi->new();
+my $body = WWW::SwaggerClient::Object::ModifySubmissionLegacyCommand->new(); # ModifySubmissionLegacyCommand | 
+my $submissionId = submissionId_example; # String | Id for the requested submission.
+
+eval { 
+    my $result = $api_instance->modifySubmissionLegacy(body => $body, submissionId => $submissionId);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling LegacySubmissionApi->modifySubmissionLegacy: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-LegacySubmission-modifySubmissionLegacy-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+
+# create an instance of the API class
+api_instance = swagger_client.LegacySubmissionApi()
+body =  # ModifySubmissionLegacyCommand | 
+submissionId = submissionId_example # String | Id for the requested submission.
+
+try: 
+    # Endpoint for legacy submission commands.
+    api_response = api_instance.modify_submission_legacy(body, submissionId)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling LegacySubmissionApi->modifySubmissionLegacy: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">submissionId*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_modifySubmissionLegacy_submissionId">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          Id for the requested submission.
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <td>
+                                
+                                
+                                <script>
+                                $(document).ready(function() {
+                                  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/ModifySubmissionLegacyCommand"
+      }
+    }
+  },
+  "required" : true
+};
+                                  var schema = schemaWrapper.content["application/json"].schema;
+                                  if (schema.$ref != null) {
+                                    schema = defsParser.$refs.get(schema.$ref);
+                                  } else {
+                                    schemaWrapper.components = {};
+                                    schemaWrapper.components.schemas = Object.assign({}, defs);
+                                    $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                      console.log(err);
+                                    });
+                                  }
+                                
+                                  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+                                  var result = $('#d2e199_modifySubmissionLegacy_body');
+                                  result.empty();
+                                  result.append(view.render());
+                                });
+                                </script>
+                                <div id="d2e199_modifySubmissionLegacy_body"></div>
+                                </td>
+                                </tr>
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 201 - Reference to the created resource. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifySubmissionLegacy-201-schema">Schema</a>
+                                </li>
+
+                                <li class="">
+                                  <a data-toggle="tab" href="#responses-modifySubmissionLegacy-201-headers">Headers</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifySubmissionLegacy-201-schema">
+                                  <div id='responses-modifySubmissionLegacy-201-schema-201' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Reference to the created resource.",
+  "headers" : {
+    "Location" : {
+      "style" : "simple",
+      "explode" : false,
+      "schema" : {
+        "type" : "string",
+        "description" : "DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource\n",
+        "example" : "http://some-domain/some/link/to/somewhere"
+      }
+    }
+  },
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/CommandId"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifySubmissionLegacy-201-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifySubmissionLegacy-201-schema-201');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifySubmissionLegacy-201-schema-data' type='hidden' value=''></input>
+                                </div>
+                                <div class="tab-pane" id="responses-modifySubmissionLegacy-201-headers">
+                                    <table>
+                                        <tr>
+                                            <th width="150px">Name</th>
+                                            <th width="100px">Type</th>
+                                            <th width="100px">Format</th>
+                                            <th>Description</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Location</td>
+                                            <td>String</td>
+                                            <td></td>
+                                            <td>DE: Link zu einer spezifischen Ressource &lt;br/&gt; EN: Link to retrieve a specific resource
+</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h3> Status: 400 - Error indicates missing or wrong request parameters. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifySubmissionLegacy-400-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifySubmissionLegacy-400-schema">
+                                  <div id='responses-modifySubmissionLegacy-400-schema-400' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates missing or wrong request parameters.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifySubmissionLegacy-400-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifySubmissionLegacy-400-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifySubmissionLegacy-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 401 - Error indicates no access to the required resource. </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifySubmissionLegacy-401-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifySubmissionLegacy-401-schema">
+                                  <div id='responses-modifySubmissionLegacy-401-schema-401' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Error indicates no access to the required resource.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/OAuthProblem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifySubmissionLegacy-401-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifySubmissionLegacy-401-schema-401');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifySubmissionLegacy-401-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 500 - Unexpected Error </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-modifySubmissionLegacy-500-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-modifySubmissionLegacy-500-schema">
+                                  <div id='responses-modifySubmissionLegacy-500-schema-500' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Unexpected Error",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/RFC7807Problem"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-modifySubmissionLegacy-500-schema-data').val(stringify(schema));
+                                        var result = $('#responses-modifySubmissionLegacy-500-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-modifySubmissionLegacy-500-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                  </section>
                 <section id="api-Protocol">
                   <h1>Protocol</h1>
                     <div id="api-Protocol-getProtocolBySubmissionId">
@@ -24157,7 +26013,7 @@ public class SubmissionsApiExample {
         String submissionId = submissionId_example; // String | Id for the requested submission.
         String calculationType = calculationType_example; // String | Subtype of the calculation data.
         try {
-            Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+            Calculations result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling SubmissionsApi#getSubmissionCalculationByType");
@@ -24177,7 +26033,7 @@ public class SubmissionsApiExample {
         String submissionId = submissionId_example; // String | Id for the requested submission.
         String calculationType = calculationType_example; // String | Subtype of the calculation data.
         try {
-            Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+            Calculations result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling SubmissionsApi#getSubmissionCalculationByType");
@@ -24200,7 +26056,7 @@ SubmissionsApi *apiInstance = [[SubmissionsApi alloc] init];
 // Get calculation data
 [apiInstance getSubmissionCalculationByTypeWith:submissionId
     calculationType:calculationType
-              completionHandler: ^(Calculation output, NSError* error) {
+              completionHandler: ^(Calculations output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -24256,7 +26112,7 @@ namespace Example
             try
             {
                 // Get calculation data
-                Calculation result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
+                Calculations result = apiInstance.getSubmissionCalculationByType(submissionId, calculationType);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -24406,7 +26262,7 @@ except ApiException as e:
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/Calculation"
+        "$ref" : "#/components/schemas/Calculations"
       }
     }
   }
@@ -29618,7 +31474,7 @@ except ApiException as e:
   
       _classCallCheck(this, JSONSchemaView);
   
-      this.schema = schema; //console.log(schema);
+      this.schema = schema;
       this.open = open;
       this.options = options;
       this.isCollapsed = open <= 0;
@@ -29631,7 +31487,7 @@ except ApiException as e:
       // Determine if a schema is an array
       this.isArray = !this.isAny && this.schema && this.schema.type === 'array';
   
-      this.isObject = this.schema && (this.schema.type === 'object' || this.schema.properties || this.schema.anyOf || this.schema.oneof || this.schema.allOf);
+      this.isObject = this.schema && (this.schema.type === 'object' || this.schema.properties || this.schema.allOf);
   
       // Determine if a schema is a primitive
       this.isPrimitive = !this.isAny && !this.isArray && !this.isObject;
