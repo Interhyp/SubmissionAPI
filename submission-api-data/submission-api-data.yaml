@@ -140,398 +140,6 @@ tags:
 - name: commands
   description: provides endpoints for command resources
 paths:
-  /v2/submissions/{submissionId}/calculations/{calculationType}:
-    get:
-      summary: Get calculation data
-      description: |-
-        Delivers calculation basics for specified calculation type.
-        Calculation type options:
-          - CONDITION (Konditionskalkulation)
-
-          - HOUSEHOLD (HH-Rechnung)
-
-          - LENDING_VALUE (Beleihungswert)
-      operationId: getSubmissionCalculationByType
-      tags:
-      - submissions
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      - $ref: '#/components/parameters/calculation-type'
-      responses:
-        '200':
-          description: Requested calculation data is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Calculation'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/commands/{commandId}:
-    get:
-      summary: Get an existing command
-      description: |
-        Delivers information about an existing command
-
-        A Command is a unit of execution which has been created to perform asynchronous operation.
-      operationId: getCommandsById
-      tags:
-      - commands
-      parameters:
-      - $ref: '#/components/parameters/command-id'
-      responses:
-        '200':
-          description: Command is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Command'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested command resource was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/correspondence:
-    get:
-      summary: Delivers all submissions correspondence for a provider
-      description: Delivers a collection of submission correspondence among involved
-        submission process parties for a specific provider filtered by the date of
-        correspondence.<p> *By Default*, we will return the first *20* matching records.
-        However, this is not a hard limitation! a parameter called `limit` can be
-        used to tell the API how many records you want to return all at once *(max
-        40)*.<p> To get further matching records, a parameter called `after` or `before`
-        can be used to tell the API the start of each page using specified cursor.<p>
-        To navigate through the query result, a reference to the following navigations
-        are included in the response *(next, prev, first, last, self)*.
-      operationId: getSubmissionsCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/since'
-      - $ref: '#/components/parameters/until'
-      - $ref: '#/components/parameters/correspondence-type-filter'
-      - $ref: '#/components/parameters/sbms-correspondence-limit'
-      - $ref: '#/components/parameters/cursor-after'
-      - $ref: '#/components/parameters/cursor-before'
-      - $ref: '#/components/parameters/embed'
-      responses:
-        '200':
-          description: A paged array of submissions correspondence
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubmissionCorrespondence'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/correspondence:
-    get:
-      summary: Get correspondence for a specific submission
-      description: Delivers detailed information about correspondence among involved
-        submission process  parties associated with a specific submission. By default
-        the result will be sorted based on createdAt ascending.
-      operationId: getCorrespondenceBySubmissionId
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      - $ref: '#/components/parameters/correspondence-type-filter'
-      - $ref: '#/components/parameters/sbms-correspondence-sort'
-      responses:
-        '200':
-          description: Submission correspondence are returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Correspondence'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    post:
-      summary: Create new correspondence for a specific submission
-      operationId: createSubmissionCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CorrespondenceItem'
-      responses:
-        '201':
-          description: Correspondence was created
-          content:
-            application/json:
-              schema:
-                properties:
-                  id:
-                    type: string
-          headers:
-            Location:
-              schema:
-                type: string
-                description: Link to retrieve a specific resource
-                example: http://some-domain/some/link/to/somewhere
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    delete:
-      summary: Delete correspondence assocaited with a specific submission
-      operationId: deleteSubmissionCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '204':
-          description: Submission correspondence are deleted
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/correspondence/{itemId}:
-    get:
-      summary: Get a specific submission correspondence item
-      description: Delivers detailed information about a specific submission correspondence
-        item.
-      operationId: getSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '200':
-          description: Submission corresponcence item is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CorrespondenceItem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    delete:
-      summary: Delete a specific submission correspondence item
-      operationId: deleteSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '204':
-          description: Submission correspondence item is deleted
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    put:
-      summary: Override a specific submission correspondence item
-      operationId: overrideSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CorrespondenceItem'
-      responses:
-        '204':
-          description: Submission correspondence item is updated
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
   /v2/financing-applications/commands:
     post:
       summary: Create a new financing application
@@ -1324,6 +932,355 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/calculations/{calculationType}:
+    get:
+      summary: Get calculation data
+      description: |-
+        Delivers calculation basics for specified calculation type.
+        Calculation type options:
+          - CONDITION (Konditionskalkulation)
+
+          - HOUSEHOLD (HH-Rechnung)
+
+          - LENDING_VALUE (Beleihungswert)
+      operationId: getSubmissionCalculationByType
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/calculation-type'
+      responses:
+        '200':
+          description: Requested calculation data is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calculations'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/correspondence:
+    get:
+      summary: Delivers all submissions correspondence for a provider
+      description: Delivers a collection of submission correspondence among involved
+        submission process parties for a specific provider filtered by the date of
+        correspondence.<p> *By Default*, we will return the first *20* matching records.
+        However, this is not a hard limitation! a parameter called `limit` can be
+        used to tell the API how many records you want to return all at once *(max
+        40)*.<p> To get further matching records, a parameter called `after` or `before`
+        can be used to tell the API the start of each page using specified cursor.<p>
+        To navigate through the query result, a reference to the following navigations
+        are included in the response *(next, prev, first, last, self)*.
+      operationId: getSubmissionsCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/since'
+      - $ref: '#/components/parameters/until'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-limit'
+      - $ref: '#/components/parameters/cursor-after'
+      - $ref: '#/components/parameters/cursor-before'
+      - $ref: '#/components/parameters/embed'
+      responses:
+        '200':
+          description: A paged array of submissions correspondence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionCorrespondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence:
+    get:
+      summary: Get correspondence for a specific submission
+      description: Delivers detailed information about correspondence among involved
+        submission process  parties associated with a specific submission. By default
+        the result will be sorted based on createdAt ascending.
+      operationId: getCorrespondenceBySubmissionId
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-sort'
+      responses:
+        '200':
+          description: Submission correspondence are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    post:
+      summary: Create new correspondence for a specific submission
+      operationId: createSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '201':
+          description: Correspondence was created
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+          headers:
+            Location:
+              schema:
+                type: string
+                description: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete correspondence assocaited with a specific submission
+      operationId: deleteSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence are deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence/{itemId}:
+    get:
+      summary: Get a specific submission correspondence item
+      description: Delivers detailed information about a specific submission correspondence
+        item.
+      operationId: getSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Submission corresponcence item is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorrespondenceItem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete a specific submission correspondence item
+      operationId: deleteSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence item is deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    put:
+      summary: Override a specific submission correspondence item
+      operationId: overrideSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '204':
+          description: Submission correspondence item is updated
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}/protocol:
     get:
       summary: Get protocol for a specific submission
@@ -1363,6 +1320,151 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/commands/{commandId}:
+    get:
+      summary: Get an existing command
+      description: |
+        Delivers information about an existing command
+
+        A Command is a unit of execution which has been created to perform asynchronous operation.
+      operationId: getCommandsById
+      tags:
+      - commands
+      parameters:
+      - $ref: '#/components/parameters/command-id'
+      responses:
+        '200':
+          description: Command is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Command'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested command resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/legacy-commands:
+    post:
+      deprecated: true
+      summary: Endpoint for legacy submission commands.
+      description: |
+        This endpoint gives a possibility to modify an existing submission asynchronously by creating a legacy command to perform this operation, as a result a *command id* shall be returned.
+
+        This Endpoint is for internal uses and servers a legacy status handling. The Endpoint will reach End Of Life in further minor releases.
+      operationId: modifySubmissionLegacy
+      tags:
+      - legacy-submission
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/financing-applications/{financingApplicationId}/legacy-commands:
+    post:
+      deprecated: true
+      summary: Endpoint for legacy financing application commands.
+      description: |
+        This endpoint gives a possibility to modify an existing financing application asynchronously by creating a legacy command to perform this operation, as a result a *command id* shall be returned.
+
+        This Endpoint is for internal uses and servers a legacy status handling. The Endpoint will reach End Of Life in further minor releases.
+      operationId: modifyFinancingApplicationLegacy
+      tags:
+      - legacy-submission
+      parameters:
+      - $ref: '#/components/parameters/financing-application-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
         '500':
           description: Unexpected Error
           content:
@@ -2200,6 +2302,7 @@ components:
       - CONSTRUCTION
       - BUY_CONSTRUCTION
       - SUPPLEMENTARY_FINANCING
+      - OTHER
     Households:
       type: object
       description: |
@@ -2691,6 +2794,7 @@ components:
       - DIVORCED
       - SEPARATED
       - COHABITING
+      - OTHER
     MaritalPropertyStatus:
       type: object
       properties:
@@ -2705,6 +2809,7 @@ components:
       - COMMUNITY_OF_ACQUESTS_AND_GAINS
       - SEPARATE_PROPERTY
       - ABSOLUTE_COMMUNITY_PROPERTY
+      - OTHER
     CreditWorthiness:
       type: object
       description: |
@@ -3518,6 +3623,8 @@ components:
       properties:
         unit:
           $ref: '#/components/schemas/LoanPartnerProcessingUnit'
+        processor:
+          $ref: '#/components/schemas/LoanPartnerProcessor'
     LoanPartnerProcessingUnit:
       type: object
       description: |
@@ -3555,6 +3662,45 @@ components:
       type: object
       properties:
         value:
+          type: string
+    LoanPartnerProcessor:
+      description: |
+        DE: Der (Kredit-)Bearbeiter. <br/> EN: The loan partner processor.
+      required:
+      - processorId
+      - processorName
+      properties:
+        processorId:
+          $ref: '#/components/schemas/LoanPartnerProcessorId'
+        processorName:
+          $ref: '#/components/schemas/LoanPartnerProcessorName'
+        processorEmail:
+          $ref: '#/components/schemas/LoanPartnerProcessorEmail'
+    LoanPartnerProcessorId:
+      description: |
+        DE: ID des (Kredit-)Bearbeiters. <br/> EN: Id of the loan partner processor.
+      required:
+      - value
+      properties:
+        value:
+          type: string
+    LoanPartnerProcessorName:
+      description: |
+        DE: Username, Vor- und Nachname des (Kredit-)Bearbeiters. <br/> EN: Username, first- and lastname of the loan partner processor.
+      required:
+      - userName
+      properties:
+        userName:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+    LoanPartnerProcessorEmail:
+      description: |
+        DE: E-Mail Adresse des (Kredit-)Bearbeiters. <br/> EN: E-Mail address of the loan partner processor.
+      properties:
+        email:
           type: string
     Estates:
       type: object
@@ -3747,6 +3893,7 @@ components:
       - MIXED
       - INDUSTRIAL
       - OUTSIDE
+      - OTHER
     Inhabitants:
       type: object
       properties:
@@ -3766,6 +3913,7 @@ components:
       - UP_TO_500000
       - UP_TO_1000000
       - MORE_THEN_1000000
+      - OTHER
     LeaseInfo:
       type: object
       description: |
@@ -3993,6 +4141,7 @@ components:
       - PREFABRICATED_HOUSE
       - GROW_HOUSE
       - SELF_BUILD_HOUSE
+      - OTHER
     RealEstatePropertyCondition:
       type: object
       properties:
@@ -4010,6 +4159,7 @@ components:
       - IN_MODERNISATION_NEED
       - WELL_KEPT
       - AS_NEW
+      - OTHER
     Furnishing:
       type: object
       properties:
@@ -4024,6 +4174,7 @@ components:
       - SIMPLE
       - GOOD
       - VERY_GOOD
+      - OTHER
     ParkingSpace:
       type: object
       required:
@@ -4104,8 +4255,14 @@ components:
           - $ref: '#/components/schemas/SquareMeter'
         areaTotal:
           description: |
-            DE: Gesamtfläche. <br/>
-            EN: Total space.
+            DE: Wohnfläche. <br/>
+            EN: Living space.
+          allOf:
+          - $ref: '#/components/schemas/SquareMeter'
+        landSize:
+          description: |
+            DE: Grundstücksgröße. <br/>
+            EN: Property space.
           allOf:
           - $ref: '#/components/schemas/SquareMeter'
         commercialArea:
@@ -4318,6 +4475,7 @@ components:
       - FIFTH_FLOOR
       - THIRD_FOURTH_OR_FIFTH_FLOOR
       - SIXTH_FLOOR_OR_HIGHER
+      - OTHER
     SpecialRealEstateCharacteristics:
       description: |
         DE: Spezielle Nutzung der Immobilie. <br/> EN: Special use of property.
@@ -4398,6 +4556,7 @@ components:
       - PARTIALLY_DEVELOPED
       - UPGRADEABLE
       - NOT_UPGRADEABLE
+      - OTHER
     Basement:
       type: object
       description: |
@@ -4425,6 +4584,7 @@ components:
       - DEVELOPED
       - PARTIALLY_DEVELOPED
       - NONE
+      - OTHER
     Plot:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "PLOT" (Grundstück). <br/>
@@ -4435,6 +4595,39 @@ components:
       - properties:
           rating:
             $ref: '#/components/schemas/LandValueEvaluation'
+          landSize:
+            description: |
+              DE: Grundstücksgröße. <br/>
+              EN: Property space.
+            allOf:
+            - $ref: '#/components/schemas/SquareMeter'
+    FinancialStandingSummary:
+      type: object
+      properties:
+        totalIncome:
+          description: |
+            DE: Nettoeinkommen
+            EN: Total net income
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        totalExpenses:
+          description: |
+            DE: Ausgaben
+            EN: Total expenses
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        surplus:
+          description: |
+            DE: Haushaltsüberschus- Restliquidität nach Finanzierung
+            EN: Remaining liquidity after financing
+          allOf:
+          - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        reserves:
+          description: |
+            DE: Rücklagen
+            EN: Total reserves after financing
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
     ExistingModernisation:
       type: object
       description: |
@@ -4757,6 +4950,8 @@ components:
       type: object
       description: |
         DE: Wert und Prozentsatz für die Darlehensquote. <br/> EN: Value and percentage for a loan quota
+      required:
+      - type
       properties:
         type:
           $ref: '#/components/schemas/LoanQuotaType'
@@ -4961,6 +5156,38 @@ components:
             $ref: '#/components/schemas/OtherCapitalFinancing'
           financingDetails:
             $ref: '#/components/schemas/OwnEstateFinancingDetails'
+    OriginInfo:
+      type: object
+      required:
+      - client
+      - externalId
+      description: |
+        DE: Enthält die Information über Datenquelle und Daten-Identifikator aus dem externen System. <br/> EN: Contains information about Data source and data identifier in the external system.
+      properties:
+        client:
+          $ref: '#/components/schemas/Client'
+        externalId:
+          $ref: '#/components/schemas/ExternalId'
+    Client:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ClientKey'
+    ClientKey:
+      type: string
+      description: |
+        DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.
+      example: INTERHYP_ASP
+      x-extensible-enum:
+      - INTERHYP_ASP
+      - COBA_ASP
+    ExternalId:
+      type: object
+      description: |
+        DE: Daten-Identifikator aus dem externen System. <br/> EN: Data identifier in the external system.
+      properties:
+        value:
+          type: string
     Calculation:
       type: object
       required:
@@ -5002,6 +5229,8 @@ components:
           type:
             type: string
             default: HOUSEHOLD
+          summary:
+            $ref: '#/components/schemas/FinancialStandingSummary'
           details:
             type: array
             items:
@@ -5108,39 +5337,22 @@ components:
           type:
             type: string
             default: CONDITION
-          loans:
+          loan:
+            $ref: '#/components/schemas/LoanConditionGeneralInfo'
+          details:
             type: array
             items:
-              $ref: '#/components/schemas/LoanConditionInfo'
-    LoanConditionInfo:
+              $ref: '#/components/schemas/LoanConditionDetail'
+    LoanConditionGeneralInfo:
       description: |
-        DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>
-        EN: Information about single loan which is a part of condition calculation.
-      type: object
-      properties:
-        loan:
-          $ref: '#/components/schemas/LoanConditionGeneral'
-        details:
-          type: array
-          description: |
-            DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>
-            EN: Information about single entry within condition calculation.
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
-        summary:
-          $ref: '#/components/schemas/LoanConditionSummary'
-    LoanConditionGeneral:
-      description: |
-        DE: Allgemeine Information zu einem Darlehen (Konditionskalkulation). <br/>
+        DE: Allgemeine Information zu den Darlehen (Konditionskalkulation). <br/>
         EN: General loan information (conditions calculation).
       type: object
       properties:
-        loanId:
-          $ref: '#/components/schemas/LoanId'
         loanAmount:
           description: |
-            DE: Darlehnsbetrag. <br/>
-            EN: Loan amount.
+            DE: Gesamter Darlehnsbetrag. <br/>
+            EN: Total loan amount.
           allOf:
           - $ref: '#/components/schemas/EuroAmount'
         loanQuota:
@@ -5169,13 +5381,6 @@ components:
           - $ref: '#/components/schemas/PeriodicalEuroAmount'
         paymentTime:
           $ref: '#/components/schemas/PaymentTime'
-    LoanId:
-      type: object
-      description: |
-        DE: ID des Darlehens. <br/> EN: Loan identifier.
-      properties:
-        value:
-          type: string
     Percentage:
       type: object
       required:
@@ -5184,6 +5389,66 @@ components:
         value:
           type: number
           format: double
+    LoanConditionDetail:
+      description: |
+        DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>
+        EN: Information about single loan which is a part of condition calculation.
+      type: object
+      properties:
+        loanId:
+          $ref: '#/components/schemas/LoanId'
+        loanType:
+          $ref: '#/components/schemas/LoanType'
+        amount:
+          description: |
+            DE: Darlehensbetrag. <br/>
+            EN: Loan amount.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        payout:
+          description: |
+            DE: Auszahlung (Prozent). <br/>
+            EN: Payout  (percent).
+          allOf:
+          - $ref: '#/components/schemas/Percentage'
+        maturity:
+          description: |
+            DE: Dauer der Sollzinsbindung. <br/>
+            EN: Duration of interest rate maturity.
+          allOf:
+          - $ref: '#/components/schemas/Duration'
+        initialAmortisationRate:
+          description: |
+            DE: Initiale Tilgungsrate (Prozent). <br/>
+            EN: Initial amortisation rate (percent).
+          allOf:
+          - $ref: '#/components/schemas/Percentage'
+        additionalInfo:
+          type: array
+          description: |
+            DE: Information über einzelnen Eintrag innerhalb des Konditionskalkulation. <br/>
+            EN: Information about single entry within condition calculation.
+          items:
+            $ref: '#/components/schemas/AdditionalInfo'
+        summary:
+          $ref: '#/components/schemas/LoanConditionSummary'
+    LoanId:
+      type: object
+      description: |
+        DE: ID des Darlehens. <br/> EN: Loan identifier.
+      properties:
+        value:
+          type: string
+    LoanType:
+      type: string
+      description: |
+        DE: Art des Darlehens (nicht abschließende Aufzählung), z.B. MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN. <br/> EN: Open ended enum contains possible loan types, possible values are MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN.
+      example: MAIN_LOAN
+      x-extensible-enum:
+      - MAIN_LOAN
+      - AUXILIARY_LOAN
+      - KFW_PROMOTION_LOAN
+      - OTHER
     LoanConditionSummary:
       description: |
         DE: Zusammenfassung von Informationen zu einzelnem Darlehen (Konditionskalkulation). <br/>
@@ -5223,40 +5488,12 @@ components:
           type:
             type: string
             default: LENDING_VALUE
+          lendingValue:
+            $ref: '#/components/schemas/LoanQuota'
           details:
             type: array
             items:
               $ref: '#/components/schemas/CalculationDetail'
-    OriginInfo:
-      type: object
-      required:
-      - client
-      - externalId
-      properties:
-        client:
-          $ref: '#/components/schemas/Client'
-        externalId:
-          $ref: '#/components/schemas/ExternalId'
-    Client:
-      type: object
-      properties:
-        key:
-          $ref: '#/components/schemas/ClientKey'
-    ClientKey:
-      type: string
-      description: |
-        DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.
-      example: INTERHYP_ASP
-      x-extensible-enum:
-      - INTERHYP_ASP
-      - COBA_ASP
-    ExternalId:
-      type: object
-      description: |
-        DE: Daten-Identifikator aus dem externen System. <br/> EN: Data identifier in the external system.
-      properties:
-        value:
-          type: string
     CorrespondenceItem:
       type: object
       required:
@@ -5325,11 +5562,14 @@ components:
           type: string
           x-extensible-enum:
           - REVOKE
+          - ASSIGN_PROCESSOR
       discriminator:
         propertyName: operation
         mapping:
           REVOKE: '#/components/schemas/RevokeSubmissionCommand'
+          ASSIGN_PROCESSOR: '#/components/schemas/AssignLoanPartnerProcessorCommand'
     RevokeSubmissionCommand:
+      description: This command is only used for internal purposes!
       type: object
       required:
       - reason
@@ -5349,6 +5589,19 @@ components:
           revokedOn:
             type: string
             format: date-time
+    AssignLoanPartnerProcessorCommand:
+      description: Assign a processor to the submission
+      type: object
+      required:
+      - processor
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionCommand'
+      - properties:
+          operation:
+            type: string
+            default: ASSIGN_PROCESSOR
+          processor:
+            $ref: '#/components/schemas/LoanPartnerProcessingInfo'
     InformerId:
       type: object
       required:
@@ -5383,6 +5636,8 @@ components:
         EN: Relationship between exactly 2 applicants involved in the financing application when applicable.
 
         The absence of this object indicates that no relationship is available.
+      required:
+      - relationType
       properties:
         applicants:
           description: |
@@ -5409,6 +5664,19 @@ components:
       - MARRIED,
       - REGISTERED_PARTNERSHIP,
       - PARTNERSHIP
+      - OTHER
+    EditingInfo:
+      type: object
+      required:
+      - at
+      - by
+      properties:
+        at:
+          $ref: '#/components/schemas/ISODateTime'
+        by:
+          $ref: '#/components/schemas/Advisor'
+        reason:
+          type: string
     CycleKey:
       type: string
       description: |
@@ -5470,6 +5738,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FinancialStandingItem'
+        summary:
+          $ref: '#/components/schemas/FinancialStandingSummary'
     FinancialStandingItem:
       type: object
       description: |
@@ -5696,8 +5966,6 @@ components:
             $ref: '#/components/schemas/EuroAmount'
     LiabilityDebt:
       type: object
-      required:
-      - guarantee
       description: |
         DE: Verbindlichkeiten vor Beginn der angefragten Finanzierung. <br/> EN: Liability obligations before the financing process.
       properties:
@@ -6147,6 +6415,7 @@ components:
       - CUSTOMER_SPECIFICATION
       - PROFIT_AND_LOSS_ACCOUNT
       - NO_METHOD
+      - OTHER
     SelfEmploymentIncomeItem:
       type: object
       description: |
@@ -6372,6 +6641,7 @@ components:
       - PARENTS
       - OWN_PROPERTY
       - FIRST_APPLICANT
+      - OTHER
     InsuranceExpense:
       type: object
       description: |
@@ -6476,6 +6746,7 @@ components:
       x-extensible-enum:
       - FIXED_PERIOD
       - VARIABLE
+      - OTHER
     VariableInterestMaturity:
       description: |
         DE: Information über die variable Sollzinsbindung. <br/>
@@ -6545,6 +6816,425 @@ components:
           type: string
           example: DE46500210000010130383
           pattern: ^[A-Z]{2}[0-9]{3,32}$
+    ModifySubmissionLegacyCommand:
+      type: object
+      required:
+      - operation
+      properties:
+        operation:
+          type: string
+          x-extensible-enum:
+          - START_EDITING
+          - ABORT_EDITING
+          - EDIT
+          - CHANGE_STATUS
+      discriminator:
+        propertyName: operation
+        mapping:
+          START_EDITING: '#/components/schemas/StartEditingSubmissionLegacyCommand'
+          ABORT_EDITING: '#/components/schemas/AbortEditingSubmissionLegacyCommand'
+          EDIT: '#/components/schemas/EditSubmissionLegacyCommand'
+          CHANGE_STATUS: '#/components/schemas/ChangeSubmissionStatusLegacyCommand'
+    StartEditingSubmissionLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - editingInfo
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: START_EDITING
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+    AbortEditingSubmissionLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - editingInfo
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: ABORT_EDITING
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+    EditSubmissionLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - submissionId
+      - financingApplication
+      - loans
+      - editingInfo
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: EDIT
+          submissionId:
+            $ref: '#/components/schemas/SubmissionId'
+          financingApplication:
+            $ref: '#/components/schemas/FinancingApplicationCommandData'
+          loans:
+            $ref: '#/components/schemas/CreditLoansEdit'
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+    SubmissionId:
+      type: object
+      description: |
+        An Id refers to a specific submission resource.
+      properties:
+        value:
+          type: string
+    FinancingApplicationCommandData:
+      type: object
+      required:
+      - venture
+      - applicants
+      - financialStandings
+      - estates
+      - offers
+      - consultation
+      properties:
+        status:
+          $ref: '#/components/schemas/FinancingApplicationStatus'
+        subType:
+          $ref: '#/components/schemas/ApplicationSubType'
+        applicants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Applicant'
+        applicantRelationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicantRelationship'
+        households:
+          type: array
+          items:
+            $ref: '#/components/schemas/Household'
+          minItems: 1
+        estates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Estate'
+          minItems: 1
+        financialStandings:
+          $ref: '#/components/schemas/FinancialStandingsCommand'
+        venture:
+          $ref: '#/components/schemas/FinancingVenture'
+        consultation:
+          $ref: '#/components/schemas/ConsultationCommand'
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinancingOffer'
+          minItems: 1
+    CreditLoansEdit:
+      type: object
+      required:
+      - loans
+      properties:
+        loans:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditLoan'
+        offerId:
+          $ref: '#/components/schemas/OfferId'
+        calculations:
+          $ref: '#/components/schemas/Calculations'
+    CreditLoan:
+      type: object
+      description: |
+        DE: Informationen zur Finanzierungsstruktur. <br/>
+        EN: A Credit Loan represents specific financing structure component.
+      properties:
+        id:
+          $ref: '#/components/schemas/CreditLoanId'
+        financingLoans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Loan'
+          minItems: 1
+        handover:
+          $ref: '#/components/schemas/Handover'
+    OfferId:
+      type: object
+      properties:
+        value:
+          type: string
+    Calculations:
+      description: |
+        A wrapper Type to hold a set of calculations.
+      type: object
+      properties:
+        calculations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationItem'
+    ChangeSubmissionStatusLegacyCommand:
+      type: object
+      required:
+      - status
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to change the submission status
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: CHANGE_STATUS
+          data:
+            $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+    ChangeSubmissionStatusLegacyCommandData:
+      type: object
+      properties:
+        remark:
+          type: string
+        changedOn:
+          $ref: '#/components/schemas/ISODateTime'
+        origin:
+          $ref: '#/components/schemas/LegacyStatusChangeOrigin'
+        status:
+          $ref: '#/components/schemas/LegacyStatusType'
+      discriminator:
+        propertyName: status
+        mapping:
+          ACCEPT: '#/components/schemas/AcceptSubmissionLegacyStatus'
+          CANCEL: '#/components/schemas/CancelSubmissionLegacyStatus'
+          CONTRACT_SIGN: '#/components/schemas/ContractSignSubmissionLegacyStatus'
+          INWORK: '#/components/schemas/InworkSubmissionLegacyStatus'
+          ONHOLD: '#/components/schemas/OnholdSubmissionLegacyStatus'
+          REJECT: '#/components/schemas/RejectSubmissionLegacyStatus'
+          CONFIRM: '#/components/schemas/ConfirmSubmissionLegacyStatus'
+    LegacyStatusChangeOrigin:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/LegacyStatusChangeKey'
+    LegacyStatusChangeKey:
+      type: string
+      description: |
+        EN: Source system that can trigger legacy status change, possible values are PARTNER_PORTAL, LEGACY_IHK.
+      x-extensible-enum:
+      - PARTNER_PORTAL
+      - LEGACY_IHK
+    LegacyStatusType:
+      type: string
+      x-extensible-enum:
+      - ACCEPT
+      - CANCEL
+      - CONTRACT_SIGN
+      - INWORK
+      - ONHOLD
+      - REJECT
+    AcceptSubmissionLegacyStatus:
+      type: object
+      required:
+      - sendContractDate
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: ACCEPT
+          sendContractDate:
+            $ref: '#/components/schemas/ISODate'
+          loans:
+            $ref: '#/components/schemas/LegacyStatusLoans'
+    LegacyStatusLoans:
+      type: object
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LegacyStatusLoan'
+    LegacyStatusLoan:
+      type: object
+      properties:
+        seq:
+          type: integer
+          format: int32
+        loanId:
+          $ref: '#/components/schemas/LoanId'
+        creditLoanId:
+          $ref: '#/components/schemas/CreditLoanId'
+        contractNumber:
+          type: string
+        amount:
+          $ref: '#/components/schemas/EuroAmount'
+        maturity:
+          $ref: '#/components/schemas/InterestMaturity'
+        nominalRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        amortisation:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        effectiveRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        fixedUntil:
+          $ref: '#/components/schemas/ISODate'
+        sotiDesc:
+          type: string
+        sotiPercentage:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        commission:
+          $ref: '#/components/schemas/Percentage'
+        kfwProduct:
+          type: string
+    CreditLoanId:
+      type: object
+      description: |
+        DE: Id der Finanzierungsstruktur. <br/> EN: Credit Loan identifier.
+      required:
+      - value
+      properties:
+        value:
+          type: string
+    CancelSubmissionLegacyStatus:
+      type: object
+      required:
+      - cancelContractDate
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: CANCEL
+          cancelContractDate:
+            $ref: '#/components/schemas/ISODate'
+    ContractSignSubmissionLegacyStatus:
+      type: object
+      required:
+      - signContractDate
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: CONTRACT_SIGN
+          signContractDate:
+            $ref: '#/components/schemas/ISODate'
+          loans:
+            $ref: '#/components/schemas/LegacyStatusLoans'
+    InworkSubmissionLegacyStatus:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: INWORK
+    OnholdSubmissionLegacyStatus:
+      type: object
+      required:
+      - predictedOffHoldDate
+      - predictedDaysPost
+      - onHoldReason
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: ONHOLD
+          predictedOffHoldDate:
+            $ref: '#/components/schemas/ISODate'
+          predictedDaysPost:
+            type: integer
+            format: int32
+          onHoldReason:
+            $ref: '#/components/schemas/OnHoldReason'
+    OnHoldReason:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/OnHoldReasonKey'
+    OnHoldReasonKey:
+      type: string
+      x-extensible-enum:
+      - DOCUMENTS
+      - INFOS
+      - BY_CUSTOMER
+      - ONHOLD
+      - EXPERTISE
+      - ORIG_CONTR
+      - REJ_SOON
+      - FIN_APPROV
+      - MIN_DOCS
+    RejectSubmissionLegacyStatus:
+      type: object
+      required:
+      - rejectReason
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: REJECT
+          rejectSolution:
+            type: string
+          rejectReason:
+            $ref: '#/components/schemas/RejectReason'
+    RejectReason:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/RejectReasonKey'
+    RejectReasonKey:
+      type: string
+      x-extensible-enum:
+      - OBJ_CRAFT
+      - GRND_PRICE
+      - BAD_UTILIZE
+      - BAD_STATE
+      - LUX_HOBBY
+      - CREDIT_NEG
+      - REL_DEBIT
+      - HH_INC_TO_VOL
+      - HH_CREDITS
+      - HH_NO_DEDUCT
+      - HH_HI_INCOME
+      - HH_EXPENSES
+      - HH_NEG_BAL
+      - SCHUFA_NEG
+      - SCHUFA_SCOR
+      - INTERN_RED
+      - FRAME
+      - LOW_EQUITY
+      - DEBT_RATIO
+      - JOB_AMOUNT
+      - RENT_RISK
+      - PROBATION
+      - SHORT_SE
+      - SECTION2
+      - SECTION3
+      - EXIST_CUST
+      - MANIPULATE
+      - EVIDENCE
+      - UNKNOWN
+      - CONTRACT
+      - OTHER
+    ConfirmSubmissionLegacyStatus:
+      type: object
+      required:
+      - confirmedAt
+      - loans
+      allOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+      - properties:
+          status:
+            type: string
+            default: CONFIRM
+          signContractDate:
+            $ref: '#/components/schemas/ISODate'
+          confirmedAt:
+            $ref: '#/components/schemas/ISODateTime'
+          loans:
+            $ref: '#/components/schemas/LegacyStatusLoans'
     Informers:
       type: object
       description: |
@@ -6631,15 +7321,6 @@ components:
             EN: Link to retrieve the content of a specific handover report as `PDF` document.
           allOf:
           - $ref: '#/components/schemas/ResourceRef'
-    LoanType:
-      type: string
-      description: |
-        DE: Art des Darlehens (nicht abschließende Aufzählung), z.B. MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN. <br/> EN: Open ended enum contains possible loan types, possible values are MAIN_LOAN, AUXILIARY_LOAN, KFW_PROMOTION_LOAN.
-      example: MAIN_LOAN
-      x-extensible-enum:
-      - MAIN_LOAN
-      - AUXILIARY_LOAN
-      - KFW_PROMOTION_LOAN
     Title:
       type: object
       properties:
@@ -6656,6 +7337,7 @@ components:
       - PD_DR
       - PROF
       - PROF_DR
+      - OTHER
     Correspondence:
       type: object
       properties:
@@ -6799,6 +7481,10 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/LoanId'
+        seq:
+          type: integer
+          format: int32
+          deprecated: true
         type:
           $ref: '#/components/schemas/LoanType'
         amount:
@@ -7044,76 +7730,18 @@ components:
             DE: Zusätzliche Provisionsdetails für das Hauptdarlehen (Schlüssel-Werte Paar). <br/> EN: Additional commission (provision) details for the main loan (key-value pairs).
           items:
             $ref: '#/components/schemas/AdditionalInfo'
-    CreditLoan:
-      type: object
-      description: |
-        DE: Informationen zur Finanzierungsstruktur. <br/>
-        EN: A Credit Loan represents specific financing structure component.
-      properties:
-        id:
-          $ref: '#/components/schemas/CreditLoanId'
-        financingLoans:
-          type: array
-          items:
-            $ref: '#/components/schemas/Loan'
-          minItems: 1
-        handover:
-          $ref: '#/components/schemas/Handover'
-    CreditLoanId:
-      type: object
-      description: |
-        DE: Id der Finanzierungsstruktur. <br/> EN: Credit Loan identifier.
-      required:
-      - value
-      properties:
-        value:
-          type: string
-    FinancingApplicationCommandData:
+    FinancialStandingsCommand:
       type: object
       required:
-      - venture
-      - applicants
-      - financialStanding
-      - estates
-      - offers
-      - consultation
+      - details
       properties:
-        status:
-          $ref: '#/components/schemas/FinancingApplicationStatus'
-        subType:
-          $ref: '#/components/schemas/ApplicationSubType'
-        applicants:
-          type: array
-          items:
-            $ref: '#/components/schemas/Applicant'
-        applicantRelationships:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApplicantRelationship'
-        households:
-          type: array
-          items:
-            $ref: '#/components/schemas/Household'
-          minItems: 1
-        estates:
-          type: array
-          items:
-            $ref: '#/components/schemas/Estate'
-          minItems: 1
-        financialStandings:
+        details:
           type: array
           items:
             $ref: '#/components/schemas/FinancialStanding'
           minItems: 1
-        venture:
-          $ref: '#/components/schemas/FinancingVenture'
-        consultation:
-          $ref: '#/components/schemas/ConsultationCommand'
-        offers:
-          type: array
-          items:
-            $ref: '#/components/schemas/FinancingOffer'
-          minItems: 1
+        summary:
+          $ref: '#/components/schemas/FinancialStandingSummary'
     ConsultationCommand:
       type: object
       required:
@@ -7201,6 +7829,128 @@ components:
             DE: Vollständige Daten des Antragsstellers. <br/> EN: Complete data of the applicant.
           allOf:
           - $ref: '#/components/schemas/Applicant'
+    ModifyFinancingApplicationLegacyCommand:
+      type: object
+      required:
+      - operation
+      properties:
+        operation:
+          type: string
+          x-extensible-enum:
+          - START_EDITING
+          - ABORT_EDITING
+          - EDIT
+      discriminator:
+        propertyName: operation
+        mapping:
+          START_EDITING: '#/components/schemas/StartEditingFinancingApplicationLegacyCommand'
+          ABORT_EDITING: '#/components/schemas/AbortEditingFinancingApplicationLegacyCommand'
+          EDIT: '#/components/schemas/EditFinancingApplicationLegacyCommand'
+    StartEditingFinancingApplicationLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - editingInfo
+      allOf:
+      - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: START_EDITING
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+          submissions:
+            type: array
+            items:
+              $ref: '#/components/schemas/SubmissionId'
+    AbortEditingFinancingApplicationLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - editingInfo
+      allOf:
+      - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: ABORT_EDITING
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+          submissions:
+            type: array
+            items:
+              $ref: '#/components/schemas/SubmissionId'
+    EditFinancingApplicationLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: EDIT
+          financingApplication:
+            $ref: '#/components/schemas/FinancingApplicationCommandData'
+          submissionRequest:
+            $ref: '#/components/schemas/EditSubmissionRequest'
+          editingInfo:
+            $ref: '#/components/schemas/EditingInfo'
+    EditSubmissionRequest:
+      type: object
+      properties:
+        submitted:
+          $ref: '#/components/schemas/SubmissionDate'
+        submittedBy:
+          $ref: '#/components/schemas/Advisor'
+        submissionRequestComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/EditSubmissionRequestComponent'
+    SubmissionDate:
+      description: |
+        DE: Erstellungsdatum der Einreichungsanforderung. <br/> EN: Submission Request creation date.
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+    EditSubmissionRequestComponent:
+      type: object
+      properties:
+        submissionId:
+          $ref: '#/components/schemas/SubmissionId'
+        submissionRequestComponent:
+          $ref: '#/components/schemas/SubmissionRequestComponent'
+    SubmissionRequestComponent:
+      type: object
+      properties:
+        externalSubmissionId:
+          type: string
+          description: External submission id from eHyp
+        loanPartnerProcessingUnit:
+          $ref: '#/components/schemas/LoanPartnerProcessingUnit'
+        loanPartnerProcessor:
+          $ref: '#/components/schemas/LoanPartnerProcessor'
+        initialEstimate:
+          $ref: '#/components/schemas/InitialSubmissionEstimate'
+        loanTypes:
+          $ref: '#/components/schemas/LoanTypes'
+        handover:
+          $ref: '#/components/schemas/Handover'
+        calculation:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Calculation'
+    LoanTypes:
+      type: object
+      required:
+      - loanTypes
+      properties:
+        loanTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoanType'
     Command:
       type: object
       required:
@@ -7280,42 +8030,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SubmissionRequestComponent'
-    SubmissionDate:
-      description: |
-        DE: Erstellungsdatum der Einreichungsanforderung. <br/> EN: Submission Request creation date.
-      type: object
-      properties:
-        createdAt:
-          type: string
-          format: date-time
-    SubmissionRequestComponent:
-      type: object
-      properties:
-        externalSubmissionId:
-          type: string
-          description: External submission id from eHyp
-        loanPartnerProcessingUnit:
-          $ref: '#/components/schemas/LoanPartnerProcessingUnit'
-        initialEstimate:
-          $ref: '#/components/schemas/InitialSubmissionEstimate'
-        loanTypes:
-          $ref: '#/components/schemas/LoanTypes'
-        handover:
-          $ref: '#/components/schemas/Handover'
-        calculation:
-          type: array
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/Calculation'
-    LoanTypes:
-      type: object
-      required:
-      - loanTypes
-      properties:
-        loanTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/LoanType'
     PropertyRegisterOwnerApplicant:
       type: object
       required:
@@ -7340,6 +8054,18 @@ components:
             type: string
           person:
             $ref: '#/components/schemas/Person'
+    CalculationItem:
+      type: object
+      properties:
+        context:
+          type: array
+          description: |
+            DE: Kalkulation nach Art des Darlehens. <br/>
+            EN: A set of financing structure contexts, which are associated with this calculation (i.e `Main` or `Nachrang` component)..
+          items:
+            $ref: '#/components/schemas/LoanType'
+        calculation:
+          $ref: '#/components/schemas/Calculation'
     Protocol:
       type: object
       properties:
@@ -7473,13 +8199,6 @@ components:
             EN: Date when this submission has been submitted.
           allOf:
           - $ref: '#/components/schemas/ISODateTime'
-    SubmissionId:
-      type: object
-      description: |
-        An Id refers to a specific submission resource.
-      properties:
-        value:
-          type: string
     Paging:
       type: object
       description: |
@@ -7767,6 +8486,8 @@ components:
           $ref: '#/components/schemas/SubmissionOverviewItem'
         creditLoans:
           $ref: '#/components/schemas/CreditLoans'
+        originInfo:
+          $ref: '#/components/schemas/OriginInfo'
     LoanQuotaType:
       type: object
       properties:
@@ -7897,9 +8618,19 @@ components:
           type:
             type: string
             default: JOINT_OWNERSHIP_INVENTORY
+          commonPropertyShare:
+            description: |
+              DE: Miteigentumsanteil (https://de.wikipedia.org/wiki/Miteigentumsanteil). EN: Co-ownership share (https://de.wikipedia.org/wiki/Miteigentumsanteil).
+            type: number
+            format: double
+          commonPropertyTotal:
+            description: |
+              DE: Summe der Miteigentumsanteile. EN: Total Co-ownership share.
+            type: number
+            format: double
           inventoryUnitProperties:
             description: |
-              DE: Sammlung von Sondereigentümen(https://de.wikipedia.org/wiki/Sondereigentum) die mit diesem Miteigentum verbunden sind. <br/> EN: Collection of special properties (inventory units) associated with this co-ownership.
+              DE: Sammlung von Sondereigentümen (https://de.wikipedia.org/wiki/Sondereigentum) die mit diesem Miteigentum verbunden sind. <br/> EN: Collection of special properties (inventory units) associated with this co-ownership.
             type: array
             items:
               $ref: '#/components/schemas/InventorySpecialProperty'
@@ -7938,6 +8669,7 @@ components:
       - TOWNHOUSE_CORNER
       - TOWNHOUSE_CENTER
       - SEMIDETACHED_HOUSE
+      - OTHER
     PropertyRegisterOwnerEntry:
       type: object
       description: |
@@ -8078,6 +8810,7 @@ components:
       x-extensible-enum:
       - LETTER
       - BOOK
+      - OTHER
     NoCessionClaim:
       type: object
       description: |
@@ -8088,11 +8821,6 @@ components:
           requested:
             type: boolean
             default: false
-    OfferId:
-      type: object
-      properties:
-        value:
-          type: string
     FinancingOfferStatus:
       type: object
       properties:
@@ -8229,6 +8957,7 @@ components:
       x-extensible-enum:
       - LIGHT
       - PLUS
+      - OTHER
     Cursor:
       type: object
       description: |
@@ -8258,6 +8987,7 @@ components:
       - DSL_PRIVAT
       - HANSEATIC_ALL
       - OYAK_ANKER
+      - OTHER
     FinancingApplicationCreationCommand:
       type: object
       required:
