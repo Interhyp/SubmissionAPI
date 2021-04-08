@@ -7734,8 +7734,7 @@ components:
       - KOMBI
       - KONSTANT
       - KONST_KOMBI
-      - VERSICHER ==> Ist das ein "Zinszahlungsdarlehen" / wenn ja umbennen, wenn
-        nein was dann?
+      - VERSICHER
       - VOLLTILGER
       - OTHER
     RegularMainProduct:
