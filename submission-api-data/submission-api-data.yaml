@@ -140,6 +140,398 @@ tags:
 - name: commands
   description: provides endpoints for command resources
 paths:
+  /v2/submissions/{submissionId}/calculations/{calculationType}:
+    get:
+      summary: Get calculation data
+      description: |-
+        Delivers calculation basics for specified calculation type.
+        Calculation type options:
+          - CONDITION (Konditionskalkulation)
+
+          - HOUSEHOLD (HH-Rechnung)
+
+          - LENDING_VALUE (Beleihungswert)
+      operationId: getSubmissionCalculationByType
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/calculation-type'
+      responses:
+        '200':
+          description: Requested calculation data is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calculations'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/commands/{commandId}:
+    get:
+      summary: Get an existing command
+      description: |
+        Delivers information about an existing command
+
+        A Command is a unit of execution which has been created to perform asynchronous operation.
+      operationId: getCommandsById
+      tags:
+      - commands
+      parameters:
+      - $ref: '#/components/parameters/command-id'
+      responses:
+        '200':
+          description: Command is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Command'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested command resource was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/correspondence:
+    get:
+      summary: Delivers all submissions correspondence for a provider
+      description: Delivers a collection of submission correspondence among involved
+        submission process parties for a specific provider filtered by the date of
+        correspondence.<p> *By Default*, we will return the first *20* matching records.
+        However, this is not a hard limitation! a parameter called `limit` can be
+        used to tell the API how many records you want to return all at once *(max
+        40)*.<p> To get further matching records, a parameter called `after` or `before`
+        can be used to tell the API the start of each page using specified cursor.<p>
+        To navigate through the query result, a reference to the following navigations
+        are included in the response *(next, prev, first, last, self)*.
+      operationId: getSubmissionsCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/since'
+      - $ref: '#/components/parameters/until'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-limit'
+      - $ref: '#/components/parameters/cursor-after'
+      - $ref: '#/components/parameters/cursor-before'
+      - $ref: '#/components/parameters/embed'
+      responses:
+        '200':
+          description: A paged array of submissions correspondence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionCorrespondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence:
+    get:
+      summary: Get correspondence for a specific submission
+      description: Delivers detailed information about correspondence among involved
+        submission process  parties associated with a specific submission. By default
+        the result will be sorted based on createdAt ascending.
+      operationId: getCorrespondenceBySubmissionId
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-sort'
+      responses:
+        '200':
+          description: Submission correspondence are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    post:
+      summary: Create new correspondence for a specific submission
+      operationId: createSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '201':
+          description: Correspondence was created
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+          headers:
+            Location:
+              schema:
+                type: string
+                description: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete correspondence assocaited with a specific submission
+      operationId: deleteSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence are deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence/{itemId}:
+    get:
+      summary: Get a specific submission correspondence item
+      description: Delivers detailed information about a specific submission correspondence
+        item.
+      operationId: getSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Submission corresponcence item is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorrespondenceItem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete a specific submission correspondence item
+      operationId: deleteSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence item is deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    put:
+      summary: Override a specific submission correspondence item
+      operationId: overrideSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '204':
+          description: Submission correspondence item is updated
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/financing-applications/commands:
     post:
       summary: Create a new financing application
@@ -932,355 +1324,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/calculations/{calculationType}:
-    get:
-      summary: Get calculation data
-      description: |-
-        Delivers calculation basics for specified calculation type.
-        Calculation type options:
-          - CONDITION (Konditionskalkulation)
-
-          - HOUSEHOLD (HH-Rechnung)
-
-          - LENDING_VALUE (Beleihungswert)
-      operationId: getSubmissionCalculationByType
-      tags:
-      - submissions
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      - $ref: '#/components/parameters/calculation-type'
-      responses:
-        '200':
-          description: Requested calculation data is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Calculations'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/correspondence:
-    get:
-      summary: Delivers all submissions correspondence for a provider
-      description: Delivers a collection of submission correspondence among involved
-        submission process parties for a specific provider filtered by the date of
-        correspondence.<p> *By Default*, we will return the first *20* matching records.
-        However, this is not a hard limitation! a parameter called `limit` can be
-        used to tell the API how many records you want to return all at once *(max
-        40)*.<p> To get further matching records, a parameter called `after` or `before`
-        can be used to tell the API the start of each page using specified cursor.<p>
-        To navigate through the query result, a reference to the following navigations
-        are included in the response *(next, prev, first, last, self)*.
-      operationId: getSubmissionsCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/since'
-      - $ref: '#/components/parameters/until'
-      - $ref: '#/components/parameters/correspondence-type-filter'
-      - $ref: '#/components/parameters/sbms-correspondence-limit'
-      - $ref: '#/components/parameters/cursor-after'
-      - $ref: '#/components/parameters/cursor-before'
-      - $ref: '#/components/parameters/embed'
-      responses:
-        '200':
-          description: A paged array of submissions correspondence
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubmissionCorrespondence'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/correspondence:
-    get:
-      summary: Get correspondence for a specific submission
-      description: Delivers detailed information about correspondence among involved
-        submission process  parties associated with a specific submission. By default
-        the result will be sorted based on createdAt ascending.
-      operationId: getCorrespondenceBySubmissionId
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      - $ref: '#/components/parameters/correspondence-type-filter'
-      - $ref: '#/components/parameters/sbms-correspondence-sort'
-      responses:
-        '200':
-          description: Submission correspondence are returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Correspondence'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    post:
-      summary: Create new correspondence for a specific submission
-      operationId: createSubmissionCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CorrespondenceItem'
-      responses:
-        '201':
-          description: Correspondence was created
-          content:
-            application/json:
-              schema:
-                properties:
-                  id:
-                    type: string
-          headers:
-            Location:
-              schema:
-                type: string
-                description: Link to retrieve a specific resource
-                example: http://some-domain/some/link/to/somewhere
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    delete:
-      summary: Delete correspondence assocaited with a specific submission
-      operationId: deleteSubmissionCorrespondence
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '204':
-          description: Submission correspondence are deleted
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/correspondence/{itemId}:
-    get:
-      summary: Get a specific submission correspondence item
-      description: Delivers detailed information about a specific submission correspondence
-        item.
-      operationId: getSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '200':
-          description: Submission corresponcence item is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CorrespondenceItem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    delete:
-      summary: Delete a specific submission correspondence item
-      operationId: deleteSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      responses:
-        '204':
-          description: Submission correspondence item is deleted
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-    put:
-      summary: Override a specific submission correspondence item
-      operationId: overrideSubmissionCorrespondenceById
-      tags:
-      - correspondence
-      parameters:
-      - $ref: '#/components/parameters/correspondence-item-id'
-      - $ref: '#/components/parameters/submission-id'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CorrespondenceItem'
-      responses:
-        '204':
-          description: Submission correspondence item is updated
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}/protocol:
     get:
       summary: Get protocol for a specific submission
@@ -1316,49 +1359,6 @@ paths:
         '404':
           description: Error indicates that a requested submission resource was not
             found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/commands/{commandId}:
-    get:
-      summary: Get an existing command
-      description: |
-        Delivers information about an existing command
-
-        A Command is a unit of execution which has been created to perform asynchronous operation.
-      operationId: getCommandsById
-      tags:
-      - commands
-      parameters:
-      - $ref: '#/components/parameters/command-id'
-      responses:
-        '200':
-          description: Command is returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Command'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '404':
-          description: Error indicates that a requested command resource was not found.
           content:
             application/json:
               schema:
@@ -1439,6 +1439,53 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/legacy-documents:
+    post:
+      deprecated: true
+      summary: Endpoint for uploading submisison document using it's metadata.
+      operationId: uploadSubmissionDocument
+      tags:
+      - legacy-submission
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubmissionDocumentLegacyCommand'
       responses:
         '201':
           description: Reference to the created resource.
@@ -1870,6 +1917,49 @@ paths:
         '404':
           description: Error indicates that a requested submission resource was not
             found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/uploaded-documents/{documentId}/content:
+    get:
+      summary: Get a specific submission document as `PDF`
+      description: Delivers detailed information about a specific submission document
+        as `PDF` document.
+      operationId: getSubmissionDocumentById
+      tags:
+      - submissions
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/document-id'
+      responses:
+        '200':
+          description: Requested submission document is returned
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/SubmissionDocumentBinary'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission document resource
+            was not found
           content:
             application/json:
               schema:
@@ -3601,6 +3691,11 @@ components:
           - $ref: '#/components/schemas/ISODateTime'
         initialEstimate:
           $ref: '#/components/schemas/InitialSubmissionEstimate'
+        timeline:
+          description: |
+            DE: Zeitplan einer Einreichung. EN: Timeline of a submission.
+          allOf:
+          - $ref: '#/components/schemas/SubmissionTimeline'
         submittedBy:
           description: |
             DE: Informationen über den Berater der den Kreditantrag abgesendet hat. <br/>
@@ -3610,12 +3705,20 @@ components:
         loanPartner:
           $ref: '#/components/schemas/LoanPartnerProcessingInfo'
     InitialSubmissionEstimate:
+      deprecated: true
       description: |
         DE: Voraussichtliches Entscheidungsdatum. <br/> EN: Estimated decision date.
       type: object
       properties:
         createdAt:
           $ref: '#/components/schemas/ISODateTime'
+    SubmissionTimeline:
+      type: object
+      description: |
+        DE: Zeitplan einer Einreichung. EN: Timeline of a submission.
+      properties:
+        predictedLoanPartnerDecisionDate:
+          $ref: '#/components/schemas/PredictedLoanPartnerDecisionDate'
     LoanPartnerProcessingInfo:
       description: |
         DE: Einheit des Kreditgebers, welche die Einreichung bearbeitet und aktueller (Kreditsach-)Bearbeiter. <br/> EN: Processing Unit and current processor of the loan partner.
@@ -4628,6 +4731,12 @@ components:
             EN: Total reserves after financing
           allOf:
           - $ref: '#/components/schemas/EuroAmount'
+        totalLiabilities:
+          description: |
+            DE: Summe Verbindlingkeiten
+            EN: Total liabilities
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
     ExistingModernisation:
       type: object
       description: |
@@ -5156,38 +5265,6 @@ components:
             $ref: '#/components/schemas/OtherCapitalFinancing'
           financingDetails:
             $ref: '#/components/schemas/OwnEstateFinancingDetails'
-    OriginInfo:
-      type: object
-      required:
-      - client
-      - externalId
-      description: |
-        DE: Enthält die Information über Datenquelle und Daten-Identifikator aus dem externen System. <br/> EN: Contains information about Data source and data identifier in the external system.
-      properties:
-        client:
-          $ref: '#/components/schemas/Client'
-        externalId:
-          $ref: '#/components/schemas/ExternalId'
-    Client:
-      type: object
-      properties:
-        key:
-          $ref: '#/components/schemas/ClientKey'
-    ClientKey:
-      type: string
-      description: |
-        DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.
-      example: INTERHYP_ASP
-      x-extensible-enum:
-      - INTERHYP_ASP
-      - COBA_ASP
-    ExternalId:
-      type: object
-      description: |
-        DE: Daten-Identifikator aus dem externen System. <br/> EN: Data identifier in the external system.
-      properties:
-        value:
-          type: string
     Calculation:
       type: object
       required:
@@ -5494,6 +5571,38 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/CalculationDetail'
+    OriginInfo:
+      type: object
+      required:
+      - client
+      - externalId
+      description: |
+        DE: Enthält die Information über Datenquelle und Daten-Identifikator aus dem externen System. <br/> EN: Contains information about Data source and data identifier in the external system.
+      properties:
+        client:
+          $ref: '#/components/schemas/Client'
+        externalId:
+          $ref: '#/components/schemas/ExternalId'
+    Client:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ClientKey'
+    ClientKey:
+      type: string
+      description: |
+        DE: Datenquelle, mögliche Werte: INTERHYP_ASP, COBA_ASP. <br/> EN: Enum representing data origin, possible values are INTERHYP_ASP, COBA_ASP.
+      example: INTERHYP_ASP
+      x-extensible-enum:
+      - INTERHYP_ASP
+      - COBA_ASP
+    ExternalId:
+      type: object
+      description: |
+        DE: Daten-Identifikator aus dem externen System. <br/> EN: Data identifier in the external system.
+      properties:
+        value:
+          type: string
     CorrespondenceItem:
       type: object
       required:
@@ -5563,11 +5672,13 @@ components:
           x-extensible-enum:
           - REVOKE
           - ASSIGN_PROCESSOR
+          - UPDATE_LOAN_PARTNER_DECISION_DATE
       discriminator:
         propertyName: operation
         mapping:
           REVOKE: '#/components/schemas/RevokeSubmissionCommand'
           ASSIGN_PROCESSOR: '#/components/schemas/AssignLoanPartnerProcessorCommand'
+          UPDATE_LOAN_PARTNER_DECISION_DATE: '#/components/schemas/UpdateLoanPartnerDecisionDateCommand'
     RevokeSubmissionCommand:
       description: This command is only used for internal purposes!
       type: object
@@ -5602,6 +5713,32 @@ components:
             default: ASSIGN_PROCESSOR
           processor:
             $ref: '#/components/schemas/LoanPartnerProcessingInfo'
+    UpdateLoanPartnerDecisionDateCommand:
+      description: Update the predicted decision date of a submission.
+      type: object
+      required:
+      - decisionDate
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionCommand'
+      - properties:
+          operation:
+            type: string
+            default: UPDATE_LOAN_PARTNER_DECISION_DATE
+          decisionDate:
+            $ref: '#/components/schemas/PredictedLoanPartnerDecisionDate'
+    PredictedLoanPartnerDecisionDate:
+      description: |
+        DE: Voraussichtliches Entscheidungsdatum des Kreditgebers. <br/> EN: Predicted decision date of the loan partner.
+      type: object
+      required:
+      - date
+      properties:
+        date:
+          $ref: '#/components/schemas/ISODate'
+        reason:
+          type: string
+          description: |
+            DE: Begründung für das voraussichtliche Entscheidungsdatum. EN: Reason for the predicted decision date.
     InformerId:
       type: object
       required:
@@ -6780,6 +6917,12 @@ components:
               EN: Fixed interest rate duration.
             allOf:
             - $ref: '#/components/schemas/Duration'
+          fixedUntil:
+            description: |
+              DE: Enddatum der Sollzinsbindung. <br/>
+              EN: End date of the fixed interest rate.
+            allOf:
+            - $ref: '#/components/schemas/ISODate'
     FinancialVentureItem:
       type: object
       description: |
@@ -6828,6 +6971,7 @@ components:
           - ABORT_EDITING
           - EDIT
           - CHANGE_STATUS
+          - UPDATE_CREDIT_LOANS
       discriminator:
         propertyName: operation
         mapping:
@@ -6835,6 +6979,7 @@ components:
           ABORT_EDITING: '#/components/schemas/AbortEditingSubmissionLegacyCommand'
           EDIT: '#/components/schemas/EditSubmissionLegacyCommand'
           CHANGE_STATUS: '#/components/schemas/ChangeSubmissionStatusLegacyCommand'
+          UPDATE_CREDIT_LOANS: '#/components/schemas/UpdateSubmissionCreditLoansLegacyCommand'
     StartEditingSubmissionLegacyCommand:
       description: This command is only used for internal purposes!
       type: object
@@ -7084,6 +7229,8 @@ components:
           $ref: '#/components/schemas/PeriodicalPercentage'
         commission:
           $ref: '#/components/schemas/Percentage'
+        commissionAmount:
+          $ref: '#/components/schemas/EuroAmount'
         kfwProduct:
           type: string
     CreditLoanId:
@@ -7233,6 +7380,21 @@ components:
             $ref: '#/components/schemas/ISODate'
           confirmedAt:
             $ref: '#/components/schemas/ISODateTime'
+          loans:
+            $ref: '#/components/schemas/LegacyStatusLoans'
+    UpdateSubmissionCreditLoansLegacyCommand:
+      type: object
+      required:
+      - loans
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to change the submission credit loans
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: UPDATE_CREDIT_LOANS
           loans:
             $ref: '#/components/schemas/LegacyStatusLoans'
     Informers:
@@ -7412,8 +7574,8 @@ components:
     ApplicationSubTypeKey:
       type: string
       description: |
-        DE: Unterkategorie des Antragstyp (nicht abschließende Aufzählung), z.B. (NEW_CUSTOMER, PROLONGATION, SUPPLEMENTARY_FINANCING). <br/>
-        EN: Open ended enum contains application sub type, possible values are (NEW_CUSTOMER, PROLONGATION, SUPPLEMENTARY_FINANCING).
+        DE: Unterkategorie des Antragstyp (nicht abschließende Aufzählung), z.B. (NEW_APPLICANT, PROLONGATION, SUPPLEMENTARY_FINANCING). <br/>
+        EN: Open ended enum contains application sub type, possible values are (NEW_APPLICANT, PROLONGATION, SUPPLEMENTARY_FINANCING).
       example: NEW_APPLICANT
       x-extensible-enum:
       - NEW_APPLICANT
@@ -8244,6 +8406,9 @@ components:
       - SELF_OCCUPIED
       - PARTLY_RENT_OUT
       - RENT_OUT
+    SubmissionDocumentBinary:
+      type: string
+      format: binary
     SubmissionCorrespondence:
       type: object
       properties:
@@ -8958,6 +9123,40 @@ components:
       - LIGHT
       - PLUS
       - OTHER
+    UploadSubmissionDocumentLegacyCommand:
+      type: object
+      required:
+      - mediaId
+      - type
+      - uploadedAt
+      - name
+      properties:
+        mediaId:
+          type: string
+        type:
+          $ref: '#/components/schemas/UploadedDocumentType'
+        uploadedAt:
+          $ref: '#/components/schemas/ISODateTime'
+        name:
+          type: string
+        label:
+          type: string
+        uploadedBy:
+          $ref: '#/components/schemas/LoanPartnerProcessingInfo'
+    UploadedDocumentType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/UploadedDocumentTypeKey'
+    UploadedDocumentTypeKey:
+      type: string
+      example: CONTRACT
+      x-extensible-enum:
+      - CONTRACT
+      - CONTRACT_ADDENDA
+      - LAND_REGISTER_EXTRACT
+      - PAYOUT_REQUIREMENT
+      - OTHER
     Cursor:
       type: object
       description: |
@@ -9119,6 +9318,13 @@ components:
         Flag to expand or embed sub-resources in the response resource.
 
         By default is set to `FALSE` where only a **ref** to the sub-resources will be returned. By set it to `TRUE` the sub-resources content will be embedded in the response which might affect the payload size
+    document-id:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested submission document.
     handover-report-name:
       name: name
       in: path
