@@ -4,6 +4,8 @@ API endpoints could be divided into *two* types
 - **_Structural:_** Delivers only structural information, For instance: *Document Categories*
 - **_Contextual:_** Requires a specific context, for instance: information regarding a specific *Submission*
 
+> **Note:** The endpoint for handover reports has been relocated to /v2/submissions/{submissionId}/handover/reports. For detailed informations please check the submission-api-data.yaml
+
 ### Document Categories
 Document Categories is a *Structural* endpoint which provides detailed information about possible Mortgage relevant Documents 
 that could be collected from the customer and used as prove for provided information.

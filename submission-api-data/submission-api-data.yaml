@@ -3167,6 +3167,22 @@ components:
         DE: Nicht näher spezifizierte Erwerbstätigkeit. <br/> EN: Unspecified Occupation.
       allOf:
       - $ref: '#/components/schemas/Occupation'
+      - properties:
+          shareHolding:
+            description: |
+              DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
+            allOf:
+            - $ref: '#/components/schemas/ShareHolding'
+    ShareHolding:
+      description: |
+        DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
+      type: object
+      properties:
+        value:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
     SelfEmployment:
       type: object
       allOf:
@@ -3187,16 +3203,6 @@ components:
               DE: Art der freiberuflichen Tätigkeit. <br/> EN: Freelancer job type.
             allOf:
             - $ref: '#/components/schemas/FreeLancerJobType'
-    ShareHolding:
-      description: |
-        DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
-      type: object
-      properties:
-        value:
-          type: number
-          format: double
-          minimum: 0
-          maximum: 100
     FreeLancerJobType:
       type: object
       properties:
@@ -7962,6 +7968,12 @@ components:
             EN: Base rate issue date.
           allOf:
           - $ref: '#/components/schemas/ISODate'
+        offerDate:
+          description: |
+            DE: Angebotsdatum. <br/>
+            EN: Offer creation date.
+          allOf:
+          - $ref: '#/components/schemas/ISODate'
         additionalInfos:
           description: |
             DE: Zusätzliche Details für das Angebot (Schlüssel-Werte Paar). <br/>
@@ -8914,6 +8926,10 @@ components:
             EN: Additional services DE: Nebenleistungen
           allOf:
           - $ref: '#/components/schemas/Percentage'
+        primary:
+          description: |
+            DE: Flag um anzuzeigen, ob der Darlehensgeber als vorrangiger Gläubiger im Grundbuch eingetragen ist. <br/> EN: Flag to indicate whether the lender is registered as primary creditor in the land register.
+          type: boolean
     CessionClaim:
       type: object
       description: |
