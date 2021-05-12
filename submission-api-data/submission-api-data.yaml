@@ -1324,6 +1324,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/financing-applications/{financingApplicationId}/submissions:
+    get:
+      summary: Get financing application's submission
+      description: Delivers detailed information about the submission belong to specific
+        loan partner and associated with this financing application.
+      operationId: getSubmissionsByFinancingApplicationId
+      tags:
+      - financing-application
+      parameters:
+      - $ref: '#/components/parameters/financing-application-id'
+      responses:
+        '200':
+          description: Requested Submissions is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submissions'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}/protocol:
     get:
       summary: Get protocol for a specific submission
@@ -2629,6 +2671,10 @@ components:
             $ref: '#/components/schemas/PeriodicalEuroAmount'
           depositValue:
             $ref: '#/components/schemas/EuroAmount'
+          contractNumber:
+            description: |
+              DE: Vertragsnummer. <br/> EN: Contract number.
+            type: string
     SuspendedRepaymentProductType:
       type: object
       properties:
@@ -4047,6 +4093,11 @@ components:
           leasehold:
             type: boolean
             default: true
+          leaseholdFees:
+            description: |
+              DE: Erbbauzins. <br/> EN: Leasehold fees.
+            allOf:
+            - $ref: '#/components/schemas/PeriodicalEuroAmount'
           leaseholdEndingDate:
             description: |
               DE: Ablaufdatum des Erbbaurechts. <br/>
@@ -4151,6 +4202,8 @@ components:
             $ref: '#/components/schemas/ExistingModernisations'
           area:
             $ref: '#/components/schemas/AreaInfo'
+          utilization:
+            $ref: '#/components/schemas/Utilization'
           rent:
             $ref: '#/components/schemas/RentInfo'
     OriginalPurchase:
@@ -4802,6 +4855,11 @@ components:
             $ref: '#/components/schemas/Informer'
         recommendation:
           $ref: '#/components/schemas/Recommendation'
+        brokerageOrganization:
+          type: string
+          description: |
+            DE: Beratungsunternehmenidentifikator - Vermittlernummer. <br/>
+            EN: Advisor company identifier.
     Informer:
       type: object
       description: |
@@ -4854,6 +4912,8 @@ components:
           $ref: '#/components/schemas/CollateralMortgageProperties'
         investEquity:
           $ref: '#/components/schemas/InvestEquity'
+        assignmentForSecurity:
+          $ref: '#/components/schemas/AssignmentForSecurity'
         utilization:
           $ref: '#/components/schemas/Utilization'
       discriminator:
@@ -4990,6 +5050,29 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/UtilizationKey'
+    AssignmentForSecurity:
+      description: |
+        DE: Sicherungsabtretung von Vermögen.
+        EN: Equity for assignment for security.
+      properties:
+        realEstateAssignedForSecurity:
+          description: |
+            DE: Sicherungsabtretung von Immobilienvermögen. <br/>
+            EN: Other realestate assigned for security.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        cashAssignedForSecurity:
+          description: |
+            DE: Sicherungsabtretung aus Bankguthaben.<br/>
+            EN: Bank balance assigned for security.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
+        mortgageSavingAssignedForSecurity:
+          description: |
+            DE: Sicherungsabtretung aus Bausparguthaben.<br/>
+            EN: Home savings plans assigned for security.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
     FinancingVentureBuyNew:
       description: |
         DE: Information über das Finanzierungsvorhaben für den Kauf einer Neubauimmobilie. <br/>
@@ -5673,6 +5756,8 @@ components:
       required:
       - operation
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         operation:
           type: string
           x-extensible-enum:
@@ -5685,6 +5770,23 @@ components:
           REVOKE: '#/components/schemas/RevokeSubmissionCommand'
           ASSIGN_PROCESSOR: '#/components/schemas/AssignLoanPartnerProcessorCommand'
           UPDATE_LOAN_PARTNER_DECISION_DATE: '#/components/schemas/UpdateLoanPartnerDecisionDateCommand'
+    CommandTrigger:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          x-extensible-enum:
+          - ADVISOR
+          - LOAN_PARTNER_PROCESSOR
+          - SYSTEM
+      discriminator:
+        propertyName: type
+        mapping:
+          ADVISOR: '#/components/schemas/AdvisorCommandTrigger'
+          LOAN_PARTNER_PROCESSOR: '#/components/schemas/LoanPartnerProcessorCommandTrigger'
+          SYSTEM: '#/components/schemas/SystemCommandTrigger'
     RevokeSubmissionCommand:
       description: This command is only used for internal purposes!
       type: object
@@ -6025,8 +6127,9 @@ components:
           - $ref: '#/components/schemas/EuroAmount'
         guarantee:
           description: |
-            DE: Weiteres Immobilienvermögen. <br/>
-            EN: Other realestate assets.
+            DE: Sicherungsabtretung von Immobilienvermögen. Veraltet, ersetzt durch FinancingVenture.assignmentForSecurity.realEstateAssignedForSecurity.<br/>
+            EN: Other realestate for assignment for security. Deprected, replaced by FinancingVenture.assignmentForSecurity.realEstateAssignedForSecurity.
+          deprecated: true
           allOf:
           - $ref: '#/components/schemas/EuroAmount'
         items:
@@ -6396,7 +6499,15 @@ components:
           family:
             $ref: '#/components/schemas/FamilyIncome'
           pension:
-            $ref: '#/components/schemas/PensionIncome'
+            description: |
+              DE: Zusätzliches regelmäßiges Einkommen aus Rente/Pension. <br/> EN: Additional periodical income from pension.
+            allOf:
+            - $ref: '#/components/schemas/PensionIncome'
+          pensionEntitlement:
+            description: |
+              DE: Rentenansprüche. <br/> EN: Pension entitlement.
+            allOf:
+            - $ref: '#/components/schemas/PensionIncome'
           capital:
             $ref: '#/components/schemas/CapitalIncome'
           other:
@@ -6653,7 +6764,7 @@ components:
       required:
       - pension
       description: |
-        DE: Zusätzliches regelmäßiges Einkommen aus Rente/Pension. <br/> EN: Additional periodical income from pension.
+        DE: Regelmäßiges Einkommen aus Rente/Pension. <br/> EN: Periodical income from pension.
       properties:
         pension:
           $ref: '#/components/schemas/PeriodicalEuroAmount'
@@ -6970,6 +7081,8 @@ components:
       required:
       - operation
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         operation:
           type: string
           x-extensible-enum:
@@ -7613,6 +7726,44 @@ components:
             DE: Komplette Information über das Finanzierungsangebot. <br/> EN: Complete information about the financing offer.
           allOf:
           - $ref: '#/components/schemas/FinancingOffer'
+    AdvisorCommandTrigger:
+      type: object
+      required:
+      - advisor
+      allOf:
+      - $ref: '#/components/schemas/CommandTrigger'
+      - properties:
+          type:
+            type: string
+            default: ADVISOR
+          advisor:
+            $ref: '#/components/schemas/Advisor'
+    LoanPartnerProcessorCommandTrigger:
+      type: object
+      required:
+      - processingUnit
+      allOf:
+      - $ref: '#/components/schemas/CommandTrigger'
+      - properties:
+          type:
+            type: string
+            default: LOAN_PARTNER_PROCESSOR
+          processingUnit:
+            $ref: '#/components/schemas/LoanPartnerProcessingInfo'
+    SystemCommandTrigger:
+      type: object
+      required:
+      - name
+      allOf:
+      - $ref: '#/components/schemas/CommandTrigger'
+      - properties:
+          name:
+            type: string
+          description:
+            type: string
+          type:
+            type: string
+            default: SYSTEM
     MainLoan:
       description: |
         DE: Information zum Hauptdarlehen. <br/>
@@ -7933,6 +8084,8 @@ components:
           $ref: '#/components/schemas/Recommendation'
         originInfo:
           $ref: '#/components/schemas/OriginInfo'
+        consultationCompanyKey:
+          $ref: '#/components/schemas/ConsultationCompanyKey'
     FinancingOffer:
       description: |
         DE: Information über das Finanzierungsangebot. <br/>
@@ -8007,6 +8160,8 @@ components:
       required:
       - operation
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         operation:
           type: string
           x-extensible-enum:
@@ -8616,6 +8771,8 @@ components:
       required:
       - operation
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         operation:
           type: string
           x-extensible-enum:
@@ -8646,6 +8803,16 @@ components:
             default: SUBMIT
           submissionRequest:
             $ref: '#/components/schemas/SubmissionRequest'
+    ConsultationCompanyKey:
+      type: string
+      description: |
+        DE: Interne Vermittler Quelle, wichtig für ermitteln des Vermittlernummers.</br>
+        EN: Advisor company key, used to determine company identifier.
+      example: INTERHYP
+      x-extensible-enum:
+      - INTERHYP
+      - PROHYP
+      - MLP_HYP
     Submission:
       type: object
       description: |
@@ -8769,6 +8936,10 @@ components:
         district:
           description: |
             DE: Gemarkung/Bezirk. <br/> EN: Cadastral district.
+          type: string
+        corridor:
+          description: |
+            DE: Flur. <br/> EN: Corridor.
           type: string
         parcel:
           description: |
@@ -9146,6 +9317,8 @@ components:
       - uploadedAt
       - name
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         mediaId:
           type: string
         type:
@@ -9207,6 +9380,8 @@ components:
       required:
       - data
       properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
         data:
           $ref: '#/components/schemas/FinancingApplicationCommandData'
   parameters:
