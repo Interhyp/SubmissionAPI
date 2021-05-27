@@ -118,6 +118,7 @@ info:
     This RESTful API has following sections, each interact with a specific part of the submission system.
     + **_submissions_**: Provides endpoints for resources associated with a specific financing partner. For Example, accessing a specific submission resource, or searching all open submissions belong to a specific financing partner within a specific period of time.
     + **_financing-application_**: Provides endpoints for resources not associate to a specific financing partner. Here all information collected from the Applicant during consultation phase could be delivered, such as Personal details, Credit Worthiness, desired Estate, etc ...
+    + **_logbook_**: Provides endpoints for submission logbook entries.
     + **_commands_**: Provides endpoints for command resources, see *Deferred Processing*
     + **_protocol_**: Is currently still under design.
     + **_correspondence_**: Is currently still under design.
@@ -139,6 +140,8 @@ tags:
     to a specific financing partner
 - name: commands
   description: provides endpoints for command resources
+- name: logbook
+  description: provides endpoints to access submission logbook
 paths:
   /v2/submissions/{submissionId}/calculations/{calculationType}:
     get:
@@ -1366,6 +1369,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/logbook:
+    get:
+      summary: Get submission logbook entries
+      description: Delivers detailed information about logbook entries associated
+        with a specific submission.
+      operationId: getLogbookBySubmissionId
+      tags:
+      - logbook
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Submission logbook entries are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionLogbook'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}/protocol:
     get:
       summary: Get protocol for a specific submission
@@ -2032,6 +2077,22 @@ components:
           type: string
           example: DE
           pattern: ^[A-Z]{2}$
+    SubmissionStatus:
+      type: string
+      description: |
+        DE: Mögliche Status der Einreichung (nicht abschließende Aufzählung), z.B. (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED) <br/>
+        EN: Open ended enum contains submission status value, possible values are (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED)
+      example: CREDIT_ACCEPTED
+      x-extensible-enum:
+      - CREDIT_ACCEPTED
+      - CREDIT_CONFIRMED
+      - ONHOLD
+      - INWORK
+      - REJECTED
+      - CONTRACT_SIGN
+      - CANCELED
+      - REVOKED
+      - SUBMITTED
     OtherCapitalFinancing:
       description: |
         DE: Finanzierungsrelevante Information zur Kapitalbeschaffung. <br/>
@@ -3557,6 +3618,170 @@ components:
           type: string
           description: Description of the invalid field value
           example: must be greater than or equal to 0
+    SubmissionLogbook:
+      type: object
+      description: |
+        DE: Enthält alle Logbucheinträge. <br/>
+        EN: Holds submission logbook entries.
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionLogbookEntry'
+    SubmissionLogbookEntry:
+      type: object
+      required:
+      - id
+      - type
+      description: |
+        DE: Informationen zu einem Logbucheintrag. <br/>
+        EN: Holds information about a logbook entry.
+      properties:
+        id:
+          $ref: '#/components/schemas/LogbookEntryId'
+        type:
+          $ref: '#/components/schemas/LogbookEntryType'
+        createdAt:
+          description: |
+            DE: Ein UTC Zeitstempel wann die mit dem Logbucheintrag verknüpfte Aktion ausgelöst wurde. <br/> EN: A UTC date-time indicates when the event associated to the logbook entry took place.
+          allOf:
+          - $ref: '#/components/schemas/ISODateTime'
+        createdBy:
+          description: |
+            DE: Der Nutzer, welcher die Aktion ausgelöst hat, die zu dem Logbucheintrag führt. <br/> EN: User who triggered the event associated to the logbook entry.
+          allOf:
+          - $ref: '#/components/schemas/SimplePerson'
+        remark:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          SUBMISSION_CREATED: '#/components/schemas/DefaultLogbookEntry'
+          SUBMISSION_EDITED: '#/components/schemas/DefaultLogbookEntry'
+          LOAN_PARTNER_PROCESSOR_ASSIGNED: '#/components/schemas/AssignProcessorLogbookEntry'
+          UPLOADED_DOCUMENT: '#/components/schemas/DocumentLogbookEntry'
+          DECISION_DATE_UPDATED: '#/components/schemas/DecisionDateLogbookEntry'
+          STATUS: '#/components/schemas/LegacyStatusLogbookEntry'
+    LogbookEntryId:
+      type: object
+      properties:
+        value:
+          type: string
+    LogbookEntryType:
+      type: string
+      description: |
+        DE: Art des Logbookentry (nicht abschließende Aufzählung), z.B. (SUBMISSION_CREATED, SUBMISSION_EDITED, DECISION_DATE_UPDATED, UPLOADED_DOCUMENT, STATUS). <br/> EN: open ended enum contains possible logbook entry types, possible values are (SUBMISSION_CREATED, SUBMISSION_EDITED, DECISION_DATE_UPDATED, UPLOADED_DOCUMENT, STATUS).
+      example: UPLOADED_DOCUMENT
+      x-extensible-enum:
+      - SUBMISSION_CREATED
+      - SUBMISSION_EDITED
+      - LOAN_PARTNER_PROCESSOR_ASSIGNED
+      - UPLOADED_DOCUMENT
+      - DECISION_DATE_UPDATED
+      - STATUS
+    SimplePerson:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        company:
+          type: string
+    DefaultLogbookEntry:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/SubmissionLogbookEntry'
+    AssignProcessorLogbookEntry:
+      type: object
+      description: |
+        DE: Ein Logbucheintrag mit Informationen zu dem neu zugewiesenen Bearbeiter. <br/> EN: A logbook entry holds information about assigning a loan partner processor to the submission.
+      allOf:
+      - $ref: '#/components/schemas/SubmissionLogbookEntry'
+      - properties:
+          type:
+            type: string
+            default: LOAN_PARTNER_PROCESSOR_ASSIGNED
+          assignedTo:
+            $ref: '#/components/schemas/SimplePerson'
+    DocumentLogbookEntry:
+      type: object
+      description: |
+        DE: Ein Logbucheintrag mit Informationen zu einem hochgeladenen Einreichungsdokument. <br/> EN: A logbook entry holds information about uploading submission document.
+      allOf:
+      - $ref: '#/components/schemas/SubmissionLogbookEntry'
+      - properties:
+          type:
+            type: string
+            default: UPLOADED_DOCUMENT
+          documentName:
+            type: string
+    DecisionDateLogbookEntry:
+      type: object
+      description: |
+        DE: Ein Logbucheintrag mit Informationen zu dem geänderten Entscheidungsdatum. <br/> EN: A logbook entry holds information about updating submission decision date.
+      allOf:
+      - $ref: '#/components/schemas/SubmissionLogbookEntry'
+      - properties:
+          type:
+            type: string
+            default: DECISION_DATE_UPDATED
+          newDecisionDate:
+            $ref: '#/components/schemas/ISODate'
+    LegacyStatusLogbookEntry:
+      type: object
+      description: |
+        DE: Ein Logbucheintrag mit Informationen zu Statusänderungen. <br/> EN: A logbook entry holds information about changing submission status.
+      allOf:
+      - $ref: '#/components/schemas/SubmissionLogbookEntry'
+      - properties:
+          type:
+            type: string
+            default: STATUS
+          status:
+            $ref: '#/components/schemas/SubmissionStatus'
+          details:
+            $ref: '#/components/schemas/StatusLogbookEntryDetails'
+    StatusLogbookEntryDetails:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/StatusLogbookEntryDetailsType'
+      discriminator:
+        propertyName: type
+        mapping:
+          ONHOLD: '#/components/schemas/OnHoldStatusLogbookEntryDetails'
+          REJECT: '#/components/schemas/RejectStatusLogbookEntryDetails'
+    StatusLogbookEntryDetailsType:
+      type: string
+      description: |
+        DE: Art des Logbookentry status details(nicht abschließende Aufzählung), z.B. (ONHOLD, REJECT). <br/> EN: open ended enum contains possible logbook entry status details, possible values are (ONHOLD, REJECT).
+      example: ONHOLD
+      x-extensible-enum:
+      - ONHOLD
+      - REJECT
+    OnHoldStatusLogbookEntryDetails:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/StatusLogbookEntryDetails'
+      - properties:
+          type:
+            type: string
+            default: ONHOLD
+          reason:
+            $ref: '#/components/schemas/OnHoldReason'
+    RejectStatusLogbookEntryDetails:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/StatusLogbookEntryDetails'
+      - properties:
+          type:
+            type: string
+            default: REJECT
+          reason:
+            $ref: '#/components/schemas/RejectReason'
+          solution:
+            type: string
     Advisor:
       type: object
       description: |
