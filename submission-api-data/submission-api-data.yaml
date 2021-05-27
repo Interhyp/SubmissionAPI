@@ -2080,7 +2080,8 @@ components:
     SubmissionStatus:
       type: string
       description: |
-        EN: Open ended enum contains submission status value, possible values are (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED) DE: Mögliche Status der Einreichung (nicht abschließende Aufzählung), z.B. (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED)
+        DE: Mögliche Status der Einreichung (nicht abschließende Aufzählung), z.B. (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED) <br/>
+        EN: Open ended enum contains submission status value, possible values are (CREDIT_ACCEPTED, CREDIT_CONFIRMED, ONHOLD, INWORK, REJECTED, CONTRACT_SIGN, CANCELED, REVOKED, SUBMITTED)
       example: CREDIT_ACCEPTED
       x-extensible-enum:
       - CREDIT_ACCEPTED
