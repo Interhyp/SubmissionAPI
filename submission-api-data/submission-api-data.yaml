@@ -2058,7 +2058,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
 security:
-  - BearerAuth: [ ]
+  - BearerAuth: []
 components:
   securitySchemes:
     BearerAuth:
