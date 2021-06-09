@@ -4928,6 +4928,8 @@ components:
             description: |
               DE: Geteilt nach dem Wohneigentumsgesetz (WEG). <br/> EN: Separated based on the WEG law.
             type: boolean
+          utilityUnits:
+            $ref: '#/components/schemas/HouseUtilityUnits'
     AtticDetail:
       type: object
       properties:
@@ -4972,6 +4974,148 @@ components:
       - PARTIALLY_DEVELOPED
       - NONE
       - OTHER
+    HouseUtilityUnits:
+      type: object
+      description: |
+        DE: Wohn- und Nutzeinheiten. <br/>
+        EN: Residential and utility units.
+      properties:
+        numberOfUnits:
+          type: integer
+          format: int32
+        unitGroups:
+          $ref: '#/components/schemas/HouseUtilityUnitGroups'
+    HouseUtilityUnitGroups:
+      type: object
+      description: |
+        DE: Detail zu beschreibenden Wohneinheiten. Die Beschreibung der Wohneinheiten erfolgt in Gruppen. <br/>
+        EN: Detail to be described residential units. The residential units can be described in groups.
+      properties:
+        numberOfUnitGroups:
+          type: integer
+          format: int32
+        breakdown:
+          $ref: '#/components/schemas/HouseUtilityUnitGroupsBreakdown'
+    HouseUtilityUnitGroupsBreakdown:
+      type: object
+      properties:
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/HouseUtilityUnitGroup'
+    HouseUtilityUnitGroup:
+      type: object
+      properties:
+        numberOfUnits:
+          type: integer
+          format: int32
+          description: |
+            DE: Anzahl der näher zu beschreibenden Wohneinheiten in einer Gruppe. <br/>
+            EN: Number of units within a unit group.
+        totalArea:
+          $ref: '#/components/schemas/SquareMeter'
+        vacantArea:
+          $ref: '#/components/schemas/SquareMeter'
+        smallestArea:
+          $ref: '#/components/schemas/SquareMeter'
+        commercialUsage:
+          $ref: '#/components/schemas/HouseUnitCommercialUsage'
+        utilization:
+          type: string
+          description: |
+            DE: Nutzung des Ojektes (nicht abschließende Aufzählung), z.B. SELF_OCCUPIED, RENT_OUT. <br/> EN: Open ended enum contains utilization of the property, possible values are SELF_OCCUPIED, RENT_OUT.
+          x-extensible-enum:
+            - SELF_OCCUPIED
+            - RENT_OUT
+      discriminator:
+        propertyName: utilization
+        mapping:
+          SELF_OCCUPIED: '#/components/schemas/HouseUtilityOwnUnitGroup'
+          RENT_OUT: '#/components/schemas/HouseUtilityRentedUnitGroup'
+    HouseUnitCommercialUsage:
+      type: object
+      properties:
+        commerceType:
+          $ref: '#/components/schemas/HouseUnitCommerceType'
+        description:
+          type: string
+    HouseUnitCommerceType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/HouseUnitCommerceTypeKey'
+    HouseUnitCommerceTypeKey:
+      type: string
+      description: |
+        DE: Mögliche Gewerbearten. z.B. RETAIL, MEDICAL_PRACTICE, etc..  <br/> EN: Open ended enum contains commerce business line , possible values are (RETAIL, MEDICAL_PRACTICE, etc..).
+      x-extensible-enum:
+        - RETAIL
+        - MEDICAL_PRACTICE
+        - OFFICE
+        - WORKSHOP
+        - WAREHOUSE
+        - GASTRONOMY
+        - HOTEL
+        - VIDEO_STORE
+        - NIGHT_CLUB
+        - EROTIC
+        - GAS_STATION
+        - BETTING_SHOP
+        - FITNESS_STUDIO
+        - TAXI
+        - TRANSPORT
+        - CONSTRUCTION
+        - BARBAR
+        - OTHER
+        - UNKNOWN
+    HouseUtilityOwnUnitGroup:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/HouseUtilityUnitGroup'
+        - properties:
+            utilization:
+              type: string
+              default: SELF_OCCUPIED
+    HouseUtilityRentedUnitGroup:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/HouseUtilityUnitGroup'
+        - properties:
+            utilization:
+              type: string
+              default: RENT_OUT
+            rentDetails:
+              $ref: '#/components/schemas/HouseRentedUnitDetails'
+    HouseRentedUnitDetails:
+      type: object
+      properties:
+        rentedPeriod:
+          $ref: '#/components/schemas/RentPeriodType'
+        rent:
+          $ref: '#/components/schemas/PeriodicalEuroAmount'
+        sustainableRent:
+          description: |
+            DE: Nachhaltige Miete pro qm. <br/>
+            EN: Sustainable rent per square meter.
+          allOf:
+            - $ref: '#/components/schemas/PeriodicalEuroAmountPerSquareMeter'
+        rentValuation:
+          description: |
+            DE: Mietewert entsprechend einer Infoquelle (z. B. Sprengnetter). <br/> EN: Rent value according to an information source (e.g. Sprengnetter).
+          allOf:
+            - $ref: '#/components/schemas/EvaluationInformation'
+    RentPeriodType:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/RentPeriodTypeKey'
+    RentPeriodTypeKey:
+      type: string
+      description: |
+        DE: Mietdauer, z.B. befristet oder unbefristet. <br/> EN: Open ended enum contains rent period, possible values are (LIMITED, UNLIMITED).
+      x-extensible-enum:
+        - LIMITED
+        - UNLIMITED
     Plot:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "PLOT" (Grundstück). <br/>
