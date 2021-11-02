@@ -2100,6 +2100,7 @@ components:
       type: object
       required:
       - neededLoan
+      - reason
       allOf:
       - $ref: '#/components/schemas/OwnEstateFinancingNeed'
       - properties:
@@ -2112,6 +2113,7 @@ components:
       type: object
       required:
       - reason
+      - type
       allOf:
       - $ref: '#/components/schemas/FinancingNeed'
       - properties:
@@ -2167,6 +2169,7 @@ components:
       type: object
       required:
       - reason
+      - type
       allOf:
       - $ref: '#/components/schemas/FinancingNeed'
       - properties:
@@ -2213,6 +2216,7 @@ components:
       type: object
       required:
       - buildCosts
+      - reason
       allOf:
       - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
       - properties:
@@ -2272,6 +2276,7 @@ components:
       type: object
       required:
       - purchasePrice
+      - reason
       allOf:
       - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
       - properties:
@@ -2304,6 +2309,7 @@ components:
         EN: Financing-relevant information for the purchase of a newly built property.
       required:
       - purchasePrice
+      - reason
       allOf:
       - $ref: '#/components/schemas/ForeignEstateFinancingNeed'
       - properties:
@@ -2401,6 +2407,8 @@ components:
         DE: Finanzierungsrelevante Information zur Anschlussfinanzierung / Umschuldung. <br/>
         EN: Financing-relevant information for the follow-up financing / rescheduling.
       type: object
+      required:
+      - reason
       allOf:
       - $ref: '#/components/schemas/OwnEstateFinancingNeed'
       - properties:
@@ -2448,6 +2456,8 @@ components:
       description: |
         DE: Finanzierungsrelevante Information zum Umbau / Modernisierung. <br/>
         EN: Financing-relevant information for the refurbishment / modernisation.
+      required:
+      - reason
       allOf:
       - $ref: '#/components/schemas/OwnEstateFinancingNeed'
       properties:
@@ -2684,6 +2694,8 @@ components:
         DE: Detaillierte Information über das Annuitätsdarlehen. <br/>
         EN: Detailed information about periodic loan.
       type: object
+      required:
+      - rateType
       allOf:
       - $ref: '#/components/schemas/RateDetails'
       - properties:
@@ -2698,6 +2710,8 @@ components:
             - $ref: '#/components/schemas/PeriodicalPercentage'
     SuspendedAmortizationDetails:
       type: object
+      required:
+      - rateType
       description: |
         DE: Information zum Tilgungssurrogat. <br/> EN: Information about the repayment surrogate.
       allOf:
@@ -3026,6 +3040,8 @@ components:
           SCHUFA: '#/components/schemas/SchufaRating'
     SchufaRating:
       type: object
+      required:
+      - type
       description: |
         DE: Bewertung der Kreditwürdigkeit des Antragstellers durch die Schufa. <br/> EN: Rating of the credit worthiness by Schufa.
       allOf:
@@ -3135,17 +3151,13 @@ components:
       - $ref: '#/components/schemas/Occupation'
       - properties:
           jobInformation:
-            description: |
-              DE: Stellenbeschreibung der Tätigkeit. <br/> EN: Description/name of the job.
-            allOf:
-            - $ref: '#/components/schemas/JobInformation'
+            $ref: '#/components/schemas/JobInformation'
           contractLimitation:
-            description: |
-              DE: Informationen ob der Vertrag befristet ist. <br/> EN: Information about contract limitation.
-            allOf:
-            - $ref: '#/components/schemas/ContractLimitation'
+            $ref: '#/components/schemas/ContractLimitation'
     JobInformation:
       type: object
+      description: |
+        DE: Stellenbeschreibung der Tätigkeit. <br/> EN: Detailed information about the specified job.
       properties:
         jobDescription:
           type: string
@@ -3225,6 +3237,8 @@ components:
       - OTHER
     ContractLimitation:
       type: object
+      description: |
+        DE: Informationen ob der Vertrag befristet ist. <br/> EN: Information about contract limitation.
       required:
       - limited
       properties:
@@ -3239,6 +3253,8 @@ components:
           false: '#/components/schemas/UnlimitedContract'
     LimitedContract:
       type: object
+      required:
+      - limited
       description: |
         DE: Informationen zu einem befirstet Vertrag. <br/> EN: Information about a limited contract.
       allOf:
@@ -3260,6 +3276,8 @@ components:
               DE: Anzahl befristeter Verlängerungen. <br/> EN: Count of fixed term renewals
     UnlimitedContract:
       type: object
+      required:
+      - limited
       description: |
         DE: Information, dass es sich um ein unbefristen Vertrag handelt. <br/> EN: Information about an unlimited contract.
       allOf:
@@ -3276,10 +3294,9 @@ components:
       - $ref: '#/components/schemas/Occupation'
       - properties:
           shareHolding:
-            description: |
-              DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
-            allOf:
-            - $ref: '#/components/schemas/ShareHolding'
+            $ref: '#/components/schemas/ShareHolding'
+          jobInformation:
+            $ref: '#/components/schemas/JobInformation'
     ShareHolding:
       description: |
         DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
@@ -3296,22 +3313,15 @@ components:
       - $ref: '#/components/schemas/Occupation'
       - properties:
           jobInformation:
-            description: |
-              DE: Stellenbeschreibung der Tätigkeit. <br/> EN: Description/name of the job.
-            allOf:
-            - $ref: '#/components/schemas/JobInformation'
+            $ref: '#/components/schemas/JobInformation'
           shareHolding:
-            description: |
-              DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
-            allOf:
-            - $ref: '#/components/schemas/ShareHolding'
+            $ref: '#/components/schemas/ShareHolding'
           freelancerJobType:
-            description: |
-              DE: Art der freiberuflichen Tätigkeit. <br/> EN: Freelancer job type.
-            allOf:
-            - $ref: '#/components/schemas/FreeLancerJobType'
+            $ref: '#/components/schemas/FreeLancerJobType'
     FreeLancerJobType:
       type: object
+      description: |
+        DE: Art der freiberuflichen Tätigkeit. <br/> EN: Freelancer job type.
       properties:
         key:
           $ref: '#/components/schemas/FreeLancerJobTypeKey'
@@ -3386,20 +3396,11 @@ components:
       - $ref: '#/components/schemas/Occupation'
       - properties:
           jobInformation:
-            description: |
-              DE: Stellenbeschreibung der Tätigkeit. <br/> EN: Description/name of the job.
-            allOf:
-            - $ref: '#/components/schemas/JobInformation'
+            $ref: '#/components/schemas/JobInformation'
           contractLimitation:
-            description: |
-              DE: Informationen ob der Vertrag befristet ist. <br/> EN: Information about contract limitation.
-            allOf:
-            - $ref: '#/components/schemas/ContractLimitation'
+            $ref: '#/components/schemas/ContractLimitation'
           shareHolding:
-            description: |
-              DE: Anteilsquote am Unternehmen. <br/> EN: Shareholding quota of the company.
-            allOf:
-            - $ref: '#/components/schemas/ShareHolding'
+            $ref: '#/components/schemas/ShareHolding'
     BankAccount:
       type: object
       description: |
@@ -3454,6 +3455,7 @@ components:
       type: object
       required:
       - person
+      - vendorType
       allOf:
       - $ref: '#/components/schemas/EstateVendor'
       - properties:
@@ -3466,6 +3468,7 @@ components:
       type: object
       required:
       - company
+      - vendorType
       allOf:
       - $ref: '#/components/schemas/EstateVendor'
       - properties:
@@ -3694,6 +3697,8 @@ components:
       - $ref: '#/components/schemas/SubmissionLogbookEntry'
     AssignProcessorLogbookEntry:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Logbucheintrag mit Informationen zu dem neu zugewiesenen Bearbeiter. <br/> EN: A logbook entry holds information about assigning a loan partner processor to the submission.
       allOf:
@@ -3706,6 +3711,8 @@ components:
             $ref: '#/components/schemas/SimplePerson'
     DocumentLogbookEntry:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Logbucheintrag mit Informationen zu einem hochgeladenen Einreichungsdokument. <br/> EN: A logbook entry holds information about uploading submission document.
       allOf:
@@ -3718,6 +3725,8 @@ components:
             type: string
     DecisionDateLogbookEntry:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Logbucheintrag mit Informationen zu dem geänderten Entscheidungsdatum. <br/> EN: A logbook entry holds information about updating submission decision date.
       allOf:
@@ -3730,6 +3739,8 @@ components:
             $ref: '#/components/schemas/ISODate'
     LegacyStatusLogbookEntry:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Logbucheintrag mit Informationen zu Statusänderungen. <br/> EN: A logbook entry holds information about changing submission status.
       allOf:
@@ -3883,10 +3894,11 @@ components:
         gender:
           type: string
           description: |
-            DE: Geschlecht der Person. <br/> EN: Gender of the person
-          enum:
+            DE: Geschlecht der Person (nicht abschließende Aufzählung), z. B. M=männlich, F=weiblich, D=divers. <br/> EN: Open ended enum contains gender of the person, possible values are M=male, F=female, D=diverse.
+          x-extensible-enum:
           - M
           - F
+          - D
         title:
           $ref: '#/components/schemas/Title'
         firstName:
@@ -4312,6 +4324,8 @@ components:
           false: '#/components/schemas/NoLeaseHold'
     LeaseHold:
       type: object
+      required:
+      - leasehold
       allOf:
       - $ref: '#/components/schemas/LeaseInfo'
       - properties:
@@ -4361,6 +4375,8 @@ components:
       - OTHER
     NoLeaseHold:
       type: object
+      required:
+      - leasehold
       allOf:
       - $ref: '#/components/schemas/LeaseInfo'
       - properties:
@@ -4492,7 +4508,7 @@ components:
     ConstructionKey:
       type: string
       description: |
-        DE: Bauweise des Gebäudes (nicht abschließende Aufzählung), z.B. MASSIVE=Massivbauweise, PREFABRICATED=Plattenbauweise, WOOD_FRAME=Holzständerbauweise, WOOD=Holzbauweise, HALF_TIMBERED=Fachwerkbauweise, LOG_BUILDING=Blockhausbauweise, LOAM=Lehmbauweise. <br/> EN: open ended enum contains construction of the property, possible values are SOLID, CONCRETE_SLAB, WOOD_STAND, WOOD, TIMBER_FRAMING, LOG_BUILDING, COB, OTHER
+        DE: Bauweise des Gebäudes (nicht abschließende Aufzählung), z.B. SOLID=Massivbauweise, CONCRETE_SLAB=Plattenbauweise, WOOD_STAND=Holzständerbauweise, WOOD=Holzbauweise, TIMBER_FRAMING=Fachwerkbauweise, LOG_BUILDING=Blockhausbauweise, COB=Lehmbauweise. <br/> EN: open ended enum contains construction of the property, possible values are SOLID, CONCRETE_SLAB, WOOD_STAND, WOOD, TIMBER_FRAMING, LOG_BUILDING, COB, OTHER
       example: SOLID
       x-extensible-enum:
       - SOLID
@@ -4537,11 +4553,11 @@ components:
     RealEstatePropertyConditionKey:
       type: string
       description: |
-        DE: Zustand des Gebäudes (nicht abschließende Aufzählung), z.B. IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW. <br/> EN: open ended enum contains general condition of the real estate, possible values are IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW
+        DE: Zustand des Gebäudes (nicht abschließende Aufzählung), z.B. IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW. <br/> EN: open ended enum contains general condition of the real estate, possible values are IN_TOTAL_RENOVATION_NEED, IN_EXTENSIVE_MODERNISATION_NEED, IN_RENOVATION_NEED, IN_MODERNISATION_NEED, WELL_KEPT, AS_NEW
       example: IN_RENOVATION_NEED
       x-extensible-enum:
       - IN_TOTAL_RENOVATION_NEED
-      - IN_EXTENSIVE_MODERNISATION_NEEED
+      - IN_EXTENSIVE_MODERNISATION_NEED
       - IN_RENOVATION_NEED
       - IN_MODERNISATION_NEED
       - WELL_KEPT
@@ -4815,6 +4831,8 @@ components:
       description: |
         DE: Bewertung des Hauses (Gebäude und Grundstueck). <br/> EN: Rating of a house (building and property).
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/RealEstateRating'
       - properties:
@@ -4898,6 +4916,8 @@ components:
       description: |
         DE: Spezielle Nutzung des Hauses. <br/> EN: Special use of the house.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/SpecialRealEstateCharacteristics'
       - properties:
@@ -5449,6 +5469,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5468,6 +5489,8 @@ components:
         DE: Finanzierungsdetails über das Finanzierungvorhaben der Immobilie die erworben wird. <br/>
         EN: Financing details about financing process associated with the property which is to be acquired.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/FinancingDetails'
       - properties:
@@ -5545,6 +5568,8 @@ components:
         DE: Finanzierungsdetails über das Finanzierungvorhaben der bereits besessenen Immobilie. <br/>
         EN: Financing details about financing process associated with already owned property.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/FinancingDetails'
       - properties:
@@ -5645,6 +5670,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5662,6 +5688,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5679,6 +5706,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5696,6 +5724,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5713,6 +5742,7 @@ components:
       required:
       - financingNeed
       - financingDetails
+      - reason
       allOf:
       - $ref: '#/components/schemas/FinancingVenture'
       - properties:
@@ -5758,6 +5788,8 @@ components:
         DE: Information zu der Haushalt Kalkulation <br/>
         EN: Information about the household calculation.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/Calculation'
       - properties:
@@ -5866,6 +5898,8 @@ components:
         DE: Information über Konditionskalkulation. <br/>
         EN: Information about condition calculation.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/Calculation'
       - properties:
@@ -6017,6 +6051,8 @@ components:
         DE: Information zu der Kalkulation <br/>
         EN: Information about the calculation.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/Calculation'
       - properties:
@@ -6041,6 +6077,8 @@ components:
           $ref: '#/components/schemas/Client'
         externalId:
           $ref: '#/components/schemas/ExternalId'
+        intentId:
+          $ref: '#/components/schemas/IntentId'
     Client:
       type: object
       properties:
@@ -6058,6 +6096,13 @@ components:
       type: object
       description: |
         DE: Daten-Identifikator aus dem externen System. <br/> EN: Data identifier in the external system.
+      properties:
+        value:
+          type: string
+    IntentId:
+      type: object
+      description: |
+        DE: IntentId aus dem externen System. <br/> EN: IntentId in the external system.
       properties:
         value:
           type: string
@@ -6133,12 +6178,14 @@ components:
           - REVOKE
           - ASSIGN_PROCESSOR
           - UPDATE_LOAN_PARTNER_DECISION_DATE
+          - ARCHIVE_SUBMISSION
       discriminator:
         propertyName: operation
         mapping:
           REVOKE: '#/components/schemas/RevokeSubmissionCommand'
           ASSIGN_PROCESSOR: '#/components/schemas/AssignLoanPartnerProcessorCommand'
           UPDATE_LOAN_PARTNER_DECISION_DATE: '#/components/schemas/UpdateLoanPartnerDecisionDateCommand'
+          ARCHIVE_SUBMISSION: '#/components/schemas/ArchiveSubmissionCommand'
     CommandTrigger:
       type: object
       required:
@@ -6162,6 +6209,7 @@ components:
       required:
       - reason
       - revokedOn
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionCommand'
       - properties:
@@ -6182,6 +6230,7 @@ components:
       type: object
       required:
       - processor
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionCommand'
       - properties:
@@ -6195,6 +6244,7 @@ components:
       type: object
       required:
       - decisionDate
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionCommand'
       - properties:
@@ -6216,6 +6266,17 @@ components:
           type: string
           description: |
             DE: Begründung für das voraussichtliche Entscheidungsdatum. EN: Reason for the predicted decision date.
+    ArchiveSubmissionCommand:
+      description: Mark a submission as archived.
+      type: object
+      required:
+      - operation
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionCommand'
+      - properties:
+          operation:
+            type: string
+            default: ARCHIVE_SUBMISSION
     InformerId:
       type: object
       required:
@@ -6283,7 +6344,6 @@ components:
       type: object
       required:
       - at
-      - by
       properties:
         at:
           $ref: '#/components/schemas/ISODateTime'
@@ -6446,6 +6506,8 @@ components:
           EXPENSE: '#/components/schemas/Expense'
     FinancialEquity:
       type: object
+      required:
+      - type
       description: |
         DE: Informationen zum Eigenkapital vor Beginn des Finanzierungsprozesses. <br/> EN: Financial equity information before the financing process.
       allOf:
@@ -6561,6 +6623,8 @@ components:
           type: string
     FinancialDebt:
       type: object
+      required:
+      - type
       description: |
         DE: Informationen über (finanzielle) Schulden vor Beginn der angefragten Finanzierung. <br/> EN: Financial debts information before the financing process.
       allOf:
@@ -6816,6 +6880,7 @@ components:
       type: object
       required:
       - estate
+      - type
       allOf:
       - $ref: '#/components/schemas/ExistingLoanDebt'
       - properties:
@@ -6850,6 +6915,8 @@ components:
             type: string
     Income:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Untertyp von "Financial Standing", welcher alle Informationen zu den `Einkünften` beinhaltet. <br/>
         EN: A specific financial standing type holds all information related to periodical `Income` aspects.
@@ -7209,6 +7276,8 @@ components:
           type: string
     Expense:
       type: object
+      required:
+      - type
       description: |
         DE: Ein Untertyp von "Financial Standing", welcher alle Informationen zu den `Ausgaben` beinhaltet. <br/>
         EN: A specific financial standing type holds all information related to periodical `Expenses` aspects.
@@ -7460,6 +7529,7 @@ components:
           - EDIT
           - CHANGE_STATUS
           - UPDATE_CREDIT_LOANS
+          - ACKNOWLEDGE_EDITING_CHANGES
       discriminator:
         propertyName: operation
         mapping:
@@ -7468,11 +7538,13 @@ components:
           EDIT: '#/components/schemas/EditSubmissionLegacyCommand'
           CHANGE_STATUS: '#/components/schemas/ChangeSubmissionStatusLegacyCommand'
           UPDATE_CREDIT_LOANS: '#/components/schemas/UpdateSubmissionCreditLoansLegacyCommand'
+          ACKNOWLEDGE_EDITING_CHANGES: '#/components/schemas/AcknowledgeSubmissionEditingLegacyCommand'
     StartEditingSubmissionLegacyCommand:
       description: This command is only used for internal purposes!
       type: object
       required:
       - editingInfo
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
       - properties:
@@ -7486,6 +7558,7 @@ components:
       type: object
       required:
       - editingInfo
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
       - properties:
@@ -7502,6 +7575,7 @@ components:
       - financingApplication
       - loans
       - editingInfo
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
       - properties:
@@ -7612,6 +7686,7 @@ components:
       type: object
       required:
       - status
+      - operation
       description: |
         This command is only used for internal purposes!
         This command is intended to change the submission status
@@ -7782,13 +7857,13 @@ components:
             type: integer
             format: int32
           onHoldReason:
-            $ref: '#/components/schemas/OnHoldReason'
-    OnHoldReason:
+            $ref: '#/components/schemas/LegacyOnHoldReason'
+    LegacyOnHoldReason:
       type: object
       properties:
         key:
-          $ref: '#/components/schemas/OnHoldReasonKey'
-    OnHoldReasonKey:
+          $ref: '#/components/schemas/LegacyOnHoldReasonKey'
+    LegacyOnHoldReasonKey:
       type: string
       x-extensible-enum:
       - DOCUMENTS
@@ -7874,6 +7949,7 @@ components:
       type: object
       required:
       - loans
+      - operation
       description: |
         This command is only used for internal purposes!
         This command is intended to change the submission credit loans
@@ -7885,6 +7961,19 @@ components:
             default: UPDATE_CREDIT_LOANS
           loans:
             $ref: '#/components/schemas/LegacyStatusLoans'
+    AcknowledgeSubmissionEditingLegacyCommand:
+      type: object
+      required:
+      - operation
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to acknowledge changes made during editing.
+      allOf:
+      - $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      - properties:
+          operation:
+            type: string
+            default: ACKNOWLEDGE_EDITING_CHANGES
     Informers:
       type: object
       description: |
@@ -8099,6 +8188,7 @@ components:
       type: object
       required:
       - advisor
+      - type
       allOf:
       - $ref: '#/components/schemas/CommandTrigger'
       - properties:
@@ -8111,6 +8201,7 @@ components:
       type: object
       required:
       - processingUnit
+      - type
       allOf:
       - $ref: '#/components/schemas/CommandTrigger'
       - properties:
@@ -8123,6 +8214,7 @@ components:
       type: object
       required:
       - name
+      - type
       allOf:
       - $ref: '#/components/schemas/CommandTrigger'
       - properties:
@@ -8268,6 +8360,8 @@ components:
       - $ref: '#/components/schemas/MainProduct'
     BridgingFinancingMainProduct:
       type: object
+      required:
+      - product
       description: |
         DE: Information zur Zwischenfinanzierung im Annuitätendarlehen. <br/> EN: Information on the bridging financing product in the annuity product.
       allOf:
@@ -8317,6 +8411,8 @@ components:
           PUBLIC_PRE_FINANCE: '#/components/schemas/PublicPreFinancing'
     OpenPropertySale:
       type: object
+      required:
+      - reason
       description: |
         DE: Information zur Zwischenfinanzierung in Zusammenhang mit einem Immobilienverkauf. <br/> EN: Information about bridging debt associated with property sale.
       allOf:
@@ -8338,6 +8434,8 @@ components:
             allOf:
             - $ref: '#/components/schemas/EuroAmount'
     ClosedPropertySale:
+      required:
+      - reason
       description: |
         DE: Information zur Zwischenfinanzierung in Zusammenhang mit einem abgeschlossenen Immobilienverkauf. <br/> EN: Bridging debt associated with a closed property sale.
       allOf:
@@ -8351,6 +8449,7 @@ components:
       required:
       - investmentType
       - investmentAmount
+      - reason
       description: |
         DE: Information zur Zwischenfinanzierung in Zusammenhang mit nicht verfügbaren Eigenkapital. <br/> EN: Bridging Debt associated with unavailable equity
       allOf:
@@ -8378,6 +8477,7 @@ components:
       required:
       - amount
       - type
+      - reason
       description: |
         DE: Information zu einem Zwischenfinanzierung in Zusammenhang mit einer öffentlichen Vorfinanzierung. <br/> EN: Bridging debt associated with public pre-financing.
       allOf:
@@ -8548,6 +8648,7 @@ components:
       type: object
       required:
       - editingInfo
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
       - properties:
@@ -8565,6 +8666,7 @@ components:
       type: object
       required:
       - editingInfo
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
       - properties:
@@ -8580,6 +8682,8 @@ components:
     EditFinancingApplicationLegacyCommand:
       description: This command is only used for internal purposes!
       type: object
+      required:
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifyFinancingApplicationLegacyCommand'
       - properties:
@@ -8731,6 +8835,7 @@ components:
       type: object
       required:
       - applicant
+      - type
       allOf:
       - $ref: '#/components/schemas/PropertyRegisterOwner'
       - properties:
@@ -8741,6 +8846,8 @@ components:
             $ref: '#/components/schemas/ApplicantIdRef'
     PropertyRegisterOwnerThirdPerson:
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/PropertyRegisterOwner'
       - properties:
@@ -9086,6 +9193,8 @@ components:
         DE: Information zum Kfw-Darlehen. <br/>
         EN: Information about the KFW promotion loan.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/Loan'
       - properties:
@@ -9154,6 +9263,8 @@ components:
           SUBMIT: '#/components/schemas/FinancingApplicationSubmitCommand'
     FinancingApplicationReplaceCommand:
       type: object
+      required:
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifyFinancingApplicationCommand'
       - properties:
@@ -9164,6 +9275,8 @@ components:
             $ref: '#/components/schemas/FinancingApplicationCommandData'
     FinancingApplicationSubmitCommand:
       type: object
+      required:
+      - operation
       allOf:
       - $ref: '#/components/schemas/ModifyFinancingApplicationCommand'
       - properties:
@@ -9318,6 +9431,8 @@ components:
       description: |
         DE: Eigentum an einem Gründstück/Objekt. <br/> EN: Ownership of a property.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/PropertiesRegisterInventory'
       - properties:
@@ -9328,6 +9443,8 @@ components:
       description: |
         DE: Miteigentumsanteil an einem Gründstück/Objekt. <br/> EN: Co-ownership of a property.
       type: object
+      required:
+      - type
       allOf:
       - $ref: '#/components/schemas/PropertiesRegisterInventory'
       - properties:
@@ -9489,6 +9606,8 @@ components:
           false: '#/components/schemas/NoCessionClaim'
     CessionClaimRequested:
       type: object
+      required:
+      - requested
       description: |
         DE: Information zur beantragten Abtretung der Grundschuld. <br/> EN: Information about the requested cession of the land charge.
       allOf:
@@ -9533,6 +9652,8 @@ components:
       - OTHER
     NoCessionClaim:
       type: object
+      required:
+      - requested
       description: |
         DE: Eine Abtretung dieser Grundschuld ist nicht erwünscht. <br/> EN: A cession of this land charge is not desired.
       allOf:
