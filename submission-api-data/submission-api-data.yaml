@@ -5379,6 +5379,17 @@ components:
         DE: Information über Darlehen die zu Hypothek hinzugefügt werden. <br/>
         EN: Information about existing loans added to the mortgage.
       properties:
+        debtId:
+          description: |
+            DE: Id der dazugehörenden Schulden.
+
+            Die Schulden können mit Hilfe des /v2/financing-applications/{financingApplicationId}/financial-standings/existing-loans/{debtId} abgefragt werden. <br/>
+
+            EN: Id of the associated Debt.
+
+            Debt can be accessed via the respective endpoint. */v2/financing-applications/{financingApplicationId}/financial-standings/existing-loans/{debtId}*
+          allOf:
+          - $ref: '#/components/schemas/DebtId'
         amount:
           description: |
             DE: Darlehenssumme. <br/>
