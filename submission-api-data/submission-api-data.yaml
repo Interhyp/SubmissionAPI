@@ -6357,6 +6357,10 @@ components:
             - $ref: '#/components/schemas/Address'
         propertyRegister:
           $ref: '#/components/schemas/PropertyRegister'
+        liabilities:
+          type: array
+          items:
+            $ref: 'api-schema-property-register.yaml#/components/schemas/PropertyRegister'
         location:
           $ref: '#/components/schemas/PropertyLocation'
         leaseInfo:
