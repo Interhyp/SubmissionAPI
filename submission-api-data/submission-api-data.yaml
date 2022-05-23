@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Interhyp Submission API
-  version: 2.0.0
+  version: 2.0.1
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2835,7 +2835,6 @@ components:
         - RENEWABLE_ENERGY
         - DISBURSMENT_COOWNERS
         - DISBURSMENT_HEIRS
-        - OTHER
         - RECONSTRUCTION
         - BUY
         - CONSTRUCTION
