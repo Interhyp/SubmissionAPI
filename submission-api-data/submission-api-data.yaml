@@ -1,7 +1,8 @@
 openapi: 3.0.2
+x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 2.1.24
+  version: 2.7.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -102,6 +103,12 @@ info:
     In order to check for the status of the created command, section **_Commands_** provides *GET* endpoint to retrieve relevant information associated with the created command. For Example ``` GET https://api-test.interhyp.de/submission/v2/commands/my-awesome-command-id ```
     > **Tip:** More details will be provided in the respective endpoint.
 
+    ## Deprecation Policy <br/>
+    As the API evolves, fields may be replaced by other fields to better reflect the target structure or new requirements. We mark such fields as deprecated and document in the field's description the reason why it has been deprecated and provide information on the new field that should be used instead. We will communicate the planned end-of-life date for a deprecated field in its description once it is set.
+    During the period when both fields are available, they will return the same result until the deprecated field reaches its end of life. However, to avoid any issues that may arise when the deprecated field is eventually removed from the API, we strongly recommend updating your code as soon as possible to use the new field.
+    ### Example
+    Previously, an applicant would have the fields `address` and `previousAddress`. Each would return a single address. We later introduced the field `livingAddresses` which returns an array of addresses and the date range in which they were used. The fields `address` and `previousAddress` were marked as deprecated, as the information could be obtained through the `livingAddresses` field. Still, we ensured that the `address` and `previousAddress` would return the correct data even for applicants which were created only with `livingAddresses`.
+
     ## API client <br/>
     As an API client you should adhere to the following robustness principle
 
@@ -139,8 +146,6 @@ tags:
       to a specific financing partner
   - name: logbook
     description: provides endpoints to access submission logbook
-  - name: pre-inquiry
-    description: provides endpoints to access pre inquiry
   - name: commands
     description: provides endpoints to access to commands sent to the submission API
 paths:
@@ -927,106 +932,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/intents/{intentId}/pre-inquiries/commands:
-    post:
-      summary: Create a new pre inquiry
-      description: |
-        EN: Create a new pre inquiry with short information about the consultation application and the issue.
-      operationId: createPreInquiry
-      tags:
-        - pre-inquiry
-      parameters:
-        - $ref: '#/components/parameters/intent-id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PreInquiryCreationCommand'
-      responses:
-        '201':
-          description: Reference to the created resource.
-          headers:
-            Location:
-              schema:
-                type: string
-                description: |
-                  DE: Link zu einer spezifischen Ressource. <br/> EN: Link to retrieve a specific resource
-                example: http://some-domain/some/link/to/somewhere
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PreInquiryCreationCommandResponse'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-  /v2/pre-inquiries/{preInquiryId}/commands:
-    post:
-      summary: Modify an existing pre inquiry.
-      description: |
-        This endpoint gives a possibility to modify an existing pre inquiry asynchronously by creating a command to perform this operation,
-                as a result a *command id* shall be returned.
-
-
-                In order to follow up the command execution result, a call to `/v2/commands` endpoint could be made providing the *command id*
-      operationId: modifyPreInquiry
-      tags:
-        - pre-inquiry
-      parameters:
-        - $ref: '#/components/parameters/pre-inquiry-id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      responses:
-        '201':
-          description: Reference to the created resource.
-          headers:
-            Location:
-              schema:
-                type: string
-                description: |
-                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
-                example: http://some-domain/some/link/to/somewhere
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommandId'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProblem'
-        '500':
-          description: Unexpected Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions:
     get:
       summary: Delivers all active submissions for a specific financing partner.
@@ -1527,6 +1432,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/status:
+    get:
+      summary: Get current status of specified submission
+      description: Delivers information about current status of a specific submission
+      operationId: getSubmissionStatusById
+      tags:
+        - submissions
+      parameters:
+        - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Current status of the requested submission is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionStatus'
+              example: '{ "type": "SUBMITTED", "remark": "Submission was submitted",
+                "changedOn": "2023-03-14T10:22:50Z" }'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-07T17:49:39.995Z", "title": "Bad Request",
+                "status": 400, "traceId": "64077933c36912de13fb3cd7ae0c00c8", "instance":
+                "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+              example: '{ "error": "invalid token", "error_description": "Access token
+                expired", }'
+        '403':
+          description: Error indicates insufficient privileges to create/access the
+            resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Forbidden",
+                "status": 403, "traceId": "64077933c36912de13fb3cd7ae0c00c8", "instance":
+                "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
+                Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
+                "instance": "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
   /v2/submissions/{submissionId}/uploaded-documents/{documentId}/content:
     get:
       summary: Get a specific submission document as `PDF`
@@ -1701,20 +1660,6 @@ components:
       schema:
         type: string
       description: Id of the requested informer
-    intent-id:
-      name: intentId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested intent.
-    pre-inquiry-id:
-      name: preInquiryId
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Id for the requested pre inquiry.
     sbms-limit:
       name: limit
       in: query
@@ -1776,53 +1721,6 @@ components:
         format: date-time
         example: 2019-12-29T10:22:50Z
   schemas:
-    AbortPreInquiryCommand:
-      description: Abort a pre inquiry.
-      type: object
-      required:
-        - operation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        remark:
-          type: string
-        operation:
-          type: string
-          default: ABORT
-    AcceptPreInquiryCommand:
-      description: Accept a pre inquiry without any changes. In case desired conditions
-        was requested the desired conditions are also accepted.
-      type: object
-      required:
-        - operation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: ACCEPT
-        remark:
-          type: string
-          description: Optional additional information regarding acceptance of pre
-            inquiry
-    AcceptPreInquiryWithProposalCommand:
-      description: Accept a pre inquiry with a proposal.
-      type: object
-      required:
-        - operation
-        - explanation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: ACCEPT_WITH_PROPOSAL
-        proposedLoans:
-          type: array
-          items:
-            $ref: '#/components/schemas/PreInquiryLoan'
-        explanation:
-          type: string
     AcceptSubmissionCounterOfferCommand:
       type: object
       description: command to accept a counter offer.
@@ -1977,20 +1875,6 @@ components:
           default: ADVISOR
         advisor:
           $ref: '#/components/schemas/Advisor'
-    AgeLimitReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_AGE_LIMIT
-        applicants:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApplicantAgeLimitDetails'
     AlimonyExpense:
       type: object
       required:
@@ -2054,22 +1938,6 @@ components:
             EN: Of which: from child support.
           allOf:
             - $ref: '#/components/schemas/PeriodicalEuroAmount'
-    AlimonyReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_ALIMONY
-        children:
-          x-is-plural: true
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PreInquiryChild'
     AnnuityDetails:
       description: |
         DE: Detaillierte Information über das Annuitätsdarlehen. <br/>
@@ -2262,23 +2130,6 @@ components:
             \ applicants, they will only be listed once.\n"
           items:
             $ref: '#/components/schemas/Child'
-    ApplicantAgeLimitDetails:
-      type: object
-      required:
-        - applicantId
-        - birthdate
-        - income
-      properties:
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
-        birthdate:
-          $ref: '#/components/schemas/ISODate'
-        income:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        loanQuotaAtRetirement:
-          $ref: '#/components/schemas/LoanQuotaAtRetirement'
-        loanQuotaWithYears:
-          $ref: '#/components/schemas/LoanQuotaWithYears'
     ApplicantId:
       type: object
       required:
@@ -2424,17 +2275,6 @@ components:
           default: APPROVE_SUBMISSION
         remark:
           type: string
-    ArchivePreInquiryCommand:
-      description: Mark a PreIquiry as archived.
-      type: object
-      required:
-        - operation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: ARCHIVE
     ArchiveSubmissionCommand:
       description: Mark a submission as archived.
       type: object
@@ -2481,20 +2321,6 @@ components:
             EN: Commercial space for own use.
           allOf:
             - $ref: '#/components/schemas/SquareMeter'
-    AssignPreInquiryLoanPartnerProcessorCommand:
-      description: Assign a processor to the pre inquiry
-      type: object
-      required:
-        - processorId
-        - operation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: ASSIGN_PROCESSOR
-        processorId:
-          $ref: '#/components/schemas/LoanPartnerProcessorId'
     AssignProcessorLogbookEntry:
       type: object
       required:
@@ -2763,22 +2589,6 @@ components:
           default: ZWIFI
         details:
           $ref: '#/components/schemas/BridgingLoanDetails'
-    BridgingFinancingReason:
-      type: object
-      required:
-        - type
-        - bridgingLoanDetails
-        - requestedInterestMaturity
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_FINANCING_BRIDGING_LOAN
-        bridgingLoanDetails:
-          $ref: '#/components/schemas/BridgingLoanDetails'
-        requestedInterestMaturity:
-          $ref: '#/components/schemas/InterestMaturity'
     BridgingLoanDetails:
       type: object
       required:
@@ -3065,6 +2875,8 @@ components:
           LENDING_VALUE: '#/components/schemas/LendingValueCalculation'
     CalculationBaseRate:
       type: object
+      required:
+        - baserateInterest
       properties:
         baserateInterest:
           $ref: '#/components/schemas/RawPercentage'
@@ -3074,32 +2886,6 @@ components:
             EN: Base rate issue date.
           allOf:
             - $ref: '#/components/schemas/ISODate'
-    CalculationCommand:
-      deprecated: true
-      description: |
-        @deprecated: use ProductCalculation instead
-      type: object
-      required:
-        - type
-        - context
-        - calculationDate
-      properties:
-        type:
-          $ref: '#/components/schemas/CalculationType'
-        context:
-          $ref: '#/components/schemas/CalculationContext'
-        calculationDate:
-          description: |
-            DE: Datum der Kalkulation. <br/>
-            EN: Calculation date.
-          allOf:
-            - $ref: '#/components/schemas/ISODate'
-      discriminator:
-        propertyName: type
-        mapping:
-          LENDING_VALUE: '#/components/schemas/LoanToValueRatioSummaryCommand'
-          HOUSEHOLD: '#/components/schemas/HouseholdCalculationCommand'
-          CONDITION: '#/components/schemas/ConditionCalculationCommand'
     CalculationContext:
       type: object
       description: |
@@ -3114,6 +2900,7 @@ components:
       type: object
       properties:
         type:
+          readOnly: true
           $ref: '#/components/schemas/LoanType'
         loanId:
           $ref: '#/components/schemas/LoanId'
@@ -3188,15 +2975,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CalculationItem'
-    CalculationsCommand:
-      description: |
-        A wrapper Type to hold a set of calculations.
-      type: object
-      properties:
-        calculations:
-          type: array
-          items:
-            $ref: '#/components/schemas/CalculationCommand'
     CancelContractReason:
       type: object
       required:
@@ -3206,7 +2984,14 @@ components:
           $ref: '#/components/schemas/CancelContractReasonKey'
     CancelContractReasonKey:
       type: string
+      description: |
+        DE: Grund für die Vertragskündigung, mögliche Werte sind NOTARY_APPOINTMENT_UNAVAILABLE=Notartermin kann nicht rechtzeitig stattfinden, OBJECT_UNAVAILABLE=Objekt hat sich zerschlagen, VENTURE_UNAVAILABLE=Vorhaben hat sich zerschlagen, CUSTOMER_DECIDED_DIFFERENT_PROVIDER=Kunde hat sich für einen anderen Finanzierungspartner entschieden, NO_CUSTOMER_INTEREST=Kunde hat sich nicht mehr gemeldet, OTHER=Nicht aufgeführter Grund EN: Reason for canceling contract, possible values are NOTARY_APPOINTMENT_UNAVAILABLE, OBJECT_UNAVAILABLE, VENTURE_UNAVAILABLE, CUSTOMER_DECIDED_DIFFERENT_PROVIDER, NO_CUSTOMER_INTEREST, OTHER
       x-extensible-enum:
+        - NOTARY_APPOINTMENT_UNAVAILABLE
+        - OBJECT_UNAVAILABLE
+        - VENTURE_UNAVAILABLE
+        - CUSTOMER_DECIDED_DIFFERENT_PROVIDER
+        - NO_CUSTOMER_INTEREST
         - OTHER
     CancelContractSubmissionCommand:
       description: command to cancel a signed contract of a submission on behalf of
@@ -3215,6 +3000,7 @@ components:
       required:
         - reason
         - operation
+        - cancellationDate
       allOf:
         - $ref: '#/components/schemas/ModifySubmissionCommand'
       properties:
@@ -3225,6 +3011,8 @@ components:
           $ref: '#/components/schemas/CancelContractReason'
         remark:
           type: string
+        cancellationDate:
+          $ref: '#/components/schemas/ISODate'
     CapitalIncome:
       type: object
       description: |
@@ -3313,26 +3101,6 @@ components:
         - LETTER
         - BOOK
         - OTHER
-    ChangeDecisionDateCommand:
-      description: change pre-inquiry's decision date
-      type: object
-      required:
-        - operation
-        - decisionDate
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: DECISION_DATE
-        decisionDate:
-          description: |
-            DE: Entscheidungstermin. <br/>
-            EN: new decision date.
-          allOf:
-            - $ref: '#/components/schemas/ISODate'
-        remark:
-          type: string
     ChangeLoanPartnerProcessingUnitCommand:
       description: command to change assigned loan partner processing unit
       type: object
@@ -3513,24 +3281,6 @@ components:
             EN: Provision amount.
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
-    CommissionReceiver:
-      type: object
-      description: |
-        DE: Informationen über den Provisionsempfänger. <br/> EN: Information about Commission Receiver.
-      properties:
-        commissionReceiverId:
-          $ref: '#/components/schemas/UserId'
-        agentId:
-          $ref: '#/components/schemas/ExternalId'
-        closingIndicator:
-          type: string
-        participation:
-          $ref: '#/components/schemas/Percentage'
-        additionalInfo:
-          x-is-plural: true
-          type: array
-          items:
-            $ref: '#/components/schemas/AdditionalInfo'
     CompanyAdvisor:
       type: object
       required:
@@ -3591,35 +3341,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LoanConditionDetail'
-    ConditionCalculationCommand:
-      deprecated: true
-      description: |
-        DE: Information über Konditionskalkulation. <br/>
-        EN: Information about condition calculation.
-        @deprecated: Use ConditionProductCalculation instead
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/CalculationCommand'
-      properties:
-        type:
-          type: string
-          default: CONDITION
-        details:
-          $ref: '#/components/schemas/ConditionCalculationDetails'
-        margen:
-          $ref: '#/components/schemas/MarginDetails'
-        commission:
-          x-is-plural: true
-          type: array
-          items:
-            $ref: '#/components/schemas/CommissionCalculationInfo'
     ConditionCalculationDetails:
       description: |
         DE: Information über einzelnen Darlehen innerhalb des Konditionskalkulations. <br/>
         EN: Information about single loan which is a part of condition calculation.
       type: object
+      required:
+        - amount
+        - payout
+        - maturity
+        - baserate
+        - paymentTime
+        - interestDetails
       properties:
         amount:
           description: |
@@ -3652,6 +3385,8 @@ components:
       type: object
       required:
         - type
+        - details
+        - margen
       allOf:
         - $ref: '#/components/schemas/ProductCalculation'
       properties:
@@ -3667,6 +3402,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CommissionCalculationInfo'
+    ConfirmedSubmissionStatus:
+      type: object
+      description: |
+        EN: Status containing information about confirming the submission
+      required:
+        - confirmedAt
+        - loans
+        - type
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: CONFIRMED
+        confirmedAt:
+          $ref: '#/components/schemas/ISODateTime'
     Construction:
       type: object
       required:
@@ -3716,13 +3467,6 @@ components:
             EN: Information about the involved informer.
           items:
             $ref: '#/components/schemas/Informer'
-        commissionReceivers:
-          type: array
-          description: |
-            DE: Daten des Provisionsempfänger. <br/>
-            EN: Information about the involved commission receivers.
-          items:
-            $ref: '#/components/schemas/CommissionReceiver'
         recommendation:
           $ref: '#/components/schemas/Recommendation'
         brokerageOrganization:
@@ -3777,6 +3521,27 @@ components:
           default: CONTRACT_CANCELED
         reason:
           $ref: '#/components/schemas/CancelContractReason'
+        cancellationDate:
+          $ref: '#/components/schemas/ISODate'
+    ContractDeliveredStatus:
+      type: object
+      description: |
+        EN: Status containing information about delivered contract
+      required:
+        - type
+        - changedOn
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: CONTRACT_DELIVERED
+        contractDeliverDate:
+          $ref: '#/components/schemas/ISODate'
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractInfo'
     ContractDeliveredStatusLogbookEntryDetails:
       type: object
       required:
@@ -3800,6 +3565,7 @@ components:
       required:
         - contractNumber
         - loanId
+        - loanType
       properties:
         contractNumber:
           type: string
@@ -3807,6 +3573,16 @@ components:
             DE: Darlehensnummer / Vertragsnummer. <br/> EN: Loan number / contract number.
         loanId:
           $ref: '#/components/schemas/LoanId'
+        loanType:
+          $ref: '#/components/schemas/ContractInfoLoanType'
+    ContractInfoLoanType:
+      description: |
+        DE: Type des Loans dessen Vertragsnummer aktualisiert werden soll. <br/>
+        EN: Type of loan where the contract number should be updated.
+      type: string
+      x-extensible-enum:
+        - LOAN
+        - SUSPENDED_AMORTIZATION_COMBINED_BUILDING_LOAN
     ContractLimitation:
       type: object
       description: |
@@ -3838,6 +3614,25 @@ components:
           $ref: '#/components/schemas/RefuseSignContractReason'
         remark:
           type: string
+    ContractSignedStatus:
+      type: object
+      description: |
+        EN: Status containing information about signed contract
+      required:
+        - type
+        - changedOn
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: CONTRACT_SIGNED
+        contractSignDate:
+          $ref: '#/components/schemas/ISODate'
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractInfo'
     ContractSignedStatusLogbookEntryDetails:
       type: object
       required:
@@ -3854,6 +3649,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContractInfo'
+    CounterOfferAnnuityRateDetails:
+      type: object
+      required:
+        - rateType
+        - interestRate
+        - amortisationRate
+      allOf:
+        - $ref: '#/components/schemas/CounterOfferRateDetails'
+      properties:
+        rateType:
+          type: string
+          default: ANNUITY
+        amortisationRate:
+          description: |
+            DE: Tilgungsrate (Prozent pro Periode). <br/>
+            EN: Amortisation rate (percent per period).
+          allOf:
+            - $ref: '#/components/schemas/PeriodicalPercentage'
     CounterOfferAuxiliaryLoan:
       description: |
         DE: Information zum Gegenangebot Nachrangdarlehen. <br/>
@@ -3869,7 +3682,50 @@ components:
           type: string
           default: AUXILIARY_LOAN
         annuityDetails:
-          $ref: '#/components/schemas/AnnuityDetails'
+          $ref: '#/components/schemas/CounterOfferAnnuityRateDetails'
+    CounterOfferBuildingSavingLoan:
+      description: |
+        DE: Information zum Gegenangebot Bausparer. <br/>
+        EN: Information about the counter offer building saving loan.
+            type: object
+      required:
+        - product
+        - amount
+        - commission
+        - creditPhase
+        - savingsPhase
+      allOf:
+        - $ref: '#/components/schemas/CounterOfferSuspendedAmortizationCombinedProduct'
+      properties:
+        product:
+          type: string
+          default: BAU_SPAR
+        amount:
+          description: |
+            DE: Darlehnsbetrag (per Tranche). <br/>
+            EN: Loan amount (for loan component).
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        commission:
+          $ref: '#/components/schemas/CommissionInfo'
+        creditPhase:
+          $ref: '#/components/schemas/CounterOfferBuildingSavingLoanCreditPhase'
+        savingsPhase:
+          $ref: '#/components/schemas/CounterOfferBuildingSavingLoanSavingsPhase'
+    CounterOfferBuildingSavingLoanCreditPhase:
+      type: object
+      required:
+        - interestRate
+      properties:
+        interestRate:
+          $ref: '#/components/schemas/InterestRate'
+    CounterOfferBuildingSavingLoanSavingsPhase:
+      type: object
+      required:
+        - interestRate
+      properties:
+        interestRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
     CounterOfferKfwLoan:
       description: |
         DE: Information zum Gegenangebot Kfw-Darlehen. <br/>
@@ -3888,7 +3744,7 @@ components:
         program:
           $ref: '#/components/schemas/KfwProgram'
         annuityDetails:
-          $ref: '#/components/schemas/AnnuityDetails'
+          $ref: '#/components/schemas/CounterOfferAnnuityRateDetails'
     CounterOfferLoan:
       type: object
       description: |
@@ -3942,7 +3798,22 @@ components:
             DE: Detailinformation zu den Raten. <br/>
             EN: Detailed information about the rates.
           allOf:
-            - $ref: '#/components/schemas/RateDetails'
+            - $ref: '#/components/schemas/CounterOfferRateDetails'
+    CounterOfferRateDetails:
+      required:
+        - rateType
+        - interestRate
+        - amortisationRate
+      properties:
+        rateType:
+          $ref: '#/components/schemas/RateDetailsType'
+        interestRate:
+          $ref: '#/components/schemas/InterestRate'
+      discriminator:
+        propertyName: rateType
+        mapping:
+          ANNUITY: '#/components/schemas/CounterOfferAnnuityRateDetails'
+          SUSPENDED_AMORTIZATION: '#/components/schemas/CounterOfferSuspendedAmortizationRateDetails'
     CounterOfferRevokedLogbookEntry:
       type: object
       required:
@@ -3955,6 +3826,31 @@ components:
           default: SUBMISSION_COUNTER_OFFER_REVOKED
         details:
           $ref: '#/components/schemas/RevokedCounterOfferLogbookEntryDetails'
+    CounterOfferSuspendedAmortizationCombinedProduct:
+      type: object
+      required:
+        - product
+      properties:
+        product:
+          $ref: '#/components/schemas/SuspendedRepaymentProductTypeKey'
+      discriminator:
+        propertyName: product
+        mapping:
+          BAU_SPAR: '#/components/schemas/CounterOfferBuildingSavingLoan'
+    CounterOfferSuspendedAmortizationRateDetails:
+      type: object
+      required:
+        - rateType
+        - interestRate
+        - amortisationRate
+      allOf:
+        - $ref: '#/components/schemas/CounterOfferRateDetails'
+      properties:
+        rateType:
+          type: string
+          default: SUSPENDED_AMORTIZATION
+        combinedProduct:
+          $ref: '#/components/schemas/CounterOfferSuspendedAmortizationCombinedProduct'
     CountryCode:
       type: object
       description: |
@@ -4059,8 +3955,20 @@ components:
       type: object
       description: The credit phase object (Darlehensphase).
       properties:
-        loan:
-          $ref: '#/components/schemas/Loan'
+        amount:
+          description: |
+            DE: Tilgungssumme <br/>
+            EN: Loan amount to be amortized.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        timeline:
+          $ref: '#/components/schemas/CreditPhaseTimeline'
+        payout:
+          $ref: '#/components/schemas/CreditPhasePayout'
+        interest:
+          $ref: '#/components/schemas/CreditPhaseInterest'
+        burden:
+          $ref: '#/components/schemas/CreditPhaseBurden'
         residualDebt:
           description: |
             DE: Restschuld am Sollzinsbindungsende. <br/>
@@ -4073,6 +3981,78 @@ components:
             EN: Agio/ term-dependent interest component that is added to the nominal amount of the loan and thus increases the loan debt.
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
+        youthBonus:
+          description: |
+            DE: Jugendbonus wenn man bei Vertragsabschluss < 26 Jahre ist. <br/>
+            EN: youth bonus when one at the contract's conclusion < 26 Years old.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+    CreditPhaseBurden:
+      type: object
+      properties:
+        creditBurden:
+          description: |
+            DE: Darlehensrate. <br/> EN: The credit rate.
+          allOf:
+            - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        lastCreditBurden:
+          description: |
+            DE: Schlussrate. <br/> EN: The last credit rate.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        totalRatesPayed:
+          description: |
+            DE: Zins- und Tilgungsbeiträge insgesamt (inkl. Sondertilgungen). <br/> EN: Sum of all payments made during credit phase.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        numberOfCreditBurdens:
+          description: |
+            DE: Anzahl der Zins- und Tilgungsbeiträge (inkl. Schlussrate). <br/> EN: Number of payed burdens including the last one.
+          type: integer
+          format: int32
+    CreditPhaseInterest:
+      type: object
+      properties:
+        interestRate:
+          $ref: '#/components/schemas/InterestRate'
+        interestPayed:
+          description: |
+            DE: Sollzinsen insgesamt. <br/> EN: Total of credit interest payed.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+    CreditPhasePayout:
+      properties:
+        amount:
+          description: |
+            DE: Bauspardarlehenssumme. <br/>
+            EN: The loan amount in EUR that is provided by the Bausparkasse.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        payoutDate:
+          description: |
+            DE: Datum der Auszahlungsdatum. <br/>
+            EN: The date on which the credit is paid out.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
+    CreditPhaseTimeline:
+      type: object
+      properties:
+        amortisationStartDate:
+          description: |
+            DE: Tilgungsbeginn. <br/> EN: The date on which the amortisation starts.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
+        amortisationEndDate:
+          description: |
+            DE: Tilgungsende. <br/> EN: The date on which the amortisation end.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
+        duration:
+          description: |
+            DE: Voraussichtliche Kreditsdaur. <br/>
+            EN: credit phase duration.
+          allOf:
+            - $ref: '#/components/schemas/Duration'
     CreditWorthiness:
       type: object
       description: |
@@ -4236,23 +4216,6 @@ components:
             DE: Datum der Aushändigung des Vertrages. <br/> EN: Contract delivery date.
           allOf:
             - $ref: '#/components/schemas/ISODate'
-    DesiredConditionReason:
-      type: object
-      required:
-        - type
-        - description
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: DESIRED_CONDITION
-        description:
-          type: string
-        desiredConditions:
-          type: array
-          items:
-            $ref: '#/components/schemas/InquiryDesiredCondition'
     DetailType:
       type: string
       description: |
@@ -4320,21 +4283,6 @@ components:
           $ref: '#/components/schemas/JobProbation'
         parentalLeave:
           $ref: '#/components/schemas/ParentalLeave'
-    EmploymentProbationPeriodReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_EMPLOYMENT_PROBATION
-        jobsInProbation:
-          x-is-plural: true
-          type: array
-          items:
-            $ref: '#/components/schemas/JobInProbation'
     EnergyEfficiency:
       type: object
       required:
@@ -4537,37 +4485,6 @@ components:
             EN: Cost of the outdoor facilities.
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
-    EstateCommercialAreaReason:
-      type: object
-      required:
-        - type
-        - commercialUnitGroups
-        - areaTotal
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_ESTATE_COMMERCIAL_AREA
-        commercialUnitGroups:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/EstateCommercialAreaReasonUnitGroup'
-        areaTotal:
-          $ref: '#/components/schemas/SquareMeter'
-    EstateCommercialAreaReasonUnitGroup:
-      type: object
-      required:
-        - commercialArea
-        - commercialRent
-      properties:
-        commercialArea:
-          $ref: '#/components/schemas/SquareMeter'
-        commercialRent:
-          $ref: '#/components/schemas/PeriodicalEuroAmountPerSquareMeter'
-        commercialUsage:
-          $ref: '#/components/schemas/HouseUnitCommercialUsage'
     EstateId:
       type: object
       required:
@@ -4600,42 +4517,6 @@ components:
             DE: Vollständige Daten zu der Immobilie. <br/> EN: Complete data about the estate.
           allOf:
             - $ref: '#/components/schemas/Estate'
-    EstateNeighbourhoodReason:
-      type: object
-      required:
-        - type
-        - address
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_ESTATE_NEIGHBOURHOOD
-        address:
-          $ref: '#/components/schemas/Address'
-    EstateRatingReason:
-      type: object
-      required:
-        - type
-        - unitGroups
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_ESTATE_RATING
-        unitGroups:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/EstateRatingReasonUnitGroup'
-    EstateRatingReasonUnitGroup:
-      type: object
-      required:
-        - condition
-      properties:
-        condition:
-          $ref: '#/components/schemas/RealEstatePropertyCondition'
     EstateRef:
       type: object
       required:
@@ -4649,42 +4530,6 @@ components:
             - $ref: '#/components/schemas/ResourceRef'
         estateId:
           $ref: '#/components/schemas/EstateId'
-    EstateRegisterRestrictionReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_ESTATE_REGISTER_RESTRICTION
-        burden:
-          type: string
-        capitalizationPossible:
-          type: boolean
-          nullable: true
-        effectiveAfterMortgages:
-          type: boolean
-          nullable: true
-    EstateRenovateReason:
-      type: object
-      required:
-        - type
-        - costs
-        - monumentProtection
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_ESTATE_RENOVATION
-        costs:
-          $ref: '#/components/schemas/EuroAmount'
-        monumentProtection:
-          type: boolean
-        measures:
-          type: string
     EstateVendor:
       description: |
         DE: Informationen über den Immobilienverkäufer. <br/> EN: Information about the estate vendor.
@@ -5060,6 +4905,8 @@ components:
           type: string
     ExternalProcessing:
       type: object
+      description: |
+        EN: Information regarding the external processing
       required:
         - details
       properties:
@@ -5068,10 +4915,10 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/ExternalProcessingDetail'
-        remark:
-          type: string
         estimatedConclusion:
           $ref: '#/components/schemas/ISODate'
+        remark:
+          type: string
     ExternalProcessingAwaitedLogbookEntryDetails:
       type: object
       required:
@@ -5094,9 +4941,13 @@ components:
     ExternalProcessingReason:
       type: string
       description: |
-        EN: Open ended enum contains possible reasons for external processing DE: Mögliche Gruende fur das Warten auf externe Faktoren
+        EN: Open ended enum contains possible reasons for external processing (EXTERNAL_EXPERT_ASSESSMENT, INTERNAL_EXPERT_ASSESSMENT, DECISION_INTERNAL_UNIT, CONTRACT_CREATION, OTHER) DE: Mögliche Gruende fur das Warten auf externe Faktoren (EXTERNAL_EXPERT_ASSESSMENT=Externes Gutachten, INTERNAL_EXPERT_ASSESSMENT=Internes Gutachten,  DECISION_INTERNAL_UNIT=Entscheidung Marktfolge, CONTRACT_CREATION=Vertragserstellung, OTHER=Nicht aufgeführter Grund)
       example: OTHER
       x-extensible-enum:
+        - EXTERNAL_EXPERT_ASSESSMENT
+        - INTERNAL_EXPERT_ASSESSMENT
+        - DECISION_INTERNAL_UNIT
+        - CONTRACT_CREATION
         - OTHER
     FamilyIncome:
       description: |
@@ -5509,19 +5360,6 @@ components:
         mapping:
           OWN: '#/components/schemas/OwnEstateFinancingDetails'
           FOREIGN: '#/components/schemas/ForeignEstateFinancingDetails'
-    FinancingLeaseholdReason:
-      type: object
-      required:
-        - type
-        - leasehold
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_FINANCING_LEASEHOLD
-        leasehold:
-          $ref: '#/components/schemas/LeaseHold'
     FinancingNeed:
       type: object
       required:
@@ -5736,6 +5574,12 @@ components:
             EN: Financing details relevant for purchase of newly build property.
           allOf:
             - $ref: '#/components/schemas/ForeignEstateFinancingDetails'
+        constructionStartDate:
+          description: |
+            DE: Baubeginn des Neubaus. <br/>
+            EN: Construction start date of the newly built property.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
     FinancingVentureConstruction:
       description: |
         DE: Information über das Finanzierungsvorhaben beim Bau einer Immobilie. <br/>
@@ -5754,6 +5598,12 @@ components:
           $ref: '#/components/schemas/BuildEstateFinancing'
         financingDetails:
           $ref: '#/components/schemas/ForeignEstateFinancingDetails'
+        constructionStartDate:
+          description: |
+            DE: Beginn der Bauarbeiten an der Immobilie. <br/>
+            EN: Start date of the construction work on the property.
+          allOf:
+            - $ref: '#/components/schemas/ISODate'
     FinancingVentureDebtRescheduling:
       description: |
         DE: Information über das Finanzierungsvorhaben beim Anschlussfinanzierung / Umschuldung. <br/>
@@ -5895,18 +5745,6 @@ components:
           BUILD: '#/components/schemas/BuildEstateFinancing'
           BUY_EXISTING: '#/components/schemas/BuyExistingEstateFinancing'
           BUY_NEW: '#/components/schemas/BuyNewEstateFinancing'
-    ForeignPreInquiryApplicationOverview:
-      type: object
-      required:
-        - totalPropertyCosts
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryApplicationOverview'
-      properties:
-        totalPropertyCosts:
-          description: |
-            DE: Gesamtkosten (Grundstückspreis, Kaufpreis, Baukosten, usw.) von der Immobilie ohne Kaufnebenkosten<br/> EN: Total costs (land price, consturcition cost, building cost, etc.) of the property without acquisition costs.
-          allOf:
-            - $ref: '#/components/schemas/EuroAmount'
     ForwardExistingMortgage:
       type: object
       description: |
@@ -6306,44 +6144,11 @@ components:
           items:
             $ref: '#/components/schemas/FinancialBurdenDetail'
           x-is-plural: true
-    HouseholdCalculationCommand:
-      deprecated: true
-      description: |
-        DE: Information zu der Haushalt Kalkulation <br/>
-        EN: Information about the household calculation.
-        @deprecated: Use HouseholdProductCalculation instead
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/CalculationCommand'
-      properties:
-        type:
-          type: string
-          default: HOUSEHOLD
-        remainingDebtAt:
-          $ref: '#/components/schemas/RemainingDebtAt'
-        income:
-          $ref: '#/components/schemas/HouseholdCalculationCommandIncome'
-        expenses:
-          $ref: '#/components/schemas/HouseholdCalculationCommandExpenses'
-        surplus:
-          description: Der Haushaltsueberschuss
-          allOf:
-            - $ref: '#/components/schemas/PeriodicalRawEuroAmount'
-        lender:
-          type: string
-          description: Darlehensgeber
-        billType:
-          type: string
-          description: 'Household Bill Type: DEFAULT: default household bill (usually
-            applicable at the start of the financing), RETIREMENT: household bill
-            to be used for after retirement'
-          x-extensible-enum:
-            - RETIREMENT
-            - DEFAULT
     HouseholdCalculationCommandEntry:
       type: object
+      required:
+        - name
+        - valuation
       properties:
         name:
           type: string
@@ -6366,6 +6171,9 @@ components:
           $ref: '#/components/schemas/LoanId'
     HouseholdCalculationCommandExpenses:
       type: object
+      required:
+        - valuation
+        - entries
       properties:
         value:
           description: Der vom Kunden eingetragene Wert
@@ -6381,6 +6189,9 @@ components:
             $ref: '#/components/schemas/HouseholdCalculationCommandEntry'
     HouseholdCalculationCommandIncome:
       type: object
+      required:
+        - valuation
+        - entries
       properties:
         value:
           description: Der vom Kunden eingetragene Wert
@@ -6401,6 +6212,10 @@ components:
       type: object
       required:
         - type
+        - expenses
+        - income
+        - lender
+        - surplus
       allOf:
         - $ref: '#/components/schemas/ProductCalculation'
       properties:
@@ -6631,36 +6446,12 @@ components:
         - MORE_THEN_1000000
         - OTHER
     InitialSubmissionEstimate:
-      deprecated: true
       description: |
         DE: Voraussichtliches Entscheidungsdatum. <br/> EN: Estimated decision date.
       type: object
       properties:
         createdAt:
           $ref: '#/components/schemas/ISODateTime'
-    InquiryDesiredCondition:
-      type: object
-      required:
-        - id
-        - nominalRate
-        - specialRepayment
-        - commission
-      properties:
-        id:
-          $ref: '#/components/schemas/LoanId'
-        nominalRate:
-          description: |
-            DE: Nominalzins (Sollzins) in Prozent <br/>
-            EN: Nominal interest rate percent per period.
-          allOf:
-            - $ref: '#/components/schemas/PeriodicalPercentage'
-        specialRepayment:
-          $ref: '#/components/schemas/SpecialRepayment'
-        commission:
-          x-is-plural: true
-          type: array
-          items:
-            $ref: '#/components/schemas/CommissionCalculationInfo'
     InsuranceBurden:
       type: object
       required:
@@ -6812,17 +6603,6 @@ components:
             EN: Collection of loans relevant for the planed financing venture.
           items:
             $ref: '#/components/schemas/VentureRelevantLoan'
-    JobInProbation:
-      type: object
-      required:
-        - applicantId
-      properties:
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
-        jobStartDate:
-          $ref: '#/components/schemas/ISODate'
-        probationPeriodEndDate:
-          $ref: '#/components/schemas/ISODate'
     JobInformation:
       type: object
       description: |
@@ -6853,32 +6633,6 @@ components:
       properties:
         probationPeriodEndDate:
           $ref: '#/components/schemas/ISODate'
-    JobReentry:
-      type: object
-      required:
-        - reentryConfirmation
-      allOf:
-        - $ref: '#/components/schemas/JobReentryInfo'
-      properties:
-        reentryConfirmation:
-          type: boolean
-          default: true
-        reentryDate:
-          $ref: '#/components/schemas/ISODate'
-        reentrySalary:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-    JobReentryInfo:
-      type: object
-      required:
-        - reentryConfirmation
-      properties:
-        reentryConfirmation:
-          type: boolean
-      discriminator:
-        propertyName: reentryConfirmation
-        mapping:
-          true: '#/components/schemas/JobReentry'
-          false: '#/components/schemas/NoJobReentry'
     JointOwnershipInventory:
       description: |
         DE: Miteigentumsanteil an einem Gründstück/Objekt. <br/> EN: Co-ownership of a property.
@@ -7073,13 +6827,6 @@ components:
         mapping:
           true: '#/components/schemas/LeaseHold'
           false: '#/components/schemas/NoLeaseHold'
-    LenderId:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: string
     LendingValueCalculation:
       description: |
         DE: Information zu der Kalkulation <br/>
@@ -7117,6 +6864,13 @@ components:
         - INDIVIDUAL
         - COMPANY
         - OTHER
+    Liability:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          $ref: '#/components/schemas/LiabilityKey'
     LiabilityDebt:
       type: object
       description: |
@@ -7136,6 +6890,43 @@ components:
             - $ref: '#/components/schemas/EuroAmount'
         description:
           type: string
+    LiabilityKey:
+      type: string
+      example: SMALL_LOAN
+      description: |
+        DE: Art des Kredits (
+          CONSUMER_CREDIT=Konsumentenkredit,
+          CAR_CREDIT=Autokredit,
+          LINE_OF_CREDIT=Rahmenkredit,
+          CALL_CREDIT=Abrufkredit,
+          BUSINESS_CREDIT=Geschäftskredit,
+          CREDIT_CARD=Kreditkarte,
+          EMPLOYEE_LOAN=Arbeitgeberdarlehen
+          ZERO_PERCENT_FINANCING=0%-Finanzierung,
+          BALLOON_FINANCING=Ballonfinanzierung,
+          BLANK_MORTGAGE=Blanko-Bauspardarlehen,
+          EDUCATION_LOAN=Bildungskredit,
+          SUBSTITUTE_SECURITY=Ersatzsicherheit,
+          SMALL_LOAN=Kleindarlehen,
+          LEASING_PRIVATE=Leasingprivat,
+          LEASING_BUSINESS=Leasinggeschäft)<br/>
+        EN: type of liability
+      x-extensible-enum:
+        - CONSUMER_CREDIT
+        - CAR_CREDIT
+        - LINE_OF_CREDIT
+        - CALL_CREDIT
+        - BUSINESS_CREDIT
+        - CREDIT_CARD
+        - EMPLOYEE_LOAN
+        - ZERO_PERCENT_FINANCING
+        - BALLOON_FINANCING
+        - BLANK_MORTGAGE
+        - EDUCATION_LOAN
+        - SUBSTITUTE_SECURITY
+        - SMALL_LOAN
+        - LEASING_PRIVATE
+        - LEASING_BUSINESS
     LimitedContract:
       type: object
       required:
@@ -7159,38 +6950,6 @@ components:
           example: 3
           description: |
             DE: Anzahl befristeter Verlängerungen. <br/> EN: Count of fixed term renewals
-    LimitedEmploymentContractReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_EMPLOYMENT_LIMITED_CONTRACT
-        limitedJobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/LimitedJob'
-    LimitedJob:
-      required:
-        - applicantId
-      properties:
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
-        jobStartDate:
-          $ref: '#/components/schemas/ISODate'
-        jobFixedTermEnd:
-          $ref: '#/components/schemas/ISODate'
-        jobDescription:
-          type: string
-        contractExtensionExpected:
-          type: boolean
-          nullable: true
-        numberOfContractExtensions:
-          type: integer
-          format: int32
     LivingAddress:
       type: object
       required:
@@ -7235,6 +6994,8 @@ components:
           type: integer
           format: int32
           deprecated: true
+          description: |
+            @deprecated: Use field id for identification instead.
         type:
           $ref: '#/components/schemas/LoanType'
         amount:
@@ -7366,6 +7127,9 @@ components:
         DE: Zusammenfassung von Informationen zu einzelnem Darlehen (Konditionskalkulation). <br/>
         EN: Summary information about single loan (conditions calculation).
       type: object
+      required:
+        - effectiveRate
+        - nominalRate
       properties:
         effectiveRate:
           description: |
@@ -7428,15 +7192,6 @@ components:
         DE: ID des Darlehens. <br/> EN: Loan identifier.
       properties:
         value:
-          type: string
-    LoanLender:
-      type: object
-      required:
-        - lenderId
-      properties:
-        lenderId:
-          $ref: '#/components/schemas/LenderId'
-        name:
           type: string
     LoanPartnerProcessingInfo:
       description: |
@@ -7611,28 +7366,6 @@ components:
             EN: Loan quota for condition retrieval.
           allOf:
             - $ref: '#/components/schemas/Percentage'
-    LoanQuotaAtRetirement:
-      type: object
-      required:
-        - retirementDate
-        - loanQuota
-      properties:
-        retirementDate:
-          $ref: '#/components/schemas/ISODate'
-        loanQuota:
-          $ref: '#/components/schemas/Percentage'
-    LoanQuotaReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_FINANCING_LOAN_QUOTA
-        collateralSecurities:
-          type: string
     LoanQuotaType:
       description: |
         DE: Wrapper für Ursprung des Wertes der Darlehensquote <br/> EN: Wrapper for loan quota value types.
@@ -7650,17 +7383,6 @@ components:
       x-extensible-enum:
         - CALCULATED
         - EXTERNAL
-    LoanQuotaWithYears:
-      type: object
-      required:
-        - years
-        - loanQuota
-      properties:
-        years:
-          type: integer
-          format: int32
-        loanQuota:
-          $ref: '#/components/schemas/Percentage'
     LoanToValueRatioBreakdown:
       title: LoanToValueRatioBreakdown
       type: object
@@ -7709,6 +7431,7 @@ components:
       type: object
       required:
         - valuation
+        - entries
       properties:
         valuation:
           description: Die Summe der Gesamtwerte, die die Bank ansetzt in Euro
@@ -7743,30 +7466,6 @@ components:
         - lender
       allOf:
         - $ref: '#/components/schemas/ProductCalculation'
-      properties:
-        type:
-          type: string
-          default: LENDING_VALUE
-        feasibility:
-          $ref: '#/components/schemas/LoanToValueRatioBreakdown'
-        conditioning:
-          $ref: '#/components/schemas/LoanToValueRatioBreakdown'
-        lender:
-          type: string
-          description: Darlehensgeber
-    LoanToValueRatioSummaryCommand:
-      type: object
-      deprecated: true
-      description: |
-        DE: Information zu der Kalkulation <br/>
-        EN: Information about the calculation.
-        @deprecated: Use LoanToValueRatioProductCalculation instead
-      required:
-        - type
-        - feasibility
-        - lender
-      allOf:
-        - $ref: '#/components/schemas/CalculationCommand'
       properties:
         type:
           type: string
@@ -7915,11 +7614,14 @@ components:
           type: string
           description: Name der Marge
         value:
-          description: Wert der Marge in Prozent>
+          description: Wert der Marge in Prozent
           allOf:
             - $ref: '#/components/schemas/RawPercentage'
     MarginDetails:
       type: object
+      required:
+        - marginCorrection
+        - margins
       properties:
         margins:
           type: array
@@ -8038,35 +7740,6 @@ components:
         - SANITARY
         - WINDOW
         - OTHER
-    ModifyPreInquiryCommand:
-      type: object
-      required:
-        - operation
-      properties:
-        createdOn:
-          $ref: '#/components/schemas/ISODateTime'
-        operation:
-          type: string
-          x-extensible-enum:
-            - SUBMIT
-            - ASSIGN_PROCESSOR
-            - ACCEPT
-            - ACCEPT_WITH_PROPOSAL
-            - DECISION_DATE
-            - REJECT
-            - ABORT
-            - ARCHIVE
-      discriminator:
-        propertyName: operation
-        mapping:
-          ASSIGN_PROCESSOR: '#/components/schemas/AssignPreInquiryLoanPartnerProcessorCommand'
-          SUBMIT: '#/components/schemas/SubmitPreInquiryCommand'
-          ACCEPT: '#/components/schemas/AcceptPreInquiryCommand'
-          ACCEPT_WITH_PROPOSAL: '#/components/schemas/AcceptPreInquiryWithProposalCommand'
-          DECISION_DATE: '#/components/schemas/ChangeDecisionDateCommand'
-          REJECT: '#/components/schemas/RejectPreInquiryCommand'
-          ABORT: '#/components/schemas/AbortPreInquiryCommand'
-          ARCHIVE: '#/components/schemas/ArchivePreInquiryCommand'
     ModifySubmissionCommand:
       type: object
       required:
@@ -8184,16 +7857,6 @@ components:
         - $ref: '#/components/schemas/CessionClaim'
       properties:
         requested:
-          type: boolean
-          default: false
-    NoJobReentry:
-      type: object
-      required:
-        - reentryConfirmation
-      allOf:
-        - $ref: '#/components/schemas/JobReentryInfo'
-      properties:
-        reentryConfirmation:
           type: boolean
           default: false
     NoLeaseHold:
@@ -8482,21 +8145,6 @@ components:
           $ref: '#/components/schemas/JobInformation'
         parentalLeave:
           $ref: '#/components/schemas/ParentalLeave'
-    OtherReason:
-      type: object
-      required:
-        - type
-        - remark
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: OTHER
-        remark:
-          type: string
-          minLength: 1
-          description: Reason provided by advisor
     OwnEstateFinancingDetails:
       description: |
         DE: Finanzierungsdetails über das Finanzierungvorhaben der bereits besessenen Immobilie. <br/>
@@ -8550,13 +8198,6 @@ components:
           DEBT_RESCHEDULING: '#/components/schemas/DebtReschedulingFinancing'
           OTHER_CAPITAL: '#/components/schemas/OtherCapitalFinancing'
           RENOVATE: '#/components/schemas/RenovateEstateFinancing'
-    OwnPreInquiryApplicationOverview:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryApplicationOverview'
-      properties:
-        marketValue:
-          $ref: '#/components/schemas/EuroAmount'
     OwnershipInventory:
       description: |
         DE: Eigentum an einem Gründstück/Objekt. <br/> EN: Ownership of a property.
@@ -8623,15 +8264,6 @@ components:
           description: |
             DE: Flurstück. <br/> EN: Land parcel.
           type: string
-    ParentalAllowance:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        parentalStartDate:
-          $ref: '#/components/schemas/ISODate'
-        parentalEndDate:
-          $ref: '#/components/schemas/ISODate'
     ParentalAllowanceInfo:
       type: object
       description: |
@@ -8643,31 +8275,6 @@ components:
           $ref: '#/components/schemas/PeriodicalEuroAmount'
         endDate:
           $ref: '#/components/schemas/ISODate'
-    ParentalAllowanceJob:
-      type: object
-      required:
-        - applicantId
-      properties:
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
-        parentalAllowance:
-          $ref: '#/components/schemas/ParentalAllowance'
-        jobReentry:
-          $ref: '#/components/schemas/JobReentryInfo'
-    ParentalAllowanceReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_PARENTAL_ALLOWANCE
-        parentalAllowanceJobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParentalAllowanceJob'
     ParentalLeave:
       type: object
       description: "DE: Beschreibt ein (Angestelltes) Beschäftigungsverhältnis das\
@@ -9159,339 +8766,6 @@ components:
             EN: Property space.
           allOf:
             - $ref: '#/components/schemas/SquareMeter'
-    PreInquiryApplicant:
-      type: object
-      required:
-        - applicantId
-        - name
-        - contact
-        - occupationType
-      properties:
-        id:
-          $ref: '#/components/schemas/ApplicantId'
-        name:
-          $ref: '#/components/schemas/PersonName'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        occupationType:
-          $ref: '#/components/schemas/OccupationType'
-    PreInquiryApplicationData:
-      type: object
-      required:
-        - applicationOverview
-        - financingStructure
-        - originInfo
-      properties:
-        salesAdvisor:
-          readOnly: true
-          allOf:
-            - $ref: '#/components/schemas/SalesAdvisor'
-        applicationOverview:
-          $ref: '#/components/schemas/PreInquiryApplicationOverview'
-        financingStructure:
-          $ref: '#/components/schemas/PreInquiryFinancingStructure'
-        originInfo:
-          $ref: '#/components/schemas/OriginInfo'
-    PreInquiryApplicationOverview:
-      type: object
-      required:
-        - ventureReason
-        - propertyType
-        - utilization
-        - equity
-        - surplus
-      properties:
-        ventureReason:
-          $ref: '#/components/schemas/FinancingApplicationReason'
-        applicants:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PreInquiryApplicant'
-        propertyType:
-          $ref: '#/components/schemas/PropertyType'
-        utilization:
-          $ref: '#/components/schemas/Utilization'
-        equity:
-          $ref: '#/components/schemas/EuroAmount'
-        surplus:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-      discriminator:
-        propertyName: ventureReason
-        mapping:
-          BUY_NEW: '#/components/schemas/ForeignPreInquiryApplicationOverview'
-          BUY_EXISTING: '#/components/schemas/ForeignPreInquiryApplicationOverview'
-          BUILD: '#/components/schemas/ForeignPreInquiryApplicationOverview'
-          REFINANCE: '#/components/schemas/OwnPreInquiryApplicationOverview'
-          RENOVATE: '#/components/schemas/OwnPreInquiryApplicationOverview'
-          RAISE_CAPITAL: '#/components/schemas/OwnPreInquiryApplicationOverview'
-    PreInquiryAuxiliaryLoan:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryLoan'
-      properties:
-        type:
-          type: string
-          default: AUXILIARY_LOAN
-        product:
-          type: string
-        annuityDetails:
-          $ref: '#/components/schemas/AnnuityDetails'
-    PreInquiryChild:
-      type: object
-      required:
-        - birthdate
-      properties:
-        birthdate:
-          $ref: '#/components/schemas/ISODate'
-    PreInquiryCommandData:
-      type: object
-      required:
-        - applicationData
-        - preInquiryData
-      properties:
-        applicationData:
-          $ref: '#/components/schemas/PreInquiryApplicationData'
-        preInquiryData:
-          $ref: '#/components/schemas/PreInquiryData'
-        calculations:
-          $ref: '#/components/schemas/CalculationsCommand'
-        submit:
-          type: boolean
-          nullable: true
-          description: flag indicates whether pre-inquiry has to be directly released/submitted
-            and hence being visible to the loan partner.
-    PreInquiryCreationCommand:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          $ref: '#/components/schemas/PreInquiryCommandData'
-        createdOn:
-          $ref: '#/components/schemas/ISODateTime'
-    PreInquiryCreationCommandResponse:
-      type: object
-      required:
-        - id
-        - preInquiryRef
-      properties:
-        id:
-          $ref: '#/components/schemas/CommandId'
-        preInquiryRef:
-          $ref: '#/components/schemas/PreInquiryRef'
-    PreInquiryData:
-      type: object
-      required:
-        - reasons
-        - loanPartnerProcessingUnit
-        - dueDate
-      properties:
-        reasons:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PreInquiryReason'
-        loanPartnerProcessingUnit:
-          $ref: '#/components/schemas/LoanPartnerProcessingUnit'
-        remark:
-          type: string
-        desiredProcessor:
-          type: string
-          description: |
-            DE: Wunschbearbeiter (Freitext Feld). <br/>
-            EN: Desired processor (Free text field).
-        dueDate:
-          description: |
-            DE: Bearbeitungsfrist. <br/>
-            EN: expected due date.
-          allOf:
-            - $ref: '#/components/schemas/ISODate'
-    PreInquiryFinancingStructure:
-      type: object
-      required:
-        - amount
-        - burden
-      properties:
-        loans:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PreInquiryLoan'
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        burden:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        interest:
-          $ref: '#/components/schemas/InterestRate'
-    PreInquiryId:
-      type: object
-      required:
-        - value
-      properties:
-        value:
-          type: string
-    PreInquiryKfwPromotionLoan:
-      type: object
-      required:
-        - type
-        - program
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryLoan'
-      properties:
-        type:
-          type: string
-          default: KFW_PROMOTION_LOAN
-        program:
-          $ref: '#/components/schemas/KfwProgram'
-        annuityDetails:
-          $ref: '#/components/schemas/AnnuityDetails'
-    PreInquiryLoan:
-      type: object
-      required:
-        - id
-        - type
-        - amount
-        - maturity
-        - specialRepayment
-      properties:
-        id:
-          $ref: '#/components/schemas/LoanId'
-        lender:
-          $ref: '#/components/schemas/LoanLender'
-        type:
-          $ref: '#/components/schemas/LoanType'
-        amount:
-          $ref: '#/components/schemas/EuroAmount'
-        maturity:
-          $ref: '#/components/schemas/InterestMaturity'
-        interest:
-          allOf:
-            - $ref: '#/components/schemas/InterestRate'
-          deprecated: true
-        amortisationRate:
-          allOf:
-            - $ref: '#/components/schemas/PeriodicalPercentage'
-          deprecated: true
-        specialRepayment:
-          $ref: '#/components/schemas/SpecialRepayment'
-        commission:
-          x-is-plural: true
-          type: array
-          items:
-            $ref: '#/components/schemas/CommissionCalculationInfo'
-      discriminator:
-        propertyName: type
-        mapping:
-          MAIN_LOAN: '#/components/schemas/PreInquiryMainLoan'
-          AUXILIARY_LOAN: '#/components/schemas/PreInquiryAuxiliaryLoan'
-          KFW_PROMOTION_LOAN: '#/components/schemas/PreInquiryKfwPromotionLoan'
-    PreInquiryMainLoan:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryLoan'
-      properties:
-        type:
-          type: string
-          default: MAIN_LOAN
-        product:
-          $ref: '#/components/schemas/MainProduct'
-        rateDetails:
-          description: |
-            DE: Detailinformation zu den Raten. <br/>
-            EN: Detailed information about the rates.
-          allOf:
-            - $ref: '#/components/schemas/RateDetails'
-    PreInquiryReason:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          $ref: '#/components/schemas/PreInquiryReasonType'
-      discriminator:
-        propertyName: type
-        mapping:
-          VIABILITY_ESTATE_RATING: '#/components/schemas/EstateRatingReason'
-          VIABILITY_ESTATE_NEIGHBOURHOOD: '#/components/schemas/EstateNeighbourhoodReason'
-          VIABILITY_ESTATE_REGISTER_RESTRICTION: '#/components/schemas/EstateRegisterRestrictionReason'
-          VIABILITY_ESTATE_RENOVATION: '#/components/schemas/EstateRenovateReason'
-          VIABILITY_ESTATE_COMMERCIAL_AREA: '#/components/schemas/EstateCommercialAreaReason'
-          VIABILITY_APPLICANT_EMPLOYMENT_LIMITED_CONTRACT: '#/components/schemas/LimitedEmploymentContractReason'
-          VIABILITY_APPLICANT_EMPLOYMENT_PROBATION: '#/components/schemas/EmploymentProbationPeriodReason'
-          VIABILITY_APPLICANT_SELF_EMPLOYMENT: '#/components/schemas/SelfEmploymentReason'
-          VIABILITY_APPLICANT_PARENTAL_ALLOWANCE: '#/components/schemas/ParentalAllowanceReason'
-          VIABILITY_APPLICANT_AGE_LIMIT: '#/components/schemas/AgeLimitReason'
-          VIABILITY_APPLICANT_ALIMONY: '#/components/schemas/AlimonyReason'
-          VIABILITY_FINANCING_LEASEHOLD: '#/components/schemas/FinancingLeaseholdReason'
-          VIABILITY_FINANCING_RAISE_CAPITAL: '#/components/schemas/RaiseCapitalReason'
-          VIABILITY_FINANCING_BRIDGING_LOAN: '#/components/schemas/BridgingFinancingReason'
-          VIABILITY_FINANCING_LOAN_QUOTA: '#/components/schemas/LoanQuotaReason'
-          DESIRED_CONDITION: '#/components/schemas/DesiredConditionReason'
-          REQUEST_CONDITION: '#/components/schemas/RequestConditionReason'
-          OTHER: '#/components/schemas/OtherReason'
-    PreInquiryReasonType:
-      type: string
-      x-extensible-enum:
-        - VIABILITY_ESTATE_RATING
-        - VIABILITY_ESTATE_NEIGHBOURHOOD
-        - VIABILITY_ESTATE_REGISTER_RESTRICTION
-        - VIABILITY_ESTATE_RENOVATION
-        - VIABILITY_ESTATE_COMMERCIAL_AREA
-        - VIABILITY_APPLICANT_EMPLOYMENT_LIMITED_CONTRACT
-        - VIABILITY_APPLICANT_EMPLOYMENT_PROBATION
-        - VIABILITY_APPLICANT_SELF_EMPLOYMENT
-        - VIABILITY_APPLICANT_PARENTAL_ALLOWANCE
-        - VIABILITY_APPLICANT_AGE_LIMIT
-        - VIABILITY_APPLICANT_ALIMONY
-        - VIABILITY_FINANCING_LEASEHOLD
-        - VIABILITY_FINANCING_RAISE_CAPITAL
-        - VIABILITY_FINANCING_BRIDGING_LOAN
-        - VIABILITY_FINANCING_LOAN_QUOTA
-        - DESIRED_CONDITION
-        - REQUEST_CONDITION
-        - OTHER
-    PreInquiryRef:
-      type: object
-      required:
-        - id
-      properties:
-        _href:
-          x-skip-camel-case-check: true
-          allOf:
-            - $ref: '#/components/schemas/ResourceRef'
-        id:
-          $ref: '#/components/schemas/PreInquiryId'
-    PreInquiryRejectReason:
-      type: string
-      description: |
-        DE: Ablehnungsgründe für die Voranfrage (nicht abschließende Aufzählung). <br/> EN: Open ended enum contains the reject reasons for a PreInquiry.
-      x-extensible-enum:
-        - GROUND_PRICE
-        - LIMITED_OBJECT_USABILITY
-        - OBJECT_CONDITION =
-        - SPECIAL_OR_COLLECTOR_PROPERTY
-        - RETURNED_DEBIT
-        - CALC_HH_INCOME_TO_VOLUME
-        - CALC_HH_CREDITS
-        - CALC_HH_HIGH_INCOME_APPROACH
-        - CALC_HH_EXPENSES
-        - CALC_HH_NEGATIV_CAPTIAL
-        - INTERN_RED
-        - INCOME_TO_LOAN_RATIO
-        - EMPLOYMENT_DURATION
-        - LOAN_AMOUNT
-        - RENT_LOSS_RISK
-        - PROBATION
-        - SELF_EMPLOYMENT_DURATION
-        - MANIPULATION
-        - INSUFFICIENT_EVIDENCE
-        - UNKNOWN
-        - OTHER
     PredictedLoanPartnerDecisionDate:
       description: |
         DE: Voraussichtliches Entscheidungsdatum des Kreditgebers. <br/> EN: Predicted decision date of the loan partner.
@@ -9906,27 +9180,6 @@ components:
           description: Collection of the invalid content of the request
           items:
             $ref: '#/components/schemas/Violation'
-    RaiseCapitalReason:
-      type: object
-      required:
-        - type
-        - lendingValue
-        - usage
-        - burden
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_FINANCING_RAISE_CAPITAL
-        originalPurchase:
-          $ref: '#/components/schemas/OriginalPurchase'
-        lendingValue:
-          $ref: '#/components/schemas/EuroAmount'
-        usage:
-          $ref: '#/components/schemas/OtherCapitalNeededLoanUsage'
-        burden:
-          type: string
     RateDetails:
       type: object
       required:
@@ -10019,8 +9272,9 @@ components:
             - $ref: '#/components/schemas/EuroAmount'
         guarantee:
           description: |
-            DE: Sicherungsabtretung von Immobilienvermögen. Veraltet, ersetzt durch FinancingVenture.assignmentForSecurity.realEstateAssignedForSecurity.<br/>
-            EN: Other realestate for assignment for security. Deprected, replaced by FinancingVenture.assignmentForSecurity.realEstateAssignedForSecurity.
+            DE: Sicherungsabtretung von Immobilienvermögen.<br/>
+            EN: Other realestate for assignment for security.
+            @deprecated: Use FinancingVenture.assignmentForSecurity.realEstateAssignedForSecurity instead.
           deprecated: true
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
@@ -10158,7 +9412,14 @@ components:
           $ref: '#/components/schemas/RefuseSignContractReasonKey'
     RefuseSignContractReasonKey:
       type: string
+      description: |
+        DE: Grund für die Ablehnung des Vertrags, mögliche Werte sind NOTARY_APPOINTMENT_UNAVAILABLE=Notartermin kann nicht rechtzeitig stattfinden, OBJECT_UNAVAILABLE=Objekt hat sich zerschlagen, VENTURE_UNAVAILABLE=Vorhaben hat sich zerschlagen, CUSTOMER_DECIDED_DIFFERENT_PROVIDER=Kunde hat sich für einen anderen Finanzierungspartner entschieden, NO_CUSTOMER_INTEREST=Kunde hat sich nicht mehr gemeldet, OTHER=Nicht aufgeführter Grund EN: Reason for refusing contract, possible values are NOTARY_APPOINTMENT_UNAVAILABLE, OBJECT_UNAVAILABLE, VENTURE_UNAVAILABLE, CUSTOMER_DECIDED_DIFFERENT_PROVIDER, NO_CUSTOMER_INTEREST, OTHER
       x-extensible-enum:
+        - NOTARY_APPOINTMENT_UNAVAILABLE
+        - OBJECT_UNAVAILABLE
+        - VENTURE_UNAVAILABLE
+        - CUSTOMER_DECIDED_DIFFERENT_PROVIDER
+        - NO_CUSTOMER_INTEREST
         - OTHER
     RegisterCover:
       description: |
@@ -10263,22 +9524,6 @@ components:
       x-extensible-enum:
         - 34_C_GEWO
         - 34_I_GEWO
-    RejectPreInquiryCommand:
-      description: Reject a pre inquiry.
-      type: object
-      required:
-        - operation
-        - rejectReason
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: REJECT
-        remark:
-          type: string
-        rejectReason:
-          $ref: '#/components/schemas/PreInquiryRejectReason'
     RejectReason:
       type: object
       required:
@@ -10364,9 +9609,12 @@ components:
     RejectSubmissionCounterOfferReasonKey:
       type: string
       description: |
-        DE: offenes Enum enthält mögliche Gründe für die Ablehnung eines Gegenangebots, mögliche Werte sind (OTHER). EN: open ended enum contains possible counter offer rejection reasons, possible values are (OTHER).
+        DE: offenes Enum enthält mögliche Gründe für die Ablehnung eines Gegenangebots, mögliche Werte sind (CONDITION_NOT_ATTRACTIVE_FOR_CUSTOMER = Konditionen waren für den Kunden nicht attraktiv, CUSTOMER_DECIDED_DIFFERENT_PROVIDER=Kunden hat sich für einen anderen Finanzierungspartner (besseres Angebot) entschieden, CONDITION_NOT_FEASIBLE_FOR_CUSTOMER=Bedingung der Bank für den Kunden nicht darstellbar, OTHER=Nicht aufgeführter Grund). EN: open ended enum contains possible counter offer rejection reasons, possible values are (CONDITION_NOT_ATTRACTIVE_FOR_CUSTOMER, CUSTOMER_DECIDED_DIFFERENT_PROVIDER, CONDITION_NOT_FEASIBLE_FOR_CUSTOMER, OTHER).
       example: OTHER
       x-extensible-enum:
+        - CONDITION_NOT_ATTRACTIVE_FOR_CUSTOMER
+        - CUSTOMER_DECIDED_DIFFERENT_PROVIDER
+        - CONDITION_NOT_FEASIBLE_FOR_CUSTOMER
         - OTHER
     RejectSubmissionStatusChangedLogbookEntryDetails:
       type: object
@@ -10497,16 +9745,6 @@ components:
             EN: Reference to the Estate which the rent is associated with.
           allOf:
             - $ref: '#/components/schemas/EstateRef'
-    RequestConditionReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: REQUEST_CONDITION
     ResourceRef:
       required:
         - href
@@ -10600,9 +9838,12 @@ components:
     RevokeSubmissionCounterOfferReasonKey:
       type: string
       description: |
-        DE: Grund aus dem zurückgezogen wird: TIME = Kreditgeberwechsel (Bearbeitungszeit), COND = Kreditgeberwechsel (Konditionen), DOCS = Kreditgeberwechsel (Unterlagennachforderung), NO_OBJECT = Objekt hat sich zerschlagen, MAIN = Nur Hauptfinanzierung gewünscht, AUX = Nur Nachrangfinanzierung gewünscht, WRONG_BID = falsches Angebot eingereicht, ERROR_USE = Fehlerhafte Bedienung, ERROR_TEC = Technischer Fehler. <br/> EN: Reason for revocation, possible values are TIME, COND, DOCS, NO_OBJECT, MAIN, AUX, WRONG_BID, ERROR_USE, ERROR_TEC.
+        DE: Grund für den Entzug, mögliche Werte sind COUNTER_OFFER_EXPIRED=Gegenangebot kann nicht mehr aufrechterhalten werden, READJUST_COUNTER_OFFER=Gegenangebot soll nach Rücksprache nochmal angepasst werden, COUNTER_OFFER_NOT_ACCEPTED=Gegenangebot wird nicht angenommen, OTHER=Nicht aufgeführter Grund EN: Reason for revocation, possible values are COUNTER_OFFER_EXPIRED, READJUST_COUNTER_OFFER, COUNTER_OFFER_NOT_ACCEPTED, OTHER
       example: OTHER
       x-extensible-enum:
+        - COUNTER_OFFER_EXPIRED
+        - READJUST_COUNTER_OFFER
+        - COUNTER_OFFER_NOT_ACCEPTED
         - OTHER
     RevokeSubmissionRejectionCommand:
       description: command to revert a rejection of a submission during credit decision
@@ -10688,16 +9929,6 @@ components:
           nullable: true
         forcedSale:
           $ref: '#/components/schemas/ForeclosureSale'
-    SalesAdvisor:
-      type: object
-      required:
-        - userId
-        - companyId
-      properties:
-        userId:
-          $ref: '#/components/schemas/UserId'
-        companyId:
-          $ref: '#/components/schemas/CompanyId'
     SavingPlanTariff:
       type: object
       required:
@@ -10964,40 +10195,6 @@ components:
         - PROFIT_AND_LOSS_ACCOUNT
         - NO_METHOD
         - OTHER
-    SelfEmploymentJob:
-      type: object
-      required:
-        - applicantId
-      properties:
-        applicantId:
-          $ref: '#/components/schemas/ApplicantId'
-        isMainIncome:
-          type: boolean
-          nullable: true
-        percentageOfTotalIncome:
-          $ref: '#/components/schemas/Percentage'
-        jobDescription:
-          type: string
-        selfEmploymentStartDate:
-          $ref: '#/components/schemas/ISODate'
-        selfEmploymentIncome:
-          $ref: '#/components/schemas/PeriodicalEuroAmount'
-        shareHolding:
-          $ref: '#/components/schemas/ShareHolding'
-    SelfEmploymentReason:
-      type: object
-      required:
-        - type
-      allOf:
-        - $ref: '#/components/schemas/PreInquiryReason'
-      properties:
-        type:
-          type: string
-          default: VIABILITY_APPLICANT_SELF_EMPLOYMENT
-        selfEmploymentJobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/SelfEmploymentJob'
     SetSubmissionDataViolationsCommand:
       description: command to indicate submission violations
       type: object
@@ -11103,6 +10300,10 @@ components:
         type:
           type: string
           default: SOLVENCY
+        liabilityType:
+          $ref: '#/components/schemas/Liability'
+        contractNumber:
+          type: string
         residualDebt:
           description: |
             DE: Aktuelle Restschuld. <br/>
@@ -11307,6 +10508,56 @@ components:
           $ref: '#/components/schemas/CreditLoans'
         originInfo:
           $ref: '#/components/schemas/OriginInfo'
+    SubmissionAwaitExternalProcessingStatus:
+      type: object
+      description: |
+        EN: Status containing information about external processing
+      required:
+        - type
+        - changedOn
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: AWAIT_EXTERNAL_PROCESSING
+        externalProcessing:
+          $ref: '#/components/schemas/ExternalProcessing'
+    SubmissionContractCanceledStatus:
+      type: object
+      description: |
+        EN: Status containing information about cancelling the contract
+      required:
+        - type
+        - changedOn
+        - reason
+        - cancellationDate
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: CONTRACT_CANCELED
+        reason:
+          $ref: '#/components/schemas/CancelContractReason'
+        cancellationDate:
+          $ref: '#/components/schemas/ISODate'
+    SubmissionContractSignRefusedStatus:
+      type: object
+      description: |
+        EN: Status containing information about refusing to sign the contract
+      required:
+        - type
+        - changedOn
+        - refuseReason
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: CONTRACT_SIGN_REFUSED
+        refuseReason:
+          $ref: '#/components/schemas/RefuseSignContractReason'
     SubmissionCounterOffer:
       type: object
       properties:
@@ -11348,6 +10599,22 @@ components:
             - $ref: '#/components/schemas/ISODate'
         remark:
           type: string
+    SubmissionCounterOfferCreatedStatus:
+      type: object
+      description: |
+        EN: Status containing information about counteroffer that was created
+      required:
+        - type
+        - changedOn
+        - offer
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: COUNTER_OFFER_CREATED
+        offer:
+          $ref: '#/components/schemas/SubmissionCounterOffer'
     SubmissionCounterOfferId:
       type: object
       required:
@@ -11357,6 +10624,22 @@ components:
       properties:
         value:
           type: string
+    SubmissionCounterOfferRejectedStatus:
+      type: object
+      description: |
+        EN: Status containing information about counteroffer that was rejected
+      required:
+        - type
+        - changedOn
+        - reason
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: COUNTER_OFFER_REJECTED
+        reason:
+          $ref: '#/components/schemas/RejectSubmissionCounterOfferReason'
     SubmissionDataViolation:
       description: a specific submission violation
       type: object
@@ -11500,13 +10783,24 @@ components:
       description: |
         DE: Generelle Informationen ueber den Kreditantrag. <br/> EN: General information about a specific submission.
       properties:
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
         submittedAt:
           description: |
             DE: Datum der Einreichung. <br/>
             EN: Date when this submission has been submitted.
           allOf:
             - $ref: '#/components/schemas/ISODateTime'
+        reviewedAt:
+          description: |
+            DE: Datum der Überprüfung. <br/>
+            EN: Date when this submission has been reviewed.
+          allOf:
+            - $ref: '#/components/schemas/ISODateTime'
         initialEstimate:
+          deprecated: true
+          description: |
+            @deprecated: Use field timeline instead.
           $ref: '#/components/schemas/InitialSubmissionEstimate'
         timeline:
           description: |
@@ -11547,6 +10841,27 @@ components:
             - $ref: '#/components/schemas/ResourceRef'
         embedded:
           $ref: '#/components/schemas/SubmissionOverview'
+    SubmissionProcessingPausedStatus:
+      type: object
+      description: |
+        EN: Status containing information about pausing the processing
+      required:
+        - type
+        - changedOn
+        - reason
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: PROCESSING_PAUSED
+        reason:
+          $ref: '#/components/schemas/PauseReason'
+        dueDate:
+          $ref: '#/components/schemas/ISODate'
+        predictedDaysPost:
+          type: integer
+          format: int32
     SubmissionProcessingPausedStatusLogbookEntryDetails:
       type: object
       required:
@@ -11586,6 +10901,25 @@ components:
             - $ref: '#/components/schemas/ResourceRef'
         id:
           $ref: '#/components/schemas/SubmissionId'
+    SubmissionRejectedStatus:
+      type: object
+      description: |
+        EN: Status containing information about rejection
+      required:
+        - type
+        - changedOn
+        - rejection
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: REJECTED
+        reasons:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/RejectReason'
     SubmissionRejection:
       type: object
       required:
@@ -11620,6 +10954,91 @@ components:
         - WRONG_BID
         - ERROR_USE
         - ERROR_TEC
+        - TERMINATION
+        - REALLOCATION
+        - OTHER
+    SubmissionRevokedReasonType:
+      type: string
+      description: |
+        DE: Mögliche Gründe für einen Widerruf des Darlehensvertrags <br/> EN: Possible reasons for revocation of the loan agreement
+      example: TIME
+      x-extensible-enum:
+        - TIME
+        - COND
+        - DOCS
+        - NO_OBJECT
+        - MAIN
+        - AUX
+        - WRONG_BID
+        - ERROR_USE
+        - ERROR_TEC
+        - TERMINATION
+        - REALLOCATION
+        - OTHER
+    SubmissionRevokedStatus:
+      type: object
+      description: |
+        EN: Status containing information about revocation
+      required:
+        - type
+        - changedOn
+        - revocation
+      allOf:
+        - $ref: '#/components/schemas/SubmissionStatus'
+      properties:
+        type:
+          type: string
+          default: REVOKED
+        reason:
+          type: string
+          description: |
+            EN: Revocation reason
+        reasonDescription:
+          type: string
+          description: |
+            EN: Short description of the revocation reason
+        reasonType:
+          $ref: '#/components/schemas/SubmissionRevokedReasonType'
+        revokedOn:
+          $ref: '#/components/schemas/ISODate'
+    SubmissionStatus:
+      type: object
+      description: |
+        EN: Basic submission status representation
+      required:
+        - type
+        - changedOn
+      properties:
+        type:
+          $ref: '#/components/schemas/SubmissionStatusType'
+        remark:
+          description: short comment regarding the status
+          type: string
+        changedOn:
+          description: timestamp as of the status has been set.
+          allOf:
+            - $ref: '#/components/schemas/ISODateTime'
+      discriminator:
+        propertyName: type
+        mapping:
+          REJECTED: '#/components/schemas/SubmissionRejectedStatus'
+          CONTRACT_DELIVERED: '#/components/schemas/ContractDeliveredStatus'
+          CONTRACT_SIGNED: '#/components/schemas/ContractSignedStatus'
+          INWORK: '#/components/schemas/SubmissionStatus'
+          APPROVED: '#/components/schemas/SubmissionStatus'
+          REJECTION_REVOKED: '#/components/schemas/SubmissionStatus'
+          AWAIT_EXTERNAL_PROCESSING: '#/components/schemas/SubmissionAwaitExternalProcessingStatus'
+          CREATED: '#/components/schemas/SubmissionStatus'
+          SUBMITTED: '#/components/schemas/SubmissionStatus'
+          AVAILABLE_FOR_DECISION: '#/components/schemas/SubmissionStatus'
+          REVOKED: '#/components/schemas/SubmissionRevokedStatus'
+          COUNTER_OFFER_CREATED: '#/components/schemas/SubmissionCounterOfferCreatedStatus'
+          COUNTER_OFFER_ACCEPTED: '#/components/schemas/SubmissionStatus'
+          COUNTER_OFFER_REJECTED: '#/components/schemas/SubmissionCounterOfferRejectedStatus'
+          PROCESSING_PAUSED: '#/components/schemas/SubmissionProcessingPausedStatus'
+          CONTRACT_SIGN_REFUSED: '#/components/schemas/SubmissionContractSignRefusedStatus'
+          CONTRACT_CANCELED: '#/components/schemas/SubmissionContractCanceledStatus'
+          CONFIRMED: '#/components/schemas/ConfirmedSubmissionStatus'
     SubmissionStatusChangedLogbookEntry:
       type: object
       required:
@@ -11679,6 +11098,31 @@ components:
         - COUNTER_OFFER_CREATED
         - COUNTER_OFFER_ACCEPTED
         - COUNTER_OFFER_REJECTED
+    SubmissionStatusType:
+      type: string
+      description: |
+        DE: Mögliche Status der Einreichung (nicht abschließende Aufzählung), z.B. (REJECTED, CONTRACT_DELIVERED) <br/> EN: Open ended enum contains submission status value, possible values are (REJECTED, CONTRACT_DELIVERED)
+      example: REJECTED
+      x-extensible-enum:
+        - REJECTED
+        - CONTRACT_DELIVERED
+        - CONTRACT_SIGNED
+        - INWORK
+        - APPROVED
+        - REJECTION_REVOKED
+        - AWAIT_EXTERNAL_PROCESSING
+        - CREATED
+        - SUBMITTED
+        - AVAILABLE_FOR_DECISION
+        - REVOKED
+        - ANONYMIZED
+        - COUNTER_OFFER_CREATED
+        - COUNTER_OFFER_ACCEPTED
+        - COUNTER_OFFER_REJECTED
+        - PROCESSING_PAUSED
+        - CONTRACT_SIGN_REFUSED
+        - CONTRACT_CANCELED
+        - CONFIRMED
     SubmissionTimeline:
       type: object
       description: |
@@ -11699,19 +11143,6 @@ components:
             $ref: '#/components/schemas/SubmissionItem'
         paging:
           $ref: '#/components/schemas/Paging'
-    SubmitPreInquiryCommand:
-      description: Submit a pre inquiry to be visible to the loan partner.
-      type: object
-      required:
-        - operation
-      allOf:
-        - $ref: '#/components/schemas/ModifyPreInquiryCommand'
-      properties:
-        operation:
-          type: string
-          default: SUBMIT
-        remark:
-          type: string
     SuspendedAmortizationBuildingSavingProduct:
       type: object
       required:
