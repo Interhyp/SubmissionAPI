@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 2.7.0
+  version: 2.10.2
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -133,8 +133,10 @@ info:
     By using the [OpenAPI-Spec generator](https://github.com/OpenAPITools/openapi-generator), you can easily generate an API client stub.
     > **Tip:** This API could be also viewed in [swagger editor](https://editor.swagger.io/) by copy/paste the content of this document in the editor.
 servers:
-  - url: https://api-test.interhyp.de/submission
+  - url: https://api-dev.ehyphome.de/submission
     description: Test-Staging
+  - url: https://api-acc.ehyphome.de/submission
+    description: Acceptance-Staging
   - url: https://api.interhyp.de/submission
     description: Production
 tags:
@@ -1244,10 +1246,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/handover-documents:
+    get:
+      summary: Get handover documents
+      description: |-
+        Delivers metadata regarding the system generated reports for a specific submission.
+        Handover reports including but not limited to
+          - Übergabeprotokoll (Handover protocol)
+
+          - Provideranschreiben (Provider cover letter)
+
+          - Überarbeiteter Antrag (Revised application)
+
+          - Kalkulation (Condition calculation)
+
+          - HH-Rechnung (Household calculation)
+      operationId: getHandoverDocuments
+      tags:
+        - submissions
+      parameters:
+        - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Requested meta data are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditDecisionDocumentMetaData'
+              example: '{ "documents": [ { "submissionId": "de-20230227-en9lndd-ev3y1",
+                "documentId": "63a86906-ad38-45bc-a10e-c1d0b8978af5", "documentType":
+                "CONDITION_CALCULATION", "documentName": "condition calculation",
+                "createdAt": "2019-12-29T10:22:50Z", "href": { "href": "https://api.interhyp.de/submission/v2/submissions/de-20230424-krczwx6-5sves/handover/reports/NDMzOTk4Mi1QUk9WSURFUl9DT1ZFUl9MRVRURVItUHJvdmlkZXJhbnNjaHJlaWJlbg=="
+                } } ] }'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-07T17:49:39.995Z", "title": "Bad Request",
+                "status": 400, "traceId": "64077933c36912de13fb3cd7ae0c00c8", "instance":
+                "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+              example: '{ "error": "invalid token", "error_description": "Access token
+                expired", }'
+        '403':
+          description: Error indicates insufficient privileges to create/access the
+            resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Forbidden",
+                "status": 403, "traceId": "64077933c36912de13fb3cd7ae0c00c8", "instance":
+                "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
+                Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
+                "instance": "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
   /v2/submissions/{submissionId}/handover/reports:
     get:
       summary: Get handover reports
+      deprecated: true
       description: |-
+        @deprecated: Please use instead endpoint: '/v2/submissions/{submissionId}/handover-documents:'
         Delivers metadata regarding the system generated reports for a specific submission.
         Handover reports including but not limited to
           - Übergabeprotokoll
@@ -1957,6 +2029,11 @@ components:
             EN: Amortisation rate (percent per period).
           allOf:
             - $ref: '#/components/schemas/PeriodicalPercentage'
+        fullAmortizer:
+          type: boolean
+          description: |
+            DE: Volltilger. <br/>
+            EN: Full Amortizer.
     Apartment:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "APARTMENT" (Wohnung). <br/>
@@ -2130,6 +2207,13 @@ components:
             \ applicants, they will only be listed once.\n"
           items:
             $ref: '#/components/schemas/Child'
+        additionalInfos:
+          description: |
+            DE: Zusätzliche Details für den Antragsteller (Schlüssel-Werte Paar). <br/>
+            EN: Additional applicant details (key-value pairs).
+          type: array
+          items:
+            $ref: '#/components/schemas/AdditionalInfo'
     ApplicantId:
       type: object
       required:
@@ -2370,6 +2454,14 @@ components:
           description: |
             DE: Sicherungsabtretung aus Bausparguthaben.<br/>
             EN: Home savings plans assigned for security.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        stockForSecurity:
+          description: Stock amount for security.
+          allOf:
+            - $ref: '#/components/schemas/EuroAmount'
+        lifeInsuranceForSecurity:
+          description: Life insurance policies for security.
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
     AtticDetail:
@@ -2741,10 +2833,13 @@ components:
       example: AGRICULTURE
       x-extensible-enum:
         - AGRICULTURE
+        - ADMINISTRATION
+        - AUTOMOTIVE
         - CAR_DEALER
         - CAR_REPAIR
         - CHURCH
         - CONSTRUCTION_INDUSTRY
+        - CONSULTING_AND_ADVISORY
         - COURIER_SERVICE
         - DATING_SERVICE
         - EDUCATION
@@ -2756,9 +2851,11 @@ components:
         - GAS_STATION
         - GASTRONOMY
         - HANDCRAFT
+        - HAULIER
         - HEALTH_SERVICE
         - HOTEL_INDUSTRY
         - IT_CONSULTING
+        - IT_AND_PROGRAMMING
         - KIOSK
         - PRODUCTION_AND_INDUSTRY
         - PUBLIC_SERVICE
@@ -2786,6 +2883,7 @@ components:
         - MANUFACTURING_INDUSTRY
         - PASSENGER_TRANSPORT
         - TEMP_EMPLOYMENT_AGENCY
+        - VIDEO_STORE
         - OTHER
     BuyExistingEstateFinancing:
       description: |
@@ -3164,6 +3262,20 @@ components:
       x-extensible-enum:
         - INTERHYP_ASP
         - COBA_ASP
+    CloseRejectedSubmissionCommand:
+      description: command to close rejected submission if new active component was
+        detected that matches with previously rejected component.
+      type: object
+      required:
+        - operation
+      allOf:
+        - $ref: '#/components/schemas/ModifySubmissionCommand'
+      properties:
+        operation:
+          type: string
+          default: CLOSE_REJECTED_SUBMISSION
+        remark:
+          type: string
     ClosedPropertySale:
       required:
         - reason
@@ -3408,7 +3520,6 @@ components:
         EN: Status containing information about confirming the submission
       required:
         - confirmedAt
-        - loans
         - type
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -3529,7 +3640,6 @@ components:
         EN: Status containing information about delivered contract
       required:
         - type
-        - changedOn
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
       properties:
@@ -3620,7 +3730,6 @@ components:
         EN: Status containing information about signed contract
       required:
         - type
-        - changedOn
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
       properties:
@@ -3893,6 +4002,13 @@ components:
             $ref: '#/components/schemas/CreditLoan'
         offer:
           $ref: '#/components/schemas/SubmissionCounterOffer'
+    CreditDecisionDocumentMetaData:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentMetaData'
     CreditLoan:
       type: object
       description: |
@@ -4225,14 +4341,16 @@ components:
         - ENTRY
         - SUB_TOTAL
     DocumentId:
-      type: object
       required:
         - value
-      description: |
-        DE: ID vom Dokument. EN: Id of the document.
       properties:
         value:
           type: string
+          description: |
+            An Id refers to a specific document resource.
+      type: object
+      description: |
+        DE: ID vom Dokument. EN: Id of the document.
     DocumentLogbookEntry:
       type: object
       required:
@@ -4247,6 +4365,32 @@ components:
           default: UPLOADED_DOCUMENT
         documentName:
           type: string
+    DocumentMetaData:
+      type: object
+      properties:
+        submissionId:
+          $ref: '#/components/schemas/SubmissionId'
+        documentId:
+          $ref: '#/components/schemas/DocumentId'
+        documentType:
+          type: string
+          description: |
+            A type refers to a specific document resource.
+          x-extensible-enum:
+            - CONDITION_CALCULATION
+            - CONDITION_CALCULATION_KFW
+            - HANDOVER_PROTOCOL
+            - HOUSEHOLD_CALCULATION
+            - MORTGAGE_LENDING_VALUE_CALCULATION
+            - REVISED_FUNDING_APPLICATION
+        documentName:
+          type: string
+          description: |
+            A name refers to a specific document resource.
+        href:
+          $ref: '#/components/schemas/ResourceRef'
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
     Duration:
       description: |
         DE: Dauer in Jahren, Monaten oder Tagen. <br/> EN: Duration in years, months, days.
@@ -4285,8 +4429,6 @@ components:
           $ref: '#/components/schemas/ParentalLeave'
     EnergyEfficiency:
       type: object
-      required:
-        - energyEfficiencyStandard
       description: |
         DE: Information die Energie effizient. <br/> EN: Information the regarding the energy efficency.
       properties:
@@ -4301,6 +4443,21 @@ components:
             - KFW_EFFIZIENZHAUS_85
             - KFW_EFFIZIENZHAUS_100
             - KFW_EFFIZIENZHAUS_DENKMAL
+            - OTHER
+        energyEfficiencyClass:
+          type: string
+          description: |
+            DE: Energieausweis für Wohngebäude<br/> EN: Energy certificate for residential buildings
+          x-extensible-enum:
+            - A_PLUS
+            - A
+            - B
+            - C
+            - D
+            - E
+            - F
+            - G
+            - H
             - OTHER
         description:
           type: string
@@ -4449,7 +4606,7 @@ components:
       x-extensible-enum:
         - OPERATIONAL_COSTS
         - REPAY_ANOTHER_LOAN
-        - PREPAYMENT_PENALTYC
+        - PREPAYMENT_PENALTY
         - CONSTRUCTION
         - RENOVATION
         - OTHER
@@ -5684,6 +5841,11 @@ components:
             EN: End date of the fixed interest rate.
           allOf:
             - $ref: '#/components/schemas/ISODate'
+        bulletLoan:
+          type: boolean
+          description: |
+            DE: Endfällig. <br/>
+            EN: Bullet loan.
     ForeclosureSale:
       description: |
         DE: Information über Zwangsversteigerung. <br/> EN: Information about foreclosure sale.
@@ -5792,6 +5954,7 @@ components:
         - HEALERMASSEUR
         - HEALER
         - HISTORIAN
+        - HR_CONSULTANT
         - COMPUTER_SPEC
         - ENGINEER
         - INSOLVENCY_ADMIN
@@ -5813,6 +5976,7 @@ components:
         - PHYSTHERAP
         - INTER_DECORATOR
         - RADIO_ANNOUNCER
+        - REMEDIAL_GYMNAST
         - EXPERT
         - TOWN_PLANER
         - STRUCT_ENG
@@ -5852,7 +6016,15 @@ components:
           type: string
           description: |
             DE: Hinweise des Beraters. <br/> EN: Hints provided by the financing advisor.
+        documents:
+          description: Link to retrieve list of handover documents
+          allOf:
+            - $ref: '#/components/schemas/ResourceRef'
+          example: https://api.interhyp.de/submission/v2/submissions/de-20230424-krczwx6-5sves/handover-documents
         handoverReports:
+          deprecated: true
+          description: |
+            @deprecated: Please use field documents to get list of handover documents
           type: array
           items:
             $ref: '#/components/schemas/HandoverReport'
@@ -6316,8 +6488,8 @@ components:
         DE: Datum, Syntax nach <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a><br/> EN: Date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a>
       type: string
       format: date-time
-      nullable: true
       example: 2019-12-29T10:22:50Z
+      nullable: true
     Iban:
       type: object
       description: |
@@ -7024,8 +7196,8 @@ components:
           $ref: '#/components/schemas/LoanPartnerProcessingUnit'
         financedMortgageProperty:
           description: |
-            DE: Referenz zu dem Beleihungsobjekt. <br/>
-            EN: Reference to the lending object.
+            DE: Referenz zu einem Beleihungsobjekt. <br/>
+            EN: Reference to a lending object.
           allOf:
             - $ref: '#/components/schemas/EstateRef'
         contractNumber:
@@ -7034,6 +7206,10 @@ components:
             DE: Darlehensnummer / Vertragsnummer. <br/> EN: Loan number / contract number.
         commission:
           $ref: '#/components/schemas/CommissionInfo'
+        isSecuredByLandRegister:
+          type: boolean
+          description: |
+            DE: Ist das Darlehen grundpfandrechtlich besichert? <br /> EN: Is the loan secured by land register?
       discriminator:
         propertyName: type
         mapping:
@@ -7570,6 +7746,11 @@ components:
             EN: Main loan product type.
           allOf:
             - $ref: '#/components/schemas/MainProductType'
+        productName:
+          description: |
+            DE: Name des Hauptdarlehensproduktes. <br/>
+            EN: Main loan product name.
+          type: string
       discriminator:
         propertyName: product
         mapping:
@@ -7774,6 +7955,7 @@ components:
             - SET_SUBMISSION_DATA_VIOLATIONS
             - REFUSE_SIGN_CONTRACT
             - CHANGE_LOAN_PARTNER_PROCESSING_UNIT
+            - CLOSE_REJECTED_SUBMISSION
       discriminator:
         propertyName: operation
         mapping:
@@ -7800,6 +7982,7 @@ components:
           SET_SUBMISSION_DATA_VIOLATIONS: '#/components/schemas/SetSubmissionDataViolationsCommand'
           REFUSE_SIGN_CONTRACT: '#/components/schemas/RefuseSignContractCommand'
           CHANGE_LOAN_PARTNER_PROCESSING_UNIT: '#/components/schemas/ChangeLoanPartnerProcessingUnitCommand'
+          CLOSE_REJECTED_SUBMISSION: '#/components/schemas/CloseRejectedSubmissionCommand'
     Nationality:
       type: object
       required:
@@ -8085,6 +8268,7 @@ components:
         EN: Open ended enum contains other capital needed loan usage, possible values are OPERATIONAL_COSTS, REPAY_ANOTHER_LOAN, PREPAYMENT_PENALTY, RESIDENTIAL_USE, RENEWABLE_ENERGY, DISBURSMENT_COOWNERS, DISBURSMENT_HEIRS, OTHER, RECONSTRUCTION, BUY, CONSTRUCTION, BUY_CONSTRUCTION, SUPPLEMENTARY_FINANCING.
       example: OPERATIONAL_COSTS
       x-extensible-enum:
+        - REFINANCE
         - OPERATIONAL_COSTS
         - REPAY_ANOTHER_LOAN
         - PREPAYMENT_PENALTY
@@ -10000,6 +10184,12 @@ components:
             DE: Sparbeiträge insgesamt. <br/> EN: The sum of the rates payed in the savings phase.
           allOf:
             - $ref: '#/components/schemas/EuroAmount'
+        specialPayments:
+          type: array
+          description: |
+            DE: Sonderzahlungen. <br/> EN: Special payments.
+          items:
+            $ref: '#/components/schemas/PeriodicalEuroAmount'
     SavingsPlanFees:
       type: object
       properties:
@@ -10321,6 +10511,12 @@ components:
             EN: Expiry of the fixed interest rate.
           allOf:
             - $ref: '#/components/schemas/ISODate'
+        burden:
+          description: |
+            DE: Periodische Rate (z.B. monatliche Rate). <br/>
+            EN: Periodical payment amount (e.g. rate per month).
+          allOf:
+            - $ref: '#/components/schemas/PeriodicalEuroAmount'
     SpecialHouseCharacteristics:
       description: |
         DE: Spezielle Nutzung des Hauses. <br/> EN: Special use of the house.
@@ -10514,7 +10710,6 @@ components:
         EN: Status containing information about external processing
       required:
         - type
-        - changedOn
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
       properties:
@@ -10529,7 +10724,6 @@ components:
         EN: Status containing information about cancelling the contract
       required:
         - type
-        - changedOn
         - reason
         - cancellationDate
       allOf:
@@ -10548,7 +10742,6 @@ components:
         EN: Status containing information about refusing to sign the contract
       required:
         - type
-        - changedOn
         - refuseReason
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -10605,7 +10798,6 @@ components:
         EN: Status containing information about counteroffer that was created
       required:
         - type
-        - changedOn
         - offer
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -10630,7 +10822,6 @@ components:
         EN: Status containing information about counteroffer that was rejected
       required:
         - type
-        - changedOn
         - reason
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -10686,12 +10877,16 @@ components:
       type: string
       format: binary
     SubmissionId:
-      type: object
-      description: |
-        An Id refers to a specific submission resource.
+      required:
+        - value
       properties:
         value:
           type: string
+          description: |
+            An Id refers to a specific submission resource.
+      type: object
+      description: |
+        An Id refers to a specific submission resource.
     SubmissionItem:
       type: object
       description: |
@@ -10847,7 +11042,6 @@ components:
         EN: Status containing information about pausing the processing
       required:
         - type
-        - changedOn
         - reason
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -10907,7 +11101,6 @@ components:
         EN: Status containing information about rejection
       required:
         - type
-        - changedOn
         - rejection
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -10981,7 +11174,6 @@ components:
         EN: Status containing information about revocation
       required:
         - type
-        - changedOn
         - revocation
       allOf:
         - $ref: '#/components/schemas/SubmissionStatus'
@@ -11007,7 +11199,6 @@ components:
         EN: Basic submission status representation
       required:
         - type
-        - changedOn
       properties:
         type:
           $ref: '#/components/schemas/SubmissionStatusType'
@@ -11039,6 +11230,7 @@ components:
           CONTRACT_SIGN_REFUSED: '#/components/schemas/SubmissionContractSignRefusedStatus'
           CONTRACT_CANCELED: '#/components/schemas/SubmissionContractCanceledStatus'
           CONFIRMED: '#/components/schemas/ConfirmedSubmissionStatus'
+          REJECTED_AND_CLOSED: '#/components/schemas/SubmissionStatus'
     SubmissionStatusChangedLogbookEntry:
       type: object
       required:
@@ -11068,6 +11260,7 @@ components:
           PROCESSING_PAUSED: '#/components/schemas/SubmissionProcessingPausedStatusLogbookEntryDetails'
           INWORK: '#/components/schemas/DefaultSubmissionStatusChangedLogbookEntryDetails'
           APPROVED: '#/components/schemas/DefaultSubmissionStatusChangedLogbookEntryDetails'
+          REJECTED_AND_CLOSED: '#/components/schemas/DefaultSubmissionStatusChangedLogbookEntryDetails'
           PROCESSING_RESUMED: '#/components/schemas/SubmissionProcessingResumedStatusLogbookEntryDetails'
           CANCELED: '#/components/schemas/DefaultSubmissionStatusChangedLogbookEntryDetails'
           CONFIRMED: '#/components/schemas/DefaultSubmissionStatusChangedLogbookEntryDetails'
@@ -11123,6 +11316,7 @@ components:
         - CONTRACT_SIGN_REFUSED
         - CONTRACT_CANCELED
         - CONFIRMED
+        - REJECTED_AND_CLOSED
     SubmissionTimeline:
       type: object
       description: |
@@ -11223,6 +11417,10 @@ components:
           type: string
         combinedProduct:
           $ref: '#/components/schemas/SuspendedAmortizationCombinedProduct'
+        debtId:
+          description: Id of an existing mortgage saving plan
+          allOf:
+            - $ref: '#/components/schemas/DebtId'
     SuspendedAmortizationOtherProduct:
       type: object
       required:
@@ -11501,7 +11699,9 @@ components:
         DE: Kosten für das Tilgungssurrogat in den Folgeperioden. <br/> EN: Upcoming payments for repayment surrogate product.
       properties:
         upcomingFees:
+          deprecated: true
           description: |
+            @deprecated: Upcoming fees are inadmissible. This was decided by the Federal Court of Justice in its ruling of November 15, 2022.
             DE: Höhe der wiederkehrenden Kosten. <br/>
             EN: Upcoming costs.
           allOf:
@@ -11703,6 +11903,18 @@ components:
             DE: Beschreibung für bestehende Darlehen. <br/>
             EN: Description of the existing loan.
           type: string
+        contractNumber:
+          type: string
+          description: Contract number.
+        burden:
+          description: |
+            DE: Periodische Rate (z.B. monatliche Rate). <br/> EN: Periodical payment amount (e.g. rate per month).
+          allOf:
+            - $ref: '#/components/schemas/PeriodicalEuroAmount'
+        debtor:
+          description: The existing mortgage saving plan bank.
+          allOf:
+            - $ref: '#/components/schemas/Debitor'
     VentureRelevantLoanType:
       type: object
       required:
