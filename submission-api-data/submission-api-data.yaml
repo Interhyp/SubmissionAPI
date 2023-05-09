@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 2.10.2
+  version: 2.10.3
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -1603,12 +1603,17 @@ paths:
                 $ref: '#/components/schemas/RFC7807Problem'
 security:
   - BearerAuth: []
+  - ApiKey: []
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    ApiKey:
+      type: apiKey
+      in: header
+      name: Api-Key
   parameters:
     applicant-id:
       name: applicantId

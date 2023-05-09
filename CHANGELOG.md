@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v2.10.3
+- added API key as header to securitySchema for all endpoints
+
 ### v2.10.2
 - Added new properties: 
   - SuspendedAmortizationDetails
