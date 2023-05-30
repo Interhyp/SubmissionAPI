@@ -1,5 +1,11 @@
 # Submission Data API
 
+### v2.12.1
+* Added new endpoint specification `/v2/info` that allows to check service status and version of the currently used API specs
+* Adjust API description for API key and Bearer Auth
+* reworked structure of specialPayments in SavingsPlanBurden to now hold the period when a special payment is due
+* New modernisation measures: `HEAT_PROTECTION`, `VENTILATION_SYSTEM`, `DIGITAL_ENERGY_OPTIMISATION`
+
 ### v2.10.3
 - added API key as header to securitySchema for all endpoints
 

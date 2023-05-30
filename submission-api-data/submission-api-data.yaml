@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 2.10.3
+  version: 2.12.1
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -150,6 +150,9 @@ tags:
     description: provides endpoints to access submission logbook
   - name: commands
     description: provides endpoints to access to commands sent to the submission API
+  - name: info
+    description: provides basic info about service status and version of the submission
+      API specs used
 paths:
   /v2/commands/{commandId}:
     get:
@@ -934,6 +937,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/info:
+    get:
+      summary: Get Submission API service status and info
+      description: Delivers information about Submission API service status and basic
+        information about the current version
+      operationId: getServiceInfo
+      tags:
+        - info
+      responses:
+        '200':
+          description: Service Info is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceInfo'
+              example: ' { "apiSpecificationVersion" : "1.0.0" }'
+        '401':
+          description: Error indicates no access to the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+              example: '{ "error": "invalid token", "error_description": "Access token
+                expired", }'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+              example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
+                Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
+                "instance": "/v2/info" }'
   /v2/submissions:
     get:
       summary: Delivers all active submissions for a specific financing partner.
@@ -1602,18 +1638,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
 security:
-  - BearerAuth: []
   - ApiKey: []
+    BearerAuth: []
 components:
   securitySchemes:
     BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      $ref: '#/components/securitySchemes/StandardBearerAuth'
     ApiKey:
+      $ref: '#/components/securitySchemes/StandardApiKey'
+    StandardApiKey:
       type: apiKey
       in: header
       name: Api-Key
+      description: API keys are unique codes issued by an API provider that allow
+        partners to access specific API resources. By requiring an API key, the provider
+        can ensure that only authorized clients are accessing the API and can prevent
+        potential abuse or unauthorized access.
+    StandardBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT stands for JSON Web Token and is a type of bearer token that
+        is commonly used for authentication and authorization purposes. Once retrieved,
+        the token is sent with each request and grants access to the associated resource
+        until it expires or is revoked. Thus, it is a compact, URL-safe means of representing
+        a user's claims to access a resource without providing additional credentials.
   parameters:
     applicant-id:
       name: applicantId
@@ -4397,26 +4446,27 @@ components:
         createdAt:
           $ref: '#/components/schemas/ISODateTime'
     Duration:
-      description: |
-        DE: Dauer in Jahren, Monaten oder Tagen. <br/> EN: Duration in years, months, days.
       type: object
+      title: Duration
+      description: |
+        DE: Gibt einen Zeitraum an. </br> EN: Specifies a duration.
       required:
         - value
         - unit
       properties:
         value:
-          description: |
-            DE: Anzahl. <br/> EN: Amount.
           type: integer
           format: int32
-        unit:
           description: |
-            DE: Zeiteinheit. <br/> EN: time unit.
+            DE: Die Menge der gewählten Zeiteinheit. </br> EN: The amount of the selected temporal unit.
+        unit:
           type: string
           enum:
             - YEARS
             - MONTHS
             - DAYS
+          description: |
+            DE: Die Zeiteinheit. </br> EN: The temporal unit.
     Employment:
       type: object
       description: |
@@ -6486,7 +6536,6 @@ components:
         DE: Datum, Syntax nach <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a><br/> EN: Date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a>
       type: string
       format: date
-      nullable: true
       example: 2019-12-29T00:00:00Z
     ISODateTime:
       description: |
@@ -6494,7 +6543,6 @@ components:
       type: string
       format: date-time
       example: 2019-12-29T10:22:50Z
-      nullable: true
     Iban:
       type: object
       description: |
@@ -7912,7 +7960,7 @@ components:
     ModernisationTypeKey:
       type: string
       description: |
-        DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER).
+        DE: Typ der Modernisierung (nicht abschließende Aufzählung), z.B. (ELECTRIC, FASSADE, FLOOR_PLAN=Raumaufteilung, FLOORING=Bodenbeläge, HEATING, INSTALLATION, INSULATION=Wärmedämmung, ROOF, SANITARY=Sanitärobjekte, WINDOW, OTHER, HEAT_PROTECTION = Wärmeschutz, VENTILATION_SYSTEM = Lüftungsanlagen, DIGITAL_ENERGY_OPTIMISATION = Digitale Systeme zur Energieoptimierung). <br/> EN: Open ended enum contains types of modernisation, possible values are (ELECTRIC, FASSADE, FLOOR_PLAN, FLOORING, HEATING, INSTALLATION, INSULATION, ROOF, SANITARY, WINDOW, OTHER, HEAT_PROTECTION, VENTILATION_SYSTEM, DIGITAL_ENERGY_OPTIMISATION).
       example: ELECTRIC
       x-extensible-enum:
         - ELECTRIC
@@ -7926,6 +7974,9 @@ components:
         - SANITARY
         - WINDOW
         - OTHER
+        - HEAT_PROTECTION
+        - VENTILATION_SYSTEM
+        - DIGITAL_ENERGY_OPTIMISATION
     ModifySubmissionCommand:
       type: object
       required:
@@ -9323,6 +9374,7 @@ components:
             - $ref: '#/components/schemas/EuroAmount'
     RFC7807Problem:
       type: object
+      title: RFC7807Problem
       description: Holds information regarding the returned error
       required:
         - timestamp
@@ -10194,7 +10246,27 @@ components:
           description: |
             DE: Sonderzahlungen. <br/> EN: Special payments.
           items:
-            $ref: '#/components/schemas/PeriodicalEuroAmount'
+            $ref: '#/components/schemas/SavingsPlanBurdenSpecialPayment'
+    SavingsPlanBurdenSpecialPayment:
+      type: object
+      required:
+        - period
+        - amount
+      properties:
+        period:
+          $ref: '#/components/schemas/SavingsPlanBurdenSpecialPaymentPeriod'
+        amount:
+          $ref: '#/components/schemas/EuroAmount'
+    SavingsPlanBurdenSpecialPaymentPeriod:
+      type: object
+      required:
+        - from
+        - to
+      properties:
+        from:
+          $ref: '#/components/schemas/ISODate'
+        to:
+          $ref: '#/components/schemas/ISODate'
     SavingsPlanFees:
       type: object
       properties:
@@ -10390,6 +10462,14 @@ components:
         - PROFIT_AND_LOSS_ACCOUNT
         - NO_METHOD
         - OTHER
+    ServiceInfo:
+      type: object
+      description: |
+        DE: Informationen zum Dienst Submission API <br/> EN: Information about Submission API service
+      properties:
+        apiSpecificationVersion:
+          type: string
+          description: Currently used version of the Submission API specification
     SetSubmissionDataViolationsCommand:
       description: command to indicate submission violations
       type: object
@@ -11941,25 +12021,24 @@ components:
     Violation:
       description: Description of the invalid field value
       type: object
+      title: Violation
       properties:
         field:
           type: string
           description: Invalid field name
-          example: customer.name
         message:
           type: string
           description: Description of the invalid field value
           example: must be greater than or equal to 0
     Year:
-      description: |
-        DE: Jahr. <br/> EN: Year.
       type: object
+      title: Year
+      description: |
+        DE: Jahr nach ISO-8601-Kalendersystem, z.B. 2007. EN: A year in the ISO-8601 calendar system, such as 2007.
       required:
         - value
       properties:
         value:
           type: string
-          format: date-fullyear
+          pattern: ^\d{4}$
           example: 2019
-          description: |
-            DE: Datum-Volljahr Format nach ISO8601 <a href="<a href="https://tools.ietf.org/html/rfc6902">RFC 6902</a>">ISO8601</a> <br/> EN: Date-fullyear format following ISO8601 <a href="<a href="https://tools.ietf.org/html/rfc6902">RFC 6902</a>">ISO8601</a>
