@@ -8,7 +8,7 @@ Submission protocol is a *Contextual* endpoint which provides the client with ne
 
 > **_Tip:_** For clients that are using API `v1` to retrieve submission data, This endpoint provides the link between legacy *Submission Id* used in API `v1` and it's counterpart used in API `v2`. 
 
-This endpoints is available: 
+This endpoint is available: 
 - Across all submissions for a specific loan partner unit/branch.
 
 > **_Tip:_** `protocolType` query parameter could be used to limit the returned protocol items based on the specified type filter. If not specified, all protocol types will be returned. 
