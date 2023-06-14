@@ -25,8 +25,6 @@ servers:
 tags:
   - name: documents
     description: access to submission documents
-  - name: document-categories
-    description: access to document categories associated to submission process
   - name: protocol
     description: access to submission protocol
 paths:
@@ -57,74 +55,6 @@ paths:
               schema:
                 type: integer
               description: metadata is expected to be ready after the specified amout
-                of seconds
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnexpectedError'
-  /v2/submissions/{submissionId}/documents/binaries:
-    get:
-      tags:
-        - documents
-      summary: Delievers all submission relevant documents as binary format.
-      operationId: getDocumentsBinary
-      description: 'Retrieve all submission relevant documents in the requested format.
-        <p /> *PossibleTypes* are `PDF` and `ZIP`<p /> Note: retries following a 202
-        *must* provide the If-Match header.'
-      parameters:
-        - in: header
-          name: If-Match
-          schema:
-            type: string
-            format: etag
-          required: false
-        - $ref: '#/components/parameters/submission-id'
-        - $ref: '#/components/parameters/document-category-name-filter'
-      responses:
-        '200':
-          description: Submission documents matching provided criteria in the requested
-            format
-          content:
-            application/pdf:
-              schema:
-                $ref: '#/components/schemas/Binary'
-            application/zip:
-              schema:
-                $ref: '#/components/schemas/Binary'
-        '202':
-          description: Payload is being prepared, try again later
-          headers:
-            ETag:
-              schema:
-                type: string
-                format: etag
-              description: unique ID of payload creation request; use as If-Match
-                in subsequent calls to retrieve payload
-            Retry-After:
-              schema:
-                type: integer
-              description: payload is expected to be ready after the specified amout
                 of seconds
         '400':
           description: Error indicates missing or wrong request parameters.
@@ -222,42 +152,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnexpectedError'
-  /v2/documents/categories:
-    get:
-      tags:
-        - document-categories
-      summary: Delievers document categories
-      operationId: getDocumentCategories
-      description: Retrieve information about possible document categories associated
-        with submission process.
-      parameters:
-        - $ref: '#/components/parameters/document-category-name-filter'
-      responses:
-        '200':
-          description: Document categories associated with submission process are
-            returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DocumentCategoriesDefinition'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '500':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnexpectedError'
   /v2/submissions/protocol:
     get:
       summary: Delivers all submissions protocol for a provider
@@ -302,51 +196,6 @@ paths:
                 $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnexpectedError'
-  /v2/submissions/{submissionId}/protocol:
-    get:
-      summary: Get protocol for a specific submission
-      description: Delivers detailed information about protocol associated with a
-        specific submission. By default the result will be sorted based on createdAt
-        ascending.
-      operationId: getProtocolBySubmissionId
-      tags:
-        - protocol
-      parameters:
-        - $ref: '#/components/parameters/submission-id'
-        - $ref: '#/components/parameters/protocol-type-filter'
-        - $ref: '#/components/parameters/sbms-protocol-sort'
-      responses:
-        '200':
-          description: Submission protocol are returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Protocol'
-        '400':
-          description: Error indicates missing or wrong request parameters.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
-        '401':
-          description: Error indicates no access to the required resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '404':
-          description: Error indicates that a requested submission resource was not
-            found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-        '500':
-          description: Unexpected Error
           content:
             application/json:
               schema:
@@ -405,27 +254,6 @@ components:
         errorCode:
           type: integer
           format: int32
-    DocumentCategoriesDefinition:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentCategoryDefinition'
-    DocumentCategoryDefinition:
-      type: object
-      properties:
-        category:
-          $ref: '#/components/schemas/DocumentCategory'
-        title:
-          type: string
-          example: Konto-/Depotauszug Eigenkapital
-        description:
-          type: string
-          example: Nachweis des vorhandenen Eigenkapitals - z.B. Bankguthaben, Bausparguthaben,
-            Wertpapiere - durch Konto- und Depotauszüge.
     DocumentCategory:
       type: object
       properties:
@@ -609,13 +437,6 @@ components:
           type: string
         after:
           type: string
-    Protocol:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProtocolItem'
     Documents:
       type: object
       required:
@@ -754,32 +575,6 @@ components:
           - new_submission
       description: query parameter to restrict submissions associated to the provided
         protocol type.
-    document-category-name-filter:
-      name: categoryName
-      in: query
-      required: false
-      schema:
-        type: string
-      description: query parameter to filter the selected documents based on the provided
-        category.
-    sbms-protocol-sort:
-      name: sort
-      in: query
-      style: form
-      required: false
-      description: Comma-separated list of fields to define the sort order.<br> To
-        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
-        descending. <br> **e.g.** /protocol?sort=+createdAt <br> ***Note*** sorting
-        applies only within a single result page when multiple pages are returned.
-        <br>
-      example: sort=+createdAt
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - +createdAt
-            - -createdAt
     document-id:
       name: documentId
       in: path
