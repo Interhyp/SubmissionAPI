@@ -1,59 +1,15 @@
 ## Submission Documents Management
 A set of API endpoints are designed to manage relevant documents collected from the customer during Advisory/Consultation phase.<p> 
-API endpoints could be divided into *two* types
-- **_Structural:_** Delivers only structural information, For instance: *Document Categories*
-- **_Contextual:_** Requires a specific context, for instance: information regarding a specific *Submission*
 
 > **Note:** The endpoint for handover reports has been relocated to /v2/submissions/{submissionId}/handover/reports. For detailed informations please check the submission-api-data.yaml
-
-### Document Categories
-Document Categories is a *Structural* endpoint which provides detailed information about possible Mortgage relevant Documents 
-that could be collected from the customer and used as prove for provided information.
-> **Tip:** This endpoint delivers only structural information and not bounded to a specific customer or mortgage type.
- 
-Every Document Category is uniquely identified via it's `name` and a set of `tags`.
-
-**<details>
-    <summary>Request</summary>**
-
-```groovy
-curl -X GET "https://some-domain/submission/v2/documents/categories" -H "accept: application/json"
-```
-</details>
-
-**<details>
-    <summary>Sample Response</summary>**
-
-```json
-{
-  "data": [
-    {
-      "category": {
-        "name": "KONTOAUSZUG",
-        "tags": [
-          {
-            "name": "MIETE"
-          },
-          {
-            "name": "MIETAUSGANG"
-          }
-        ]
-      },
-      "title": "Konto-/Depotauszug Eigenkapital"
-    }
-  ]
-}
-```
-</details>
 
 ### Submission Protocol
 Submission protocol is a *Contextual* endpoint which provides the client with needed information to track any changes were performed on the *submission* resource.   
 
 > **_Tip:_** For clients that are using API `v1` to retrieve submission data, This endpoint provides the link between legacy *Submission Id* used in API `v1` and it's counterpart used in API `v2`. 
 
-Two endpoints are available: 
+This endpoints is available: 
 - Across all submissions for a specific loan partner unit/branch.
-- For a specific submission.
 
 > **_Tip:_** `protocolType` query parameter could be used to limit the returned protocol items based on the specified type filter. If not specified, all protocol types will be returned. 
 
@@ -104,16 +60,6 @@ curl -X GET "https://api-test.interhyp.de/submission/v2/submissions/protocol?sin
   ],
   "paging": "_comment: here goes the pagination info ..."
 }
-```
-</details>
-
-#### Specific submission
-This endpoint returns all protocol items for a specified submission. 
-
-**<details>
-    <summary>Request</summary>**
-```groovy
-curl -X GET "https://some-domain/submission/v2/submissions/{sbm-id}/protocol?protocolType=new_submission" -H "accept: application/json"
 ```
 </details>
 
