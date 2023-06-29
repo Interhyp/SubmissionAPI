@@ -38,6 +38,7 @@ paths:
         <p>
       parameters:
         - $ref: '#/components/parameters/submission-id'
+        - $ref: '#/components/parameters/startDate'
         - $ref: '#/components/parameters/embed'
       responses:
         '200':
@@ -541,6 +542,16 @@ components:
       schema:
         type: string
       description: Id for the requested submission.
+    startDate:
+      name: startDate
+      in: query
+      description: A UTC date-time value that points to the start of the range of
+        time-based data. <br> Defined by date-time - [RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: 2019-12-29T10:22:50Z
     since:
       name: since
       in: query
