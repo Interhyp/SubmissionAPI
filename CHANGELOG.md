@@ -73,7 +73,7 @@ added 3 new reasons for enum `ExternalProcessingReason`:
 * Introduce `residualDebtProtections` on submission level
 
 ### v3.2.1
-* Make loanId in ContractInfo non-mandatory
+* Make loanId in ContractInfo optional
 
 ## v3.2.0
 * added `residualDebtProtections` to schema `FinancingStructures`.
