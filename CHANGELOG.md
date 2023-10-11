@@ -1,4 +1,138 @@
 # Submission Data API
+### v6.1.2
+prepare github and developer portal release
+
+### v6.1.1
+changed TemporaryResidencePermit required field from residencePermitExpiryDate to expected expiryDate
+
+## v6.1.0
+changed financingNeed to interface instead of direct implementation
+
+# v6.0.0
+Changed objects that are using discriminators to Interfaces, and added BaseObjects for inheritance.
+To prepare proper json schemas and remove duplicate mapping API specs were refactored to be conforming with the documentation and best practices.
+See https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/ , https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/ and https://github.com/OpenAPITools/openapi-generator/issues/13150#issuecomment-1704912927
+
+# v5.0.0
+Moved EnergyEfficiency from PlannedModernisation to PlannedModernisations
+
+### v4.2.2
+- add ONE_TIME to Cycle
+- add frequency to SavingsPlanBurdenSpecialPayment
+- add externalId to SuspendedAmortizationDetails
+
+### v4.2.1
+added extra field with related to previous minor change in KREMA-5806
+
+## v4.2.0
+Added AddSubmissionLogbookNoteCommand
+
+### v4.1.2
+Added missing homePurchaseSavingProvider and amortizationProvider fields.
+
+### v4.1.1
+Rename events to entries regarding Repayment Plan
+
+## v4.1.0
+Extend Financing Structures with repayment plan
+
+### v4.0.1
+Added previous status to Paused and Await External Processing statuses
+
+# v4.0.0
+Remove loanId from ContractInfo and replace it with required referenceId
+
+### v3.5.2
+Added primaryEnergyDemand property do EnergyEfficiency
+
+### v3.5.1
+- Introduce field `submitter` in `SubmissionOverview`
+- Introduce `ConsultationInfo` object and put it as field in `FinancingApplication`
+
+## v3.5.0
+* Make `OfferId` property `value` required
+* Add new property `revision` to `OfferId`
+
+### v3.4.3
+Add command to update contact user
+
+### v3.4.2
+Added new model for OrganizationUser used for contactUser in SubmissionOverview
+
+### v3.4.1
+Extended rejection reasons by following values:
+- OVERALL_CONSTELLATION
+- NEGATIVE_HOUSEHOLD_CALCULATION
+- PROPERTY_VALUATION_LOAN_QUOTA
+
+## v3.4.0
+added 3 new reasons for enum `ExternalProcessingReason`:
+* FORWARD_FINAL_DECISION
+* REJECT_NOTICE
+* WAITING_FOR_ORIGINAL_CONTRACT
+
+## v3.3.0
+* Wrap `residualDebtProtections` into wrapper object
+* Introduce `residualDebtProtections` on submission level
+
+### v3.2.1
+* Make loanId in ContractInfo non-mandatory
+
+## v3.2.0
+* added `residualDebtProtections` to schema `FinancingStructures`.
+* added schema for `ResidualDebtProtection` with first sub type for mortgage saving plans. The hold a reference to a loan if they are linked to a loan.
+* removed property `savingsPlan` from schema `FinancingStructures` as it is not in use currently and probably needs to be remodeled in the future.
+* added new referenceId to `ContractInfo` as there could be multiple other reference to be updated than just loans
+
+### v3.1.1
+* Set x-skip-camel-case-check to true for separatedByWEG
+
+## v3.1.0
+* Deprecate key property in KfwProgram
+* Introduce type property in KfwProgram 
+
+### v3.0.1
+* Introduce taxable income from past years
+
+# v3.0.0
+Updated specification to be compatible with OpenApi Generator v6.6.0
+
+### v2.14.1
+* Added submission counter offer revoked status
+
+## v2.14.0
+* Added new structure for loan partner information
+  * `LoanPartnerDetails` wrapper containing information for loan partner, processing unit and the processor.
+  * `ProcessingUnit` wrapper for the processing unit it self and the loan partner queue of this unit.
+* Adjusted properties
+  * `SavingPlanTariff`
+    * added `loanPartnerId` of type `CompanyId`
+    * deprecated `loanPartner`
+  * `LoanPartnerProcessorCommandTrigger`
+    * added `processingUnitId` of type `CompanyId`
+    * deprecated `processingUnit`
+  * `Loan`
+    * added `loanPartnerId` of type `CompanyId`
+    * deprecated `loanPartner`
+  * `LoanPartnerProcessingUnitChangedLogbookEntry`
+    * added `updatedProcessingUnit` of type `ProcessingUnit`
+    * added `previousProcessingUnit` of type `ProcessingUnit`
+    * removed `updatedLoanPartner`, `previousLoanPartner`, `loanPartnerQueue`
+  * `ChangeLoanPartnerProcessingUnitCommand`
+    * added `processingUnit` of type `ProcessingUnit`
+    * deprecated `processingUnitId`
+  * `AssignLoanPartnerProcessorLegacyCommand`
+    * added `loanPartnerDetails` of type `LoanPartnerDetails`
+    * deprecated `processor`
+  * `UploadSubmissionDocumentLegacyCommand`
+    * added `createdBy` of type `LoanPartnerDetails`
+    * deprecated `uploadedBy`
+  * `SubmissionOverview`
+    * added `loanPartnerDetails` of type `ProcessorId`
+    * deprecated `loanPartner`
+
+### v2.13.0
+* Added optional field `residualDebt` to `RateDetails`
 
 ### v2.12.1
 * Added new endpoint specification `/v2/info` that allows to check service status and version of the currently used API specs
