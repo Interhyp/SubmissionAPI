@@ -100,7 +100,7 @@ Updated specification to be compatible with OpenApi Generator v6.6.0
 ## v2.14.0
 * Added new structure for loan partner information
   * `LoanPartnerDetails` wrapper containing information for loan partner, processing unit and the processor.
-  * `ProcessingUnit` wrapper for the processing unit it self and the loan partner queue of this unit.
+  * `ProcessingUnit` wrapper for the processing unit itself and the loan partner queue of this unit.
 * Adjusted properties
   * `SavingPlanTariff`
     * added `loanPartnerId` of type `CompanyId`
