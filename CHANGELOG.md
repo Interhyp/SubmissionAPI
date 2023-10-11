@@ -40,7 +40,7 @@ Added previous status to Paused and Await External Processing statuses
 Remove loanId from ContractInfo and replace it with required referenceId
 
 ### v3.5.2
-Added primaryEnergyDemand property do EnergyEfficiency
+Added primaryEnergyDemand property to EnergyEfficiency
 
 ### v3.5.1
 - Introduce field `submitter` in `SubmissionOverview`
