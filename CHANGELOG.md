@@ -21,9 +21,6 @@ Moved EnergyEfficiency from PlannedModernisation to PlannedModernisations
 - add frequency to SavingsPlanBurdenSpecialPayment
 - add externalId to SuspendedAmortizationDetails
 
-### v4.2.1
-added extra field with related to previous minor change in KREMA-5806
-
 ## v4.2.0
 Added AddSubmissionLogbookNoteCommand
 
