@@ -7,10 +7,12 @@ To generate interfaces from openapi, openapi-generator-maven-plugin or openapi-g
 
 Gradle:
 configOptions = [
+
     ...
     useOneOfInterfaces: "true",
 ]
 additionalProperties = [
+
     ...
     supportUrlQuery: 'false'
 ]
