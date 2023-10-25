@@ -30,6 +30,7 @@ tags:
 paths:
   /v2/submissions/{submissionId}/documents/metadata:
     get:
+      deprecated: true
       tags:
         - documents
       summary: Delievers all submission relevant documents metadata
@@ -84,6 +85,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedError'
   /v2/submissions/{submissionId}/documents/{documentId}/binaries:
     get:
+      deprecated: true
       tags:
         - documents
       summary: Delievers specific submission document in `pdf` format
@@ -155,6 +157,7 @@ paths:
                 $ref: '#/components/schemas/UnexpectedError'
   /v2/submissions/protocol:
     get:
+      deprecated: true
       summary: Delivers all submissions protocol for a provider
       description: Delivers a collection of submission protocol for a specific provider
         filtered by the date of protocol.<p> *By Default*, we will return the first

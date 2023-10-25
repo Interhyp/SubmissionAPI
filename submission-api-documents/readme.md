@@ -1,4 +1,9 @@
 ## Submission Documents Management
+
+**This API is deprecated and will not be supported after 2024.**
+
+Please use https://developer.ehyphome.de/document_v2.html#tag/submission-download instead.
+
 A set of API endpoints are designed to manage relevant documents collected from the customer during Advisory/Consultation phase.<p> 
 
 > **Note:** The endpoint for handover reports has been relocated to /v2/submissions/{submissionId}/handover/reports. For detailed informations please check the submission-api-data.yaml
