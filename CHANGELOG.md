@@ -1,12 +1,7 @@
 # Submission Data API
 ### v6.1.8
-preapre submission api release
-
-### v6.1.4
-extended v2 api with commitmentInterest field in loans and counter-offer-loans
-
-### v6.1.3
-Removed pattern from Iban
+* removed pattern from Iban
+* extended v2 api with commitmentInterest field in loans and counter-offer-loans
 
 ### v6.1.2
 prepare github and developer portal release
