@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.1.2
+  version: 6.1.8
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2676,6 +2676,10 @@ components:
           $ref: '#/components/schemas/SpecialRepayment'
         commission:
           $ref: '#/components/schemas/CommissionInfo'
+        commitmentInterest:
+          description: |
+            DE: Bereitstellungszins. <br/> EN: Periodical commitment interest rate.
+          $ref: '#/components/schemas/PeriodicalPercentage'
       discriminator:
         propertyName: type
     BaseCounterOfferRateDetails:
@@ -2959,6 +2963,10 @@ components:
           type: boolean
           description: |
             DE: Ist das Darlehen grundpfandrechtlich besichert? <br /> EN: Is the loan secured by land register?
+        commitmentInterest:
+          description: |
+            DE: Bereitstellungszins. <br/> EN: Periodical commitment interest rate.
+          $ref: '#/components/schemas/PeriodicalPercentage'
       discriminator:
         propertyName: type
     BaseLogbookEntry:
@@ -6935,7 +6943,6 @@ components:
         value:
           type: string
           example: DE46500210000010130383
-          pattern: ^[A-Z]{2}[0-9]{3,32}$
     Income:
       type: object
       required:
