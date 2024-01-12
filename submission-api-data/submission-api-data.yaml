@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.1.8
+  version: 6.1.10
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -150,6 +150,10 @@ tags:
   description: provides endpoints to access submission logbook
 - name: commands
   description: provides endpoints to access to commands sent to the submission API
+- name: legacy-submission
+  description: Create legacy submission commands
+- name: correspondence
+  description: access to submission correspondence
 - name: info
   description: provides basic info about service status and version of the submission
     API specs used
@@ -1021,6 +1025,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/correspondence:
+    get:
+      summary: Delivers all submissions correspondence for a provider
+      description: Delivers a collection of submission correspondence among involved
+        submission process parties for a specific provider filtered by the date of
+        correspondence.<p> *By Default*, we will return the first *20* matching records.
+        However, this is not a hard limitation! a parameter called `limit` can be
+        used to tell the API how many records you want to return all at once *(max
+        40)*.<p> To get further matching records, a parameter called `after` or `before`
+        can be used to tell the API the start of each page using specified cursor.<p>
+        To navigate through the query result, a reference to the following navigations
+        are included in the response *(next, prev, first, last, self)*.
+      operationId: getSubmissionsCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/since'
+      - $ref: '#/components/parameters/until'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-limit'
+      - $ref: '#/components/parameters/cursor-after'
+      - $ref: '#/components/parameters/cursor-before'
+      - $ref: '#/components/parameters/embed'
+      responses:
+        '200':
+          description: A paged array of submissions correspondence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionCorrespondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}:
     get:
       summary: Get a specific submission
@@ -1166,6 +1218,258 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence:
+    get:
+      summary: Get correspondence for a specific submission
+      description: Delivers detailed information about correspondence among involved
+        submission process  parties associated with a specific submission. By default
+        the result will be sorted based on createdAt ascending.
+      operationId: getCorrespondenceBySubmissionId
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      - $ref: '#/components/parameters/correspondence-type-filter'
+      - $ref: '#/components/parameters/sbms-correspondence-sort'
+      responses:
+        '200':
+          description: Submission correspondence are returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondence'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    post:
+      summary: Create new correspondence for a specific submission
+      operationId: createSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '201':
+          description: Correspondence was created
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+          headers:
+            Location:
+              schema:
+                type: string
+                description: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete correspondence assocaited with a specific submission
+      operationId: deleteSubmissionCorrespondence
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence are deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/correspondence/{itemId}:
+    get:
+      summary: Get a specific submission correspondence item
+      description: Delivers detailed information about a specific submission correspondence
+        item.
+      operationId: getSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '200':
+          description: Submission corresponcence item is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorrespondenceItem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    delete:
+      summary: Delete a specific submission correspondence item
+      operationId: deleteSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      responses:
+        '204':
+          description: Submission correspondence item is deleted
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+    put:
+      summary: Override a specific submission correspondence item
+      operationId: overrideSubmissionCorrespondenceById
+      tags:
+      - correspondence
+      parameters:
+      - $ref: '#/components/parameters/correspondence-item-id'
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrespondenceItem'
+      responses:
+        '204':
+          description: Submission correspondence item is updated
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
         '500':
           description: Unexpected Error
           content:
@@ -1457,6 +1761,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/legacy-commands:
+    post:
+      deprecated: true
+      summary: Endpoint for legacy submission commands.
+      description: |
+        This endpoint gives a possibility to modify an existing submission asynchronously by creating a legacy command to perform this operation, as a result a *command id* shall be returned. @deprecated: This endpoint is for internal uses. The endpoint will reach end of life in further minor releases.
+      operationId: modifySubmissionLegacy
+      tags:
+      - legacy-submission
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifySubmissionLegacyCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/submissions/{submissionId}/legacy-documents:
+    post:
+      deprecated: true
+      summary: Endpoint for uploading submission document using its metadata.
+      description: |
+        @deprecated: This Endpoint is for internal uses and legacy document handling. The Endpoint will reach End Of Life in further minor releases.
+      operationId: uploadSubmissionDocument
+      tags:
+      - legacy-submission
+      parameters:
+      - $ref: '#/components/parameters/submission-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubmissionDocumentLegacyCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions/{submissionId}/logbook:
     get:
       summary: Get submission logbook entries
@@ -1689,6 +2091,24 @@ components:
       schema:
         type: string
       description: Id of the requested command
+    correspondence-item-id:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested submission correspondence item.
+    correspondence-type-filter:
+      name: correspondenceType
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - message
+        - note
+      description: query parameter to restrict submissions associated with the provided
+        correspondence type.
     credit-loan-id:
       name: creditLoanId
       in: path
@@ -1786,6 +2206,36 @@ components:
       schema:
         type: string
       description: Id of the requested informer
+    sbms-correspondence-limit:
+      name: limit
+      in: query
+      description: Specifies how many items to return at one time (max 40). <br> A
+        query may return fewer than the value of limit due to filtering.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 40
+        default: 20
+    sbms-correspondence-sort:
+      name: sort
+      in: query
+      style: form
+      required: false
+      description: Comma-separated list of fields to define the sort order.<br> To
+        indicate sorting direction, fields may be prefixed with `+` ascending or `-`
+        descending. <br> **e.g.** /correspondence?sort=+createdAt <br> ***Note***
+        sorting applies only within a single result page when multiple pages are returned.
+        <br>
+      example: sort=+createdAt
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - +createdAt
+          - -createdAt
     sbms-limit:
       name: limit
       in: query
@@ -1859,6 +2309,18 @@ components:
           $ref: '#/components/schemas/SubmissionCounterOfferId'
         remark:
           type: string
+    AcceptSubmissionLegacyStatus:
+      description: Accept submission command
+      type: object
+      required:
+      - sendContractDate
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        sendContractDate:
+          $ref: '#/components/schemas/ISODate'
+        loans:
+          $ref: '#/components/schemas/LegacyStatusLoans'
     AcceptedCounterOfferLogbookEntryDetails:
       type: object
       description: Accepted counter offer submission logbook entry details
@@ -1869,6 +2331,13 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/SubmissionCounterOfferId'
+    AcknowledgeSubmissionEditingLegacyCommand:
+      type: object
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to acknowledge changes made during editing.
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
     AddSubmissionLogbookNoteCommand:
       description: command to add Logbook note for the submission
       type: object
@@ -2001,6 +2470,36 @@ components:
       properties:
         advisor:
           $ref: '#/components/schemas/Advisor'
+    AdvisoryDetails:
+      type: object
+      required:
+      - clientAdvisor
+      - broker
+      - brokeragePlatform
+      description: |
+        DE: Informationen über die Beratung. <br/>
+        EN: Information about the involved parties in the consultation phase
+      properties:
+        clientAdvisor:
+          description: |
+            DE: Daten des Endkundekontakt. <br/>
+            EN: Information about the client contact person.
+          $ref: '#/components/schemas/ClientAdvisor'
+        subBroker:
+          description: |
+            DE: Untervermittler des Antrags. <br/>
+            EN: sub broker.
+          $ref: '#/components/schemas/OrganizationUser'
+        broker:
+          description: |
+            DE: Daten des Vermittlers. <br/>
+            EN: Information about the main Broker (Interhp, Prohyp, MLP Hyp or Prohyp-WhiteLabel-Partner).
+          $ref: '#/components/schemas/OrganizationUser'
+        brokeragePlatform:
+          description: |
+            DE: Vermittlerplattform. <br/>
+            EN: Brokerage Platform
+          $ref: '#/components/schemas/BrokeragePlatform'
     AlimonyExpense:
       type: object
       required:
@@ -2415,6 +2914,19 @@ components:
             DE: Gewerbliche Fläche für Eigenbedarf. <br/>
             EN: Commercial space for own use.
           $ref: '#/components/schemas/SquareMeter'
+    AssignLoanPartnerProcessorLegacyCommand:
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to assign a processor to an existing submission.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
+      properties:
+        processor:
+          deprecated: true
+          $ref: '#/components/schemas/LoanPartnerProcessingInfo'
+        loanPartnerDetails:
+          $ref: '#/components/schemas/LoanPartnerDetails'
     AssignProcessorLogbookEntry:
       type: object
       description: |
@@ -2634,6 +3146,22 @@ components:
           $ref: '#/components/schemas/ISODate'
       discriminator:
         propertyName: type
+    BaseChangeSubmissionStatusLegacyCommandData:
+      type: object
+      description: Change submission command
+      required:
+      - status
+      properties:
+        remark:
+          type: string
+        changedOn:
+          $ref: '#/components/schemas/ISODateTime'
+        origin:
+          $ref: '#/components/schemas/LegacyStatusChangeOrigin'
+        status:
+          $ref: '#/components/schemas/LegacyStatusType'
+      discriminator:
+        propertyName: status
     BaseCommandTrigger:
       type: object
       required:
@@ -2647,6 +3175,21 @@ components:
           - ADVISOR
           - LOAN_PARTNER_PROCESSOR
           - SYSTEM
+      discriminator:
+        propertyName: type
+    BaseCorrespondenceItem:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          $ref: '#/components/schemas/SubmissionCorrespondenceType'
+        id:
+          type: string
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        author:
+          type: string
       discriminator:
         propertyName: type
     BaseCounterOfferLoan:
@@ -3323,6 +3866,26 @@ components:
           - ADD_SUBMISSION_LOGBOOK_NOTE
       discriminator:
         propertyName: operation
+    BaseSubmissionLegacyCommand:
+      type: object
+      required:
+      - operation
+      properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
+        createdOn:
+          $ref: '#/components/schemas/ISODateTime'
+        operation:
+          type: string
+          x-extensible-enum:
+          - CHANGE_STATUS
+          - UPDATE_CREDIT_LOANS
+          - ACKNOWLEDGE_EDITING_CHANGES
+          - ASSIGN_PROCESSOR
+          - REVOKE
+          - UPDATE_ADVISOR_CONTACT
+      discriminator:
+        propertyName: operation
     BaseSubmissionStatus:
       type: object
       description: |
@@ -3490,6 +4053,35 @@ components:
           UNAVAILABLE: '#/components/schemas/UnavailableEquity'
           PUBLIC_PRE_FINANCE: '#/components/schemas/PublicPreFinancing'
           EXISTING_BUILDING_SAVING_PLAN: '#/components/schemas/ExistingBuildingSavingPlan'
+    BrokeragePlatform:
+      type: object
+      required:
+      - company
+      properties:
+        company:
+          $ref: '#/components/schemas/OrganizationCompany'
+        platformIdentifier:
+          $ref: '#/components/schemas/BrokeragePlatformIdentifier'
+    BrokeragePlatformIdentifier:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/BrokeragePlatformIdentifierKey'
+        value:
+          type: string
+          description: |
+            DE: Beratungsunternehmenidentifikator - Vermittlernummer. <br/>
+            EN: Advisor company identifier.
+    BrokeragePlatformIdentifierKey:
+      type: string
+      description: |
+        DE: Interne Vermittler Quelle, wichtig für ermitteln des Vermittlernummers.</br>
+        EN: Advisor company key, used to determine company identifier.
+      example: INTERHYP
+      x-extensible-enum:
+      - INTERHYP
+      - PROHYP
+      - MLP_HYP
     BuildEstateFinancing:
       description: |
         DE: Finanzierungsrelevante Information zu dem Bau der Immobilie. <br/>
@@ -3918,6 +4510,15 @@ components:
           type: string
         cancellationDate:
           $ref: '#/components/schemas/ISODate'
+    CancelSubmissionLegacyStatus:
+      type: object
+      required:
+      - cancelContractDate
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        cancelContractDate:
+          $ref: '#/components/schemas/ISODate'
     CapitalIncome:
       type: object
       description: |
@@ -4017,6 +4618,37 @@ components:
           $ref: '#/components/schemas/ProcessingUnit'
         remark:
           type: string
+    ChangeSubmissionStatusLegacyCommand:
+      type: object
+      required:
+      - status
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to change the submission status
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
+      properties:
+        data:
+          $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommandData'
+    ChangeSubmissionStatusLegacyCommandData:
+      oneOf:
+      - $ref: '#/components/schemas/AcceptSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/CancelSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/ContractSignSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/InworkSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/OnholdSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/RejectSubmissionLegacyStatus'
+      - $ref: '#/components/schemas/ConfirmSubmissionLegacyStatus'
+      discriminator:
+        propertyName: status
+        mapping:
+          ACCEPT: '#/components/schemas/AcceptSubmissionLegacyStatus'
+          CANCEL: '#/components/schemas/CancelSubmissionLegacyStatus'
+          CONTRACT_SIGN: '#/components/schemas/ContractSignSubmissionLegacyStatus'
+          INWORK: '#/components/schemas/InworkSubmissionLegacyStatus'
+          ONHOLD: '#/components/schemas/OnholdSubmissionLegacyStatus'
+          REJECT: '#/components/schemas/RejectSubmissionLegacyStatus'
+          CONFIRM: '#/components/schemas/ConfirmSubmissionLegacyStatus'
     Child:
       type: object
       description: |
@@ -4055,6 +4687,28 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/ClientKey'
+    ClientAdvisor:
+      type: object
+      description: |
+        DE: Informationen über den Endkundenberater. <br/> EN: Information about the customer sales advisor.
+      required:
+      - userId
+      properties:
+        userId:
+          $ref: '#/components/schemas/ClientAdvisorId'
+        personName:
+          $ref: '#/components/schemas/PersonName'
+        contact:
+          $ref: '#/components/schemas/Contact'
+    ClientAdvisorId:
+      type: object
+      required:
+      - value
+      description: |
+        DE: ID des Users. <br/> EN: ID of a user.
+      properties:
+        value:
+          type: string
     ClientKey:
       type: string
       description: |
@@ -4314,6 +4968,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CommissionCalculationInfo'
+    ConfirmSubmissionLegacyStatus:
+      type: object
+      required:
+      - confirmedAt
+      - loans
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        signContractDate:
+          $ref: '#/components/schemas/ISODate'
+        confirmedAt:
+          $ref: '#/components/schemas/ISODateTime'
+        loans:
+          $ref: '#/components/schemas/LegacyStatusLoans'
     ConfirmedSubmissionStatus:
       type: object
       description: |
@@ -4356,18 +5024,26 @@ components:
       required:
       - broker
       properties:
+        advisory:
+          $ref: '#/components/schemas/AdvisoryDetails'
         broker:
+          deprecated: true
+          x-replaced-with: advisory.broker
           description: |
             DE: Daten des Vermittlers. <br/>
             EN: Information about the main Broker (Interhp, Prohyp, MLP Hyp or Prohyp-WhiteLabel-Partner).
           $ref: '#/components/schemas/Advisor'
         subBroker:
+          deprecated: true
+          x-replaced-with: advisory.subBroker
           description: |
             DE: Untervermittler des Antrags. <br/>
             EN: Sub advisor.
           $ref: '#/components/schemas/Advisor'
         informers:
           type: array
+          deprecated: true
+          x-replaced-with: advisory.clientAdvisor
           description: |
             DE: Daten des Zuträgers. <br/>
             EN: Information about the involved informer.
@@ -4377,16 +5053,20 @@ components:
           $ref: '#/components/schemas/Recommendation'
         brokerageOrganization:
           type: string
+          deprecated: true
+          x-replaced-with: advisory.brokeragePlatform.platformIdentifier
           description: |
             DE: Beratungsunternehmenidentifikator - Vermittlernummer. <br/>
-            EN: Advisor company identifier.
+            EN: Advisor company identifier
     ConsultationInfo:
       type: object
+      deprecated: true
+      x-replaced-with: Consultation.advisory
       required:
       - clientAdvisor
       description: |
         DE: Informationen über die Beratung. <br/>
-        EN: Information about the involved parties in the consultation phase
+        EN: Information about the involved parties in the consultation phase.
       properties:
         clientAdvisor:
           $ref: '#/components/schemas/OrganizationUser'
@@ -4514,6 +5194,17 @@ components:
           $ref: '#/components/schemas/RefuseSignContractReason'
         remark:
           type: string
+    ContractSignSubmissionLegacyStatus:
+      type: object
+      required:
+      - signContractDate
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        signContractDate:
+          $ref: '#/components/schemas/ISODate'
+        loans:
+          $ref: '#/components/schemas/LegacyStatusLoans'
     ContractSignedStatus:
       type: object
       description: |
@@ -4540,6 +5231,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContractInfo'
+    Correspondence:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorrespondenceItem'
+    CorrespondenceItem:
+      oneOf:
+      - $ref: '#/components/schemas/SubmissionMessage'
+      - $ref: '#/components/schemas/SubmissionNote'
+      discriminator:
+        propertyName: type
+        mapping:
+          MESSAGE: '#/components/schemas/SubmissionMessage'
+          NOTE: '#/components/schemas/SubmissionNote'
     CounterOfferAnnuityRateDetails:
       type: object
       allOf:
@@ -4709,6 +5416,7 @@ components:
           $ref: '#/components/schemas/SubmissionCounterOffer'
     CreditDecisionDocumentMetaData:
       type: object
+      deprecated: true
       properties:
         documents:
           type: array
@@ -5057,6 +5765,7 @@ components:
           type: string
     DocumentMetaData:
       type: object
+      deprecated: true
       properties:
         submissionId:
           $ref: '#/components/schemas/SubmissionId'
@@ -5103,6 +5812,14 @@ components:
           - DAYS
           description: |
             DE: Die Zeiteinheit. </br> EN: The temporal unit.
+    EmbeddedSubmissionCorrespondence:
+      type: object
+      properties:
+        correspondence:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorrespondenceItem'
+          x-is-plural: true
     Employment:
       type: object
       description: |
@@ -7201,6 +7918,10 @@ components:
             EN: Collection of loans relevant for the planed financing venture.
           items:
             $ref: '#/components/schemas/VentureRelevantLoan'
+    InworkSubmissionLegacyStatus:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
     JobInformation:
       type: object
       description: |
@@ -7441,6 +8162,90 @@ components:
         mapping:
           true: '#/components/schemas/LeaseHold'
           false: '#/components/schemas/NoLeaseHold'
+    LegacyOnHoldReason:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/LegacyOnHoldReasonKey'
+    LegacyOnHoldReasonKey:
+      type: string
+      x-extensible-enum:
+      - DOCUMENTS
+      - INFOS
+      - BY_CUSTOMER
+      - ONHOLD
+      - EXPERTISE
+      - ORIG_CONTR
+      - REJ_SOON
+      - FIN_APPROV
+      - MIN_DOCS
+    LegacyStatusChangeKey:
+      type: string
+      description: |
+        EN: Source system that can trigger legacy status change, possible values are PARTNER_PORTAL, LEGACY_IHK.
+      x-extensible-enum:
+      - PARTNER_PORTAL
+      - LEGACY_IHK
+    LegacyStatusChangeOrigin:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/LegacyStatusChangeKey'
+    LegacyStatusLoan:
+      type: object
+      properties:
+        seq:
+          type: integer
+          format: int32
+        loanId:
+          $ref: '#/components/schemas/LoanId'
+        creditLoanId:
+          $ref: '#/components/schemas/CreditLoanId'
+        contractNumber:
+          type: string
+        amount:
+          $ref: '#/components/schemas/EuroAmount'
+        maturity:
+          $ref: '#/components/schemas/InterestMaturity'
+        nominalRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        amortisation:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        effectiveRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        fixedUntil:
+          $ref: '#/components/schemas/ISODate'
+        sotiDesc:
+          type: string
+        sotiPercentage:
+          $ref: '#/components/schemas/PeriodicalPercentage'
+        commission:
+          $ref: '#/components/schemas/Percentage'
+        commissionAmount:
+          $ref: '#/components/schemas/EuroAmount'
+        kfwProduct:
+          type: string
+    LegacyStatusLoans:
+      type: object
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/LegacyStatusLoan'
+    LegacyStatusType:
+      type: string
+      x-extensible-enum:
+      - ACCEPT
+      - CANCEL
+      - CONTRACT_SIGN
+      - INWORK
+      - ONHOLD
+      - REJECT
     LendingValueCalculation:
       description: |
         DE: Information zu der Kalkulation <br/>
@@ -8334,6 +9139,23 @@ components:
           CLOSE_REJECTED_SUBMISSION: '#/components/schemas/CloseRejectedSubmissionCommand'
           UPDATE_CONTACT_USER: '#/components/schemas/UpdateSubmissionContactUserCommand'
           ADD_SUBMISSION_LOGBOOK_NOTE: '#/components/schemas/AddSubmissionLogbookNoteCommand'
+    ModifySubmissionLegacyCommand:
+      oneOf:
+      - $ref: '#/components/schemas/ChangeSubmissionStatusLegacyCommand'
+      - $ref: '#/components/schemas/UpdateSubmissionCreditLoansLegacyCommand'
+      - $ref: '#/components/schemas/AcknowledgeSubmissionEditingLegacyCommand'
+      - $ref: '#/components/schemas/AssignLoanPartnerProcessorLegacyCommand'
+      - $ref: '#/components/schemas/RevokeSubmissionLegacyCommand'
+      - $ref: '#/components/schemas/UpdateAdvisorContactLegacyCommand'
+      discriminator:
+        propertyName: operation
+        mapping:
+          CHANGE_STATUS: '#/components/schemas/ChangeSubmissionStatusLegacyCommand'
+          UPDATE_CREDIT_LOANS: '#/components/schemas/UpdateSubmissionCreditLoansLegacyCommand'
+          ACKNOWLEDGE_EDITING_CHANGES: '#/components/schemas/AcknowledgeSubmissionEditingLegacyCommand'
+          ASSIGN_PROCESSOR: '#/components/schemas/AssignLoanPartnerProcessorLegacyCommand'
+          REVOKE: '#/components/schemas/RevokeSubmissionLegacyCommand'
+          UPDATE_ADVISOR_CONTACT: '#/components/schemas/UpdateAdvisorContactLegacyCommand'
     Nationality:
       type: object
       required:
@@ -8507,6 +9329,22 @@ components:
         revision:
           type: string
           description: Offer revision that has been currently submitted
+    OnholdSubmissionLegacyStatus:
+      type: object
+      required:
+      - predictedOffHoldDate
+      - predictedDaysPost
+      - onHoldReason
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        predictedOffHoldDate:
+          $ref: '#/components/schemas/ISODate'
+        predictedDaysPost:
+          type: integer
+          format: int32
+        onHoldReason:
+          $ref: '#/components/schemas/LegacyOnHoldReason'
     OpenPropertySale:
       type: object
       description: |
@@ -10069,6 +10907,17 @@ components:
       - CUSTOMER_DECIDED_DIFFERENT_PROVIDER
       - CONDITION_NOT_FEASIBLE_FOR_CUSTOMER
       - OTHER
+    RejectSubmissionLegacyStatus:
+      type: object
+      required:
+      - rejectReason
+      allOf:
+      - $ref: '#/components/schemas/BaseChangeSubmissionStatusLegacyCommandData'
+      properties:
+        rejectSolution:
+          type: string
+        rejectReason:
+          $ref: '#/components/schemas/RejectReason'
     RejectSubmissionStatusChangedLogbookEntryDetails:
       type: object
       allOf:
@@ -10345,6 +11194,24 @@ components:
       - READJUST_COUNTER_OFFER
       - COUNTER_OFFER_NOT_ACCEPTED
       - OTHER
+    RevokeSubmissionLegacyCommand:
+      description: This command is only used for internal purposes!
+      type: object
+      required:
+      - reason
+      - revokedOn
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
+      properties:
+        reason:
+          type: string
+        reasonDescription:
+          type: string
+        remark:
+          type: string
+        revokedOn:
+          type: string
+          format: date-time
     RevokeSubmissionRejectionCommand:
       description: command to revert a rejection of a submission during credit decision
         phase.
@@ -11027,6 +11894,38 @@ components:
       properties:
         refuseReason:
           $ref: '#/components/schemas/RefuseSignContractReason'
+    SubmissionCorrespondence:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionCorrespondenceItem'
+        paging:
+          $ref: '#/components/schemas/Paging'
+    SubmissionCorrespondenceItem:
+      type: object
+      properties:
+        submission:
+          $ref: '#/components/schemas/SubmissionRef'
+        correspondence:
+          $ref: '#/components/schemas/SubmissionCorrespondenceRef'
+    SubmissionCorrespondenceRef:
+      type: object
+      properties:
+        _href:
+          x-skip-camel-case-check: true
+          $ref: '#/components/schemas/ResourceRef'
+        embedded:
+          $ref: '#/components/schemas/EmbeddedSubmissionCorrespondence'
+    SubmissionCorrespondenceType:
+      type: string
+      description: |
+        DE: Art der Korrespondenz (nicht abschließende Aufzählung), z.B. (MESSAGE, NOTE). <br/> EN: Open ended enum contains correspondence types, possible values are (MESSAGE, NOTE).
+      example: MESSAGE
+      x-extensible-enum:
+      - MESSAGE
+      - NOTE
     SubmissionCounterOffer:
       type: object
       properties:
@@ -11156,6 +12055,7 @@ components:
     SubmissionId:
       required:
       - value
+      deprecated: true
       properties:
         value:
           type: string
@@ -11237,6 +12137,28 @@ components:
           SUBMISSION_LOAN_PARTNER_DOCUMENT_UPDATED: '#/components/schemas/SubmissionLoanPartnerDocumentLogbookEntry'
           SUBMISSION_LOAN_PARTNER_DOCUMENT_DELETED: '#/components/schemas/SubmissionLoanPartnerDocumentLogbookEntry'
           LOAN_PARTNER_PROCESSING_UNIT_CHANGED: '#/components/schemas/LoanPartnerProcessingUnitChangedLogbookEntry'
+    SubmissionMessage:
+      type: object
+      description: |
+        DE: Enthält Nachrichten, die sich auf eine bestimmte Einreichung beziehen. Die Nachrichten richten sich an einen bestimmten Empfänger. <br/> EN: Contains messages related to a specific submission. Messages target a certain recipient.
+      allOf:
+      - $ref: '#/components/schemas/BaseCorrespondenceItem'
+      properties:
+        to:
+          type: string
+        text:
+          type: string
+    SubmissionNote:
+      type: object
+      description: |
+        DE: Enthält Notizen in Bezug auf eine bestimmte Einreichung. <br/> EN: Contains notes related to a specific submission
+      allOf:
+      - $ref: '#/components/schemas/BaseCorrespondenceItem'
+      properties:
+        category:
+          type: string
+        text:
+          type: string
     SubmissionOverview:
       readOnly: true
       type: object
@@ -11928,6 +12850,19 @@ components:
             DE: Laufzeit des Tilgungssurrogats. <br/>
             EN: Duration of the repayment surrogate product.
           $ref: '#/components/schemas/Duration'
+    UpdateAdvisorContactLegacyCommand:
+      writeOnly: true
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to assign a currently active advisor to an existing submission.
+      type: object
+      required:
+      - advisorContact
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
+      properties:
+        advisorContact:
+          $ref: '#/components/schemas/Advisor'
     UpdateLoanPartnerDecisionDateCommand:
       description: Update the predicted decision date of a submission.
       type: object
@@ -11951,6 +12886,18 @@ components:
           $ref: '#/components/schemas/UserId'
         companyId:
           $ref: '#/components/schemas/CompanyId'
+    UpdateSubmissionCreditLoansLegacyCommand:
+      type: object
+      required:
+      - loans
+      description: |
+        This command is only used for internal purposes!
+        This command is intended to change the submission credit loans
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionLegacyCommand'
+      properties:
+        loans:
+          $ref: '#/components/schemas/LegacyStatusLoans'
     UpdateSubmissionLoanContractNumberCommand:
       description: Update the contract number of a loan of a submission.
       type: object
@@ -11968,6 +12915,32 @@ components:
           description: |
             DE: Optionale Informationen über den Auslöser der Aktion. <br/> EN: Optional information about the trigger of the command.
           $ref: '#/components/schemas/PersonName'
+    UploadSubmissionDocumentLegacyCommand:
+      type: object
+      required:
+      - mediaId
+      - type
+      - uploadedAt
+      - name
+      properties:
+        trigger:
+          $ref: '#/components/schemas/CommandTrigger'
+        mediaId:
+          type: string
+        type:
+          $ref: '#/components/schemas/UploadedDocumentType'
+        uploadedAt:
+          $ref: '#/components/schemas/ISODateTime'
+        name:
+          type: string
+        label:
+          type: string
+        uploadedBy:
+          description: Can be removed after the changes have been released.
+          deprecated: true
+          $ref: '#/components/schemas/LoanPartnerProcessingInfo'
+        createdBy:
+          $ref: '#/components/schemas/ProcessorId'
     UploadedDocumentType:
       type: object
       required:
@@ -12157,5 +13130,6 @@ components:
       properties:
         value:
           type: string
+          description: The actual value of the year.
           pattern: ^\d{4}$
           example: 2019
