@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.1.8
+  version: 6.1.10
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2001,6 +2001,36 @@ components:
       properties:
         advisor:
           $ref: '#/components/schemas/Advisor'
+    AdvisoryDetails:
+      type: object
+      required:
+      - clientAdvisor
+      - broker
+      - brokeragePlatform
+      description: |
+        DE: Informationen über die Beratung. <br/>
+        EN: Information about the involved parties in the consultation phase
+      properties:
+        clientAdvisor:
+          description: |
+            DE: Daten des Endkundekontakt. <br/>
+            EN: Information about the client contact person.
+          $ref: '#/components/schemas/ClientAdvisor'
+        subBroker:
+          description: |
+            DE: Untervermittler des Antrags. <br/>
+            EN: sub broker.
+          $ref: '#/components/schemas/OrganizationUser'
+        broker:
+          description: |
+            DE: Daten des Vermittlers. <br/>
+            EN: Information about the main Broker (Interhp, Prohyp, MLP Hyp or Prohyp-WhiteLabel-Partner).
+          $ref: '#/components/schemas/OrganizationUser'
+        brokeragePlatform:
+          description: |
+            DE: Vermittlerplattform. <br/>
+            EN: Brokerage Platform
+          $ref: '#/components/schemas/BrokeragePlatform'
     AlimonyExpense:
       type: object
       required:
@@ -3490,6 +3520,35 @@ components:
           UNAVAILABLE: '#/components/schemas/UnavailableEquity'
           PUBLIC_PRE_FINANCE: '#/components/schemas/PublicPreFinancing'
           EXISTING_BUILDING_SAVING_PLAN: '#/components/schemas/ExistingBuildingSavingPlan'
+    BrokeragePlatform:
+      type: object
+      required:
+      - company
+      properties:
+        company:
+          $ref: '#/components/schemas/OrganizationCompany'
+        platformIdentifier:
+          $ref: '#/components/schemas/BrokeragePlatformIdentifier'
+    BrokeragePlatformIdentifier:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/BrokeragePlatformIdentifierKey'
+        value:
+          type: string
+          description: |
+            DE: Beratungsunternehmenidentifikator - Vermittlernummer. <br/>
+            EN: Advisor company identifier.
+    BrokeragePlatformIdentifierKey:
+      type: string
+      description: |
+        DE: Interne Vermittler Quelle, wichtig für ermitteln des Vermittlernummers.</br>
+        EN: Advisor company key, used to determine company identifier.
+      example: INTERHYP
+      x-extensible-enum:
+      - INTERHYP
+      - PROHYP
+      - MLP_HYP
     BuildEstateFinancing:
       description: |
         DE: Finanzierungsrelevante Information zu dem Bau der Immobilie. <br/>
@@ -4055,6 +4114,28 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/ClientKey'
+    ClientAdvisor:
+      type: object
+      description: |
+        DE: Informationen über den Endkundenberater. <br/> EN: Information about the customer sales advisor.
+      required:
+      - userId
+      properties:
+        userId:
+          $ref: '#/components/schemas/ClientAdvisorId'
+        personName:
+          $ref: '#/components/schemas/PersonName'
+        contact:
+          $ref: '#/components/schemas/Contact'
+    ClientAdvisorId:
+      type: object
+      required:
+      - value
+      description: |
+        DE: ID des Users. <br/> EN: ID of a user.
+      properties:
+        value:
+          type: string
     ClientKey:
       type: string
       description: |
@@ -4356,18 +4437,26 @@ components:
       required:
       - broker
       properties:
+        advisory:
+          $ref: '#/components/schemas/AdvisoryDetails'
         broker:
+          deprecated: true
+          x-replaced-with: advisory.broker
           description: |
             DE: Daten des Vermittlers. <br/>
             EN: Information about the main Broker (Interhp, Prohyp, MLP Hyp or Prohyp-WhiteLabel-Partner).
           $ref: '#/components/schemas/Advisor'
         subBroker:
+          deprecated: true
+          x-replaced-with: advisory.subBroker
           description: |
             DE: Untervermittler des Antrags. <br/>
             EN: Sub advisor.
           $ref: '#/components/schemas/Advisor'
         informers:
           type: array
+          deprecated: true
+          x-replaced-with: advisory.clientAdvisor
           description: |
             DE: Daten des Zuträgers. <br/>
             EN: Information about the involved informer.
@@ -4377,16 +4466,20 @@ components:
           $ref: '#/components/schemas/Recommendation'
         brokerageOrganization:
           type: string
+          deprecated: true
+          x-replaced-with: advisory.brokeragePlatform.platformIdentifier
           description: |
             DE: Beratungsunternehmenidentifikator - Vermittlernummer. <br/>
-            EN: Advisor company identifier.
+            EN: Advisor company identifier
     ConsultationInfo:
       type: object
+      deprecated: true
+      x-replaced-with: Consultation.advisory
       required:
       - clientAdvisor
       description: |
         DE: Informationen über die Beratung. <br/>
-        EN: Information about the involved parties in the consultation phase
+        EN: Information about the involved parties in the consultation phase.
       properties:
         clientAdvisor:
           $ref: '#/components/schemas/OrganizationUser'
@@ -4709,6 +4802,7 @@ components:
           $ref: '#/components/schemas/SubmissionCounterOffer'
     CreditDecisionDocumentMetaData:
       type: object
+      deprecated: true
       properties:
         documents:
           type: array
@@ -5057,6 +5151,7 @@ components:
           type: string
     DocumentMetaData:
       type: object
+      deprecated: true
       properties:
         submissionId:
           $ref: '#/components/schemas/SubmissionId'
@@ -11156,6 +11251,7 @@ components:
     SubmissionId:
       required:
       - value
+      deprecated: true
       properties:
         value:
           type: string
@@ -12157,5 +12253,6 @@ components:
       properties:
         value:
           type: string
+          description: The actual value of the year.
           pattern: ^\d{4}$
           example: 2019
