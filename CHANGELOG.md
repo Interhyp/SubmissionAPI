@@ -1,11 +1,4 @@
-# Submission Data API
-### v6.1.10
-- preparation for new advisory structure representing people involved in the financing advisory process.
-- early announcement for field deprecations. no action required.
-
-### v6.1.9
-internal dependencies update
-  
+# Submission Data API  
 ### v6.1.8
 * removed pattern from Iban
 * extended v2 api with commitmentInterest field in loans and counter-offer-loans
