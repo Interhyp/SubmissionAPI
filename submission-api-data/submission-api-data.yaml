@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.1.10
+  version: 6.1.11
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -11249,17 +11249,14 @@ components:
       type: string
       format: binary
     SubmissionId:
-      required:
-      - value
-      deprecated: true
-      properties:
-        value:
-          type: string
-          description: |
-            An Id refers to a specific submission resource.
       type: object
       description: |
         An Id refers to a specific submission resource.
+      required:
+      - value
+      properties:
+        value:
+          type: string
     SubmissionItem:
       type: object
       description: |
