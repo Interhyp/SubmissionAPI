@@ -1,4 +1,7 @@
 # Submission Data API
+### v6.1.11
+- revert wrong submission id deprecation
+
 ### v6.1.10
 - preparation for new advisory structure representing people involved in the financing advisory process.
 - early announcement for field deprecations. no action required.
