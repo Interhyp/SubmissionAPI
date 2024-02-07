@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.1.11
+  version: 6.2.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2455,7 +2455,7 @@ components:
         assignedTo:
           $ref: '#/components/schemas/UserData'
     AssignSubmissionLoanPartnerProcessorCommand:
-      description: Assign a processor to the a submission
+      description: assign a processor using an id
       type: object
       required:
       - processorId
@@ -2464,6 +2464,16 @@ components:
       properties:
         processorId:
           $ref: '#/components/schemas/LoanPartnerProcessorId'
+    AssignSubmissionLoanPartnerProcessorDetailsCommand:
+      description: assign processing using details
+      type: object
+      required:
+      - processor
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionCommand'
+      properties:
+        processor:
+          $ref: '#/components/schemas/ProcessorDetails'
     AssignmentForSecurity:
       description: |
         DE: Sicherungsabtretung von Vermögen.
@@ -8376,6 +8386,7 @@ components:
       oneOf:
       - $ref: '#/components/schemas/RevokeSubmissionCommand'
       - $ref: '#/components/schemas/AssignSubmissionLoanPartnerProcessorCommand'
+      - $ref: '#/components/schemas/AssignSubmissionLoanPartnerProcessorDetailsCommand'
       - $ref: '#/components/schemas/UpdateLoanPartnerDecisionDateCommand'
       - $ref: '#/components/schemas/UpdateSubmissionLoanContractNumberCommand'
       - $ref: '#/components/schemas/ArchiveSubmissionCommand'
@@ -8405,6 +8416,7 @@ components:
         mapping:
           REVOKE_SUBMISSION: '#/components/schemas/RevokeSubmissionCommand'
           ASSIGN_PROCESSOR: '#/components/schemas/AssignSubmissionLoanPartnerProcessorCommand'
+          ASSIGN_FULL_PROCESSOR: '#/components/schemas/AssignSubmissionLoanPartnerProcessorDetailsCommand'
           UPDATE_LOAN_PARTNER_DECISION_DATE: '#/components/schemas/UpdateLoanPartnerDecisionDateCommand'
           UPDATE_LOAN_CONTRACT_NUMBER: '#/components/schemas/UpdateSubmissionLoanContractNumberCommand'
           ARCHIVE_SUBMISSION: '#/components/schemas/ArchiveSubmissionCommand'
@@ -9444,6 +9456,18 @@ components:
         processorName:
           readOnly: true
           $ref: '#/components/schemas/ProcessorName'
+    ProcessorDetails:
+      description: details of loan partner processor
+      type: object
+      required:
+      - loanPartnerId
+      properties:
+        name:
+          $ref: '#/components/schemas/PersonName'
+        loanPartnerId:
+          $ref: '#/components/schemas/CompanyId'
+        contact:
+          $ref: '#/components/schemas/Contact'
     ProcessorId:
       description: |
         DE: ID des Sachearbeiters bei einem Kreditgeber. EN: Id of the loan partner processor.

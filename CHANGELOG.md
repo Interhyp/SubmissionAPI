@@ -1,4 +1,7 @@
 # Submission Data API
+## v6.2.0
+- Add new command to assign a processor providing processor details
+  
 ### v6.1.11
 - revert wrong submission id deprecation
 
