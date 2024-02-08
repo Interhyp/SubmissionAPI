@@ -1,4 +1,8 @@
 # Submission Data API
+## v6.2.1
+- Add new key MOBILE_WORK to PhoneTypeKey
+- Add new field externalEstateId to Estates
+
 ## v6.2.0
 - Add new command to assign a processor providing processor details
   
