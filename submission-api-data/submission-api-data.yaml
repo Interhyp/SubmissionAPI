@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.2.0
+  version: 6.2.1
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3229,6 +3229,8 @@ components:
             DE: Immobilienbeschreibung. <br/>
             EN: Estate description.
           type: string
+        externalEstateId:
+          $ref: '#/components/schemas/ExternalEstateId'
       discriminator:
         propertyName: type
     BaseRealEstateRating:
@@ -5785,6 +5787,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntryMarking'
+    ExternalEstateId:
+      description: |
+        DE: ID des vorhandenen Objekts im System <br/> EN: ID of existing object in the system
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
     ExternalId:
       type: object
       description: |
@@ -9258,11 +9269,12 @@ components:
     PhoneTypeKey:
       type: string
       description: |
-        DE: Art der Telefonnummer (nicht abschließende Aufzählung, zum Beispiel: MOBILE = Mobilfunknummer, LANDLINE = Festnetznummer, UNSPECIFIED = nicht angegeben). <br/> EN: Type of the phone number, possible values are MOBILE, LANDLINE, UNSPECIFIED.
+        DE: Art der Telefonnummer (nicht abschließende Aufzählung, zum Beispiel: MOBILE = Mobilfunknummer, LANDLINE = Festnetznummer, UNSPECIFIED = nicht angegeben, MOBILE_WORK= Firmenhandynummer). <br/> EN: Type of the phone number, possible values are MOBILE, LANDLINE, UNSPECIFIED, MOBILE_WORK.
       x-extensible-enum:
       - MOBILE
       - LANDLINE
       - UNSPECIFIED
+      - MOBILE_WORK
     PlanTemplate:
       type: string
       description: |
