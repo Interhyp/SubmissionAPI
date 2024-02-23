@@ -1,4 +1,17 @@
 # Submission Data API
+## v6.2.2
+* Documentation Fix:
+  * adjust description for handover-report-name path variable
+* Introduce new fields:
+  * prefabCertified: flag indicates quality seal (Gütesiegel)
+  * localPriceDetails: provides information about local price per square meter of living space
+  * basementExtensionForResidentialUse: provides information about basement extension for residential use
+  * debitor: add debitor to ExistingRealEstateDebt Object
+  * desiredDecisionDate: provides information about the desired decision date
+  * fractionalOwnership: flag indicates fractional Ownership (Bruchteileigentum)
+  * constructionCostInvoice: provides information about the instance to which the construction costs are charged
+  * inventoryUnitPropertie: add inventoryUnitPropertie to OwnershipInventory
+
 ## v6.2.1
 - Add new key MOBILE_WORK to PhoneTypeKey
 - Add new field externalEstateId to Estates

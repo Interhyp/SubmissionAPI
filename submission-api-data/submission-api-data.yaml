@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.2.1
+  version: 6.2.2
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -1777,8 +1777,8 @@ components:
       required: true
       schema:
         type: string
-      description: Name for the requested handover report.
-      example: HANDOVER_PROTOCOL
+      description: Document Id for the requested handover report.
+      example: MTIzNDU2Ny1QUk9WSURFUl9DT1ZFUl9MRVRURVItUHJvdmlkZXJhbnNjaHJlaWJlbg==
     informer-id:
       name: informerId
       in: path
@@ -2843,6 +2843,11 @@ components:
             DE: Auszahlungsdatum. <br/>
             EN: Payout date.
           $ref: '#/components/schemas/ISODate'
+        desiredDecisionDate:
+          description: |
+            DE: gewünschte Entscheidungsdatum. <br/>
+            EN: desired decision date.
+          $ref: '#/components/schemas/ISODate'
         amortisationStartDate:
           description: |
             DE: Tilgungsbeginn. <br/>
@@ -3455,6 +3460,8 @@ components:
       properties:
         basementDetail:
           $ref: '#/components/schemas/BasementDetail'
+        basementExtensionForResidentialUse:
+          $ref: '#/components/schemas/BasementExtensionForResidentialUse'
         basementArea:
           description: |
             DE: Kellerfläche. <br/>
@@ -3471,6 +3478,23 @@ components:
       type: string
       description: |
         DE: Details zum Keller (nicht abschließende Aufzählung), z.B DEVELOPED=voll_unterkellert, PARTIALY_DEVELOPED=teil_unterkellert, NONE=nicht_unterkellert. <br/> EN: Open ended enum contains basement details, possible values are DEVELOPED, PARTIALY_DEVELOPED, NONE.
+      example: DEVELOPED
+      x-extensible-enum:
+      - DEVELOPED
+      - PARTIALLY_DEVELOPED
+      - NONE
+      - OTHER
+    BasementExtensionForResidentialUse:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/BasementExtensionForResidentialUseKey'
+    BasementExtensionForResidentialUseKey:
+      type: string
+      description: |
+        DE: Details zum Kellerausbau (für Wohnnutzung), z.B DEVELOPED=voll ausgebaut, PARTIALY_DEVELOPED=teilweise ausgebaut, NONE=nicht ausgebaut. <br/> EN: Open ended enum contains basement extension for residential use, possible values are DEVELOPED, PARTIALY_DEVELOPED, NONE.
       example: DEVELOPED
       x-extensible-enum:
       - DEVELOPED
@@ -3606,6 +3630,12 @@ components:
           $ref: '#/components/schemas/CubicMeter'
         prefabrication:
           $ref: '#/components/schemas/Prefabrication'
+        prefabCertified:
+          type: boolean
+          nullable: true
+          description: |
+            DE: Gütesiegel. <br/>
+            EN: quality seal.
         energyEfficiency:
           $ref: '#/components/schemas/EnergyEfficiency'
     BuildingRepaymentPlan:
@@ -4426,6 +4456,24 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/ConstructionKey'
+    ConstructionCostInvoice:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/ConstructionCostInvoiceKey'
+    ConstructionCostInvoiceKey:
+      type: string
+      description: |
+        DE: Die Instanz, mit welcher die Abrechnung der Baukosten erfolgt. PROPERTY_DEVELOPER = Bautraeger, GENERAL_CONTRACTOR = Generalunternehmer, ARCHITECT = Architekt, INDIVIDUAL_TRADES = Einzelgewerkvergabe <br/> EN: Open ended enum contains the instance to which the construction costs are charged.
+      example: MAP
+      x-extensible-enum:
+      - PROPERTY_DEVELOPER
+      - GENERAL_CONTRACTOR
+      - ARCHITECT
+      - INDIVIDUAL_TRADES
+      - UNKNOWN
     ConstructionKey:
       type: string
       description: |
@@ -5104,6 +5152,9 @@ components:
     DefaultRealEstateRating:
       allOf:
       - $ref: '#/components/schemas/BaseRealEstateRating'
+      properties:
+        localPriceDetails:
+          $ref: '#/components/schemas/LocalPriceDetails'
     DefaultSpecialRealEstateCharacteristics:
       allOf:
       - $ref: '#/components/schemas/BaseSpecialRealEstateCharacteristics'
@@ -5489,6 +5540,15 @@ components:
             DE: Betrag. <br/> EN: Value.
           type: number
           format: double
+    EuroAmountPerSquareMeter:
+      description: |
+        DE: Euro Betrag pro Quadratmeter. <br/> EN: Euro amount per square meter.
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          $ref: '#/components/schemas/EuroAmount'
     EvaluationInformation:
       type: object
       properties:
@@ -5746,6 +5806,8 @@ components:
           description: |
             DE: Nominalzins (Sollzins) <br/> EN: Nominal interest rate
           $ref: '#/components/schemas/PeriodicalPercentage'
+        debitor:
+          $ref: '#/components/schemas/Debitor'
     Expense:
       type: object
       required:
@@ -8147,6 +8209,15 @@ components:
       - AUXILIARY_LOAN
       - KFW_PROMOTION_LOAN
       - OTHER
+    LocalPriceDetails:
+      type: object
+      description: |
+        DE: Ortsüblicher Preis pro Quadratmeter Wohnfläche. <br/> EN: Local price per square meter of living space.
+      properties:
+        value:
+          $ref: '#/components/schemas/EuroAmountPerSquareMeter'
+        evaluationInformation:
+          $ref: '#/components/schemas/EvaluationInformation'
     LogbookEntryId:
       type: object
       properties:
@@ -8820,6 +8891,13 @@ components:
       type: object
       allOf:
       - $ref: '#/components/schemas/BasePropertiesRegisterInventory'
+      properties:
+        inventoryUnitProperties:
+          description: |
+            DE: Sammlung von Sondereigentümen (https://de.wikipedia.org/wiki/Sondereigentum) die mit diesem Miteigentum verbunden sind. <br/> EN: Collection of special properties (inventory units) associated with this co-ownership.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventorySpecialProperty'
     Paging:
       type: object
       description: |
@@ -10546,8 +10624,15 @@ components:
             DE: Verkauf findet innerhalb der Familie statt. <br/> EN: Sold within family.
           type: boolean
           nullable: true
+        fractionalOwnership:
+          description: |
+            DE: Bruchteileigentum. <br/> EN: Fractional Ownership.
+          type: boolean
+          nullable: true
         forcedSale:
           $ref: '#/components/schemas/ForeclosureSale'
+        constructionCostInvoice:
+          $ref: '#/components/schemas/ConstructionCostInvoice'
     SavingPlanTariff:
       type: object
       required:
