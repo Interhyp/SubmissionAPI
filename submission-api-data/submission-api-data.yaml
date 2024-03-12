@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.3.0
+  version: 6.4.3
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -150,6 +150,9 @@ tags:
   description: provides endpoints to access submission logbook
 - name: commands
   description: provides endpoints to access to commands sent to the submission API
+- name: pre-submission-checks
+  description: provides endpoints for pre-submission resources associated with a specific
+    financing partner
 - name: info
   description: provides basic info about service status and version of the submission
     API specs used
@@ -970,6 +973,99 @@ paths:
               example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
                 Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
                 "instance": "/v2/info" }'
+  /v2/pre-submission-checks/{preSubmissionCheckId}:
+    get:
+      summary: Get a specific pre submission check
+      description: |-
+        This endpoint gives a possibility to retrieve information about a specific pre-submission check using it's id.
+        A pre-submission check provided a way of pre-scoring to allows financial advisors to get an early indication whether a submission can be created
+      operationId: getPreSubmissionCheckById
+      tags:
+      - pre-submission-checks
+      parameters:
+      - $ref: '#/components/parameters/pre-submission-check-id'
+      responses:
+        '200':
+          description: Requested pre submission check is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreSubmissionCheck'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+  /v2/pre-submission-checks/{preSubmissionCheckId}/commands:
+    post:
+      summary: Modify an existing pre submission check.
+      description: |
+        This endpoint gives a possibility to modify an existing pre-submission check asynchronously by creating a command to perform this operation, as a result a *command id* shall be returned.
+
+        In order to follow up the command execution result, a call to `/v2/commands` endpoint could be made providing the *command id*
+      operationId: modifyPreSubmissionCheck
+      tags:
+      - pre-submission-checks
+      parameters:
+      - $ref: '#/components/parameters/pre-submission-check-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyPreSubmissionCheckCommand'
+      responses:
+        '201':
+          description: Reference to the created resource.
+          headers:
+            Location:
+              schema:
+                type: string
+                description: |
+                  DE: Link zu einer spezifischen Ressource <br/> EN: Link to retrieve a specific resource
+                example: http://some-domain/some/link/to/somewhere
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandId'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /v2/submissions:
     get:
       summary: Delivers all active submissions for a specific financing partner.
@@ -1786,6 +1882,13 @@ components:
       schema:
         type: string
       description: Id of the requested informer
+    pre-submission-check-id:
+      name: preSubmissionCheckId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Id for the requested pre submission check id.
     sbms-limit:
       name: limit
       in: query
@@ -2109,6 +2212,23 @@ components:
           description: |
             DE: Volltilger. <br/>
             EN: Full Amortizer.
+    AnswerPreSubmissionCheckCommand:
+      description: command to give feedback for a specific pre submission check
+      type: object
+      required:
+      - remarks
+      allOf:
+      - $ref: '#/components/schemas/BasePreSubmissionCheckCommand'
+      properties:
+        remarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreSubmissionCheckRemark'
+          minItems: 1
+        score:
+          $ref: '#/components/schemas/PreSubmissionCheckScore'
+        externalIdentifier:
+          type: string
     Apartment:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "APARTMENT" (Wohnung). <br/>
@@ -3112,6 +3232,19 @@ components:
           type: string
       discriminator:
         propertyName: modernisationType
+    BasePreSubmissionCheckCommand:
+      type: object
+      required:
+      - operation
+      properties:
+        createdOn:
+          $ref: '#/components/schemas/ISODateTime'
+        operation:
+          type: string
+          x-extensible-enum:
+          - ANSWER_PRE_SUBMISSION_CHECK
+      discriminator:
+        propertyName: operation
     BaseProductCalculation:
       type: object
       required:
@@ -5231,6 +5364,8 @@ components:
           - HOUSEHOLD_CALCULATION
           - MORTGAGE_LENDING_VALUE_CALCULATION
           - REVISED_FUNDING_APPLICATION
+          - PROVIDER_COVER_LETTER
+          - PROHYP_COVER_LETTER
         documentName:
           type: string
           description: |
@@ -8468,6 +8603,13 @@ components:
       - HEAT_PROTECTION
       - VENTILATION_SYSTEM
       - DIGITAL_ENERGY_OPTIMISATION
+    ModifyPreSubmissionCheckCommand:
+      oneOf:
+      - $ref: '#/components/schemas/AnswerPreSubmissionCheckCommand'
+      discriminator:
+        propertyName: operation
+        mapping:
+          ANSWER_PRE_SUBMISSION_CHECK: '#/components/schemas/AnswerPreSubmissionCheckCommand'
     ModifySubmissionCommand:
       oneOf:
       - $ref: '#/components/schemas/RevokeSubmissionCommand'
@@ -9480,6 +9622,130 @@ components:
             DE: Grundstücksgröße. <br/>
             EN: Property space.
           $ref: '#/components/schemas/SquareMeter'
+    PreSubmissionCheck:
+      type: object
+      description: |
+        EN: A pre submission check holds all the information in order to help the financing partners during credit check phase.
+      required:
+      - preSubmissionCheckId
+      properties:
+        preSubmissionCheckId:
+          $ref: '#/components/schemas/PreSubmissionCheckId'
+        financingApplication:
+          $ref: '#/components/schemas/PreSubmissionCheckFinancingApplication'
+        overview:
+          $ref: '#/components/schemas/PreSubmissionCheckOverview'
+        originInfo:
+          $ref: '#/components/schemas/OriginInfo'
+    PreSubmissionCheckConsultation:
+      writeOnly: true
+      type: object
+      required:
+      - advisory
+      - originInfo
+      properties:
+        advisory:
+          $ref: '#/components/schemas/AdvisoryDetails'
+    PreSubmissionCheckFinancialStandings:
+      type: object
+      required:
+      - details
+      properties:
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinancialStanding'
+          minItems: 1
+        summary:
+          $ref: '#/components/schemas/FinancialStandingSummary'
+    PreSubmissionCheckFinancingApplication:
+      type: object
+      required:
+      - applicants
+      - households
+      - estates
+      - financialStandings
+      - venture
+      - consultation
+      - offer
+      properties:
+        applicants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Applicant'
+        applicantRelationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicantRelationship'
+        households:
+          type: array
+          items:
+            $ref: '#/components/schemas/Household'
+          minItems: 1
+        estates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Estate'
+          minItems: 1
+        financialStandings:
+          $ref: '#/components/schemas/PreSubmissionCheckFinancialStandings'
+        venture:
+          $ref: '#/components/schemas/FinancingVenture'
+        consultation:
+          $ref: '#/components/schemas/PreSubmissionCheckConsultation'
+        offer:
+          $ref: '#/components/schemas/FinancingOffer'
+    PreSubmissionCheckId:
+      type: object
+      description: |
+        An Id refers to a specific pre submission check resource.
+      properties:
+        value:
+          type: string
+    PreSubmissionCheckLoanPartnerDetails:
+      type: object
+      properties:
+        loanPartner:
+          $ref: '#/components/schemas/Company'
+    PreSubmissionCheckOverview:
+      type: object
+      properties:
+        timeline:
+          $ref: '#/components/schemas/PreSubmissionCheckTimeline'
+        loanPartnerDetails:
+          $ref: '#/components/schemas/PreSubmissionCheckLoanPartnerDetails'
+    PreSubmissionCheckRemark:
+      description: a specific pre submission check remark
+      type: object
+      required:
+      - description
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    PreSubmissionCheckScore:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/PreSubmissionCheckScoreKey'
+    PreSubmissionCheckScoreKey:
+      type: string
+      x-extensible-enum:
+      - GREEN
+      - YELLOW
+      - RED
+    PreSubmissionCheckTimeline:
+      type: object
+      description: |
+        Timeline of a specific pre submission check.
+      properties:
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        answeredAt:
+          $ref: '#/components/schemas/ISODateTime'
     PredictedLoanPartnerDecisionDate:
       description: |
         DE: Voraussichtliches Entscheidungsdatum des Kreditgebers. <br/> EN: Predicted decision date of the loan partner.
