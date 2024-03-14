@@ -3,10 +3,6 @@
 * Documentation Fix: correct required field in SubmissionRejectedStatus
 * remove optional consultaiton.advisory.suBroker field
 * add optional consultaiton.advisory.suBrokers field
-
-
-  * Get a specific pre-submission-check
-  * Answer a specific pre-submission-check
   
 ## v6.4.3
 * add pre submission check endpoints
