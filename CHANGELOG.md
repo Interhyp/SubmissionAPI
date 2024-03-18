@@ -1,4 +1,8 @@
 # Submission Data API
+## v6.5.0
+* add UNSPECIFIED to gender enum
+* add useNewModifyCommandVersion flag  to indicate whether the usage of the new status interface is required for this submission
+
 ### v6.4.4
 * Documentation Fix: correct required field in SubmissionRejectedStatus
 * remove optional consultaiton.advisory.suBroker field
