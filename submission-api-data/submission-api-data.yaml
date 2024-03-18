@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.4.3
+  version: 6.4.4
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2119,11 +2119,13 @@ components:
             DE: Daten des Endkundekontakt. <br/>
             EN: Information about the client contact person.
           $ref: '#/components/schemas/ClientAdvisor'
-        subBroker:
+        subBrokers:
+          type: array
           description: |
             DE: Untervermittler des Antrags. <br/>
-            EN: sub broker.
-          $ref: '#/components/schemas/OrganizationUser'
+            EN: sub brokers.
+          items:
+            $ref: '#/components/schemas/OrganizationUser'
         broker:
           description: |
             DE: Daten des Vermittlers. <br/>
@@ -4641,7 +4643,7 @@ components:
           $ref: '#/components/schemas/Advisor'
         subBroker:
           deprecated: true
-          x-replaced-with: advisory.subBroker
+          x-replaced-with: advisory.subBrokers
           description: |
             DE: Untervermittler des Antrags. <br/>
             EN: Sub advisor.
@@ -11847,7 +11849,7 @@ components:
         EN: Status containing information about rejection
       required:
       - type
-      - rejection
+      - reasons
       allOf:
       - $ref: '#/components/schemas/BaseSubmissionStatus'
       properties:
