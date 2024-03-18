@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.4.4
+  version: 6.5.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -9427,11 +9427,12 @@ components:
         gender:
           type: string
           description: |
-            DE: Geschlecht der Person (nicht abschließende Aufzählung), z. B. M=männlich, F=weiblich, D=divers. <br/> EN: Open ended enum contains gender of the person, possible values are M=male, F=female, D=diverse.
+            DE: Geschlecht der Person (nicht abschließende Aufzählung), z. B. M=männlich, F=weiblich, D=divers, UNSPECIFIED. <br/> EN: Open ended enum contains gender of the person, possible values are M=male, F=female, D=diverse, UNSPECIFIED.
           x-extensible-enum:
           - M
           - F
           - D
+          - UNSPECIFIED
         title:
           $ref: '#/components/schemas/Title'
         firstName:
@@ -11774,6 +11775,10 @@ components:
           $ref: '#/components/schemas/LoanPartnerDetails'
         additionalFields:
           $ref: '#/components/schemas/AdditionalFields'
+        useNewModifyCommandVersion:
+          description: Flag indicates whether the usage of the new status interface
+            is required for this submission.
+          type: boolean
     SubmissionOverviewItem:
       type: object
       required:
