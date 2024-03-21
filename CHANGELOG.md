@@ -1,4 +1,8 @@
 # Submission Data API
+## v6.6.1
+* added ExtendedContractInfo to replace ContractInfo in deliver contract and sign contract commands
+* replaced ContractInfo with ExtendedContractInfo in logbooks and statuses related to deliver and sign contract scenarios
+  
 ## v6.5.0
 * add UNSPECIFIED to gender enum
 * add useNewModifyCommandVersion flag  to indicate whether the usage of the new status interface is required for this submission
