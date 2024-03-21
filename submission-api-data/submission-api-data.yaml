@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.5.0
+  version: 6.6.1
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2214,6 +2214,16 @@ components:
           description: |
             DE: Volltilger. <br/>
             EN: Full Amortizer.
+    AnnuityInterestRateUpdate:
+      description: details of annuity interest rate update
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseInterestRateUpdate'
+      properties:
+        baseInterestRate:
+          $ref: '#/components/schemas/InterestRate'
+        amortizationRate:
+          $ref: '#/components/schemas/PeriodicalPercentage'
     AnswerPreSubmissionCheckCommand:
       description: command to give feedback for a specific pre submission check
       type: object
@@ -3070,6 +3080,18 @@ components:
           $ref: '#/components/schemas/InterestMaturityType'
       discriminator:
         propertyName: type
+    BaseInterestRateUpdate:
+      type: object
+      required:
+      - rateUpdateType
+      properties:
+        rateUpdateType:
+          type: string
+          x-extensible-enum:
+          - ANNUITY
+          - BUILDING_SAVING_PLAN
+      discriminator:
+        propertyName: rateUpdateType
     BaseLoan:
       type: object
       description: |
@@ -3864,6 +3886,16 @@ components:
           description: id (projection id) used to identify the product used as a suspended
             amortization in the bank external system
           type: string
+    BuildingSavingPlanInterestRateUpdate:
+      description: details of building saving plan interest rate update
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseInterestRateUpdate'
+      properties:
+        savingPhaseInterestRate:
+          $ref: '#/components/schemas/SavingsPlanInterest'
+        creditPhaseInterestRate:
+          $ref: '#/components/schemas/InterestRate'
     BuildingSavingPlanInvestEquity:
       type: object
       required:
@@ -4730,7 +4762,7 @@ components:
         contracts:
           type: array
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
     ContractDeliveredStatusLogbookEntryDetails:
       type: object
       allOf:
@@ -4741,7 +4773,7 @@ components:
         contracts:
           type: array
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
     ContractInfo:
       type: object
       description: |
@@ -4816,7 +4848,7 @@ components:
         contracts:
           type: array
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
     ContractSignedStatusLogbookEntryDetails:
       type: object
       allOf:
@@ -4827,7 +4859,7 @@ components:
         contracts:
           type: array
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
     CounterOfferAnnuityRateDetails:
       type: object
       allOf:
@@ -5314,7 +5346,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
         contractDeliveryDate:
           description: |
             DE: Datum der Aushändigung des Vertrages. <br/> EN: Contract delivery date.
@@ -5368,6 +5400,21 @@ components:
           - REVISED_FUNDING_APPLICATION
           - PROVIDER_COVER_LETTER
           - PROHYP_COVER_LETTER
+          - COMMISSION_REQUIREMENT_SHEET
+          - PRE_CONTRACTUAL_INFORMATION
+          - ADVISORS_SURVEY
+          - DSL_FAX_PROLONGATION
+          - ING_INFO_SHEET
+          - FACT_SHEET
+          - DEBT_SERVICE_CALCULATION
+          - REALESTATE_VALUATION
+          - OBJECT_DATA_SHEET
+          - ADDITIONAL_PROPERTY_1_OBJECT_DATA_SHEET
+          - ADDITIONAL_PROPERTY_2_OBJECT_DATA_SHEET
+          - ADDITIONAL_PROPERTY_3_OBJECT_DATA_SHEET
+          - ADDITIONAL_PROPERTY_4_OBJECT_DATA_SHEET
+          - ADDITIONAL_PROPERTY_5_OBJECT_DATA_SHEET
+          - CHECKLIST_MORTGAGE_ASSIGNMENT
         documentName:
           type: string
           description: |
@@ -5965,6 +6012,25 @@ components:
           $ref: '#/components/schemas/ExistingLoanExpenses'
         other:
           $ref: '#/components/schemas/OtherExpense'
+    ExtendedContractInfo:
+      type: object
+      description: |
+        DE: Vertragsnummer mit Referenznummer ID.<br/> EN: Contract number and reference id pair with additional loan details.
+      required:
+      - contractNumber
+      - loanType
+      - referenceId
+      properties:
+        contractNumber:
+          type: string
+          description: |
+            DE: Darlehensnummer / Vertragsnummer. <br/> EN: Loan number / contract number.
+        referenceId:
+          $ref: '#/components/schemas/ContractInfoReferenceId'
+        loanType:
+          $ref: '#/components/schemas/ContractInfoLoanType'
+        loanDetails:
+          $ref: '#/components/schemas/LoanDetails'
     ExtendedPeriodicalCreditEntry:
       type: object
       description: The credit entries including markings for special entries.
@@ -7453,6 +7519,15 @@ components:
             DE: Effektivzins in Prozent. <br/>
             EN: Effective interest rate percent per period. <br/>
           $ref: '#/components/schemas/PeriodicalPercentage'
+    InterestRateUpdate:
+      oneOf:
+      - $ref: '#/components/schemas/AnnuityInterestRateUpdate'
+      - $ref: '#/components/schemas/BuildingSavingPlanInterestRateUpdate'
+      discriminator:
+        propertyName: rateUpdateType
+        mapping:
+          ANNUITY: '#/components/schemas/AnnuityInterestRateUpdate'
+          BUILDING_SAVING_PLAN: '#/components/schemas/BuildingSavingPlanInterestRateUpdate'
     InventorySpecialProperty:
       type: object
       properties:
@@ -8039,6 +8114,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContractInfo'
+    LoanDetails:
+      description: details of the loan to be updated
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          $ref: '#/components/schemas/EuroAmount'
+        maturity:
+          $ref: '#/components/schemas/InterestMaturity'
+        interestRateUpdate:
+          $ref: '#/components/schemas/InterestRateUpdate'
+        specialRepayment:
+          $ref: '#/components/schemas/SpecialRepayment'
+        commission:
+          $ref: '#/components/schemas/CommissionInfo'
     LoanId:
       type: object
       description: |
@@ -11269,7 +11360,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/ContractInfo'
+            $ref: '#/components/schemas/ExtendedContractInfo'
         contractSignDate:
           description: |
             DE: Datum der Unterschrift des Vertrages. <br/> EN: Contract sign date.
