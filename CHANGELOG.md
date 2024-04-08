@@ -1,4 +1,14 @@
 # Submission Data API
+## v6.7.0
+* changed remark in SubmissionCounterOfferCommandData to required
+* added new Employment property - ShortTimeWork 
+* added new property marketValue to Plot
+* added new property retirementResidence to BaseSpecialRealEstateCharacteristics
+* added new property debitor to SolvencyCreditDebt
+* changed description for LandValueEvaluation
+* changed description for property groundValue in LandValueEvaluation
+* changed description for primaryEnergDemand in EnergyEfficency
+
 ## v6.6.1
 * added ExtendedContractInfo to replace ContractInfo in deliver contract and sign contract commands
 * replaced ContractInfo with ExtendedContractInfo in logbooks and statuses related to deliver and sign contract scenarios
