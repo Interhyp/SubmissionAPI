@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.6.1
+  version: 6.7.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3476,6 +3476,11 @@ components:
             DE: Tiny Haus. <br/> EN: Tiny house
           type: boolean
           nullable: true
+        retirementResidence:
+          description: |
+            DE: Seniorenresidenz. <br/> EN: Retirement residence
+          type: boolean
+          nullable: true
       discriminator:
         propertyName: type
     BaseSpecialRepayment:
@@ -4015,6 +4020,11 @@ components:
             DE: Fälligkeit des Kaufpreises. <br/>
             EN: Due date of the purchase price.
           $ref: '#/components/schemas/ISODate'
+        notaryDate:
+          description: |
+            DE: Notartermin. <br/>
+            EN: Notary date.
+          $ref: '#/components/schemas/ISODate'
     BuyNewEstateFinancing:
       type: object
       description: |
@@ -4039,6 +4049,11 @@ components:
           description: |
             DE: Fälligkeit des Kaufpreises. <br/>
             EN: Due date of the purchase price.
+          $ref: '#/components/schemas/ISODate'
+        notaryDate:
+          description: |
+            DE: Notartermin. <br/>
+            EN: Notary date.
           $ref: '#/components/schemas/ISODate'
     Calculation:
       oneOf:
@@ -5460,6 +5475,8 @@ components:
           $ref: '#/components/schemas/JobProbation'
         parentalLeave:
           $ref: '#/components/schemas/ParentalLeave'
+        shortTimeWork:
+          $ref: '#/components/schemas/ShortTimeWork'
     EnergyEfficiency:
       type: object
       description: |
@@ -5471,7 +5488,11 @@ components:
             DE: Energieeffizienz Standard nach KfW<br/> EN: energy efficiency standard according to KfW
           x-extensible-enum:
           - KFW_EFFIZIENZHAUS_40
+          - KFW_EFFIZIENZHAUS_40PLUS
+          - KFW_EFFIZIENZHAUS_40_MIT_NACHHALTIGKEIT
           - KFW_EFFIZIENZHAUS_55
+          - KFW_EFFIZIENZHAUS_55PLUS
+          - KFW_EFFIZIENZHAUS_55_MIT_NACHHALTIGKEIT
           - KFW_EFFIZIENZHAUS_70
           - KFW_EFFIZIENZHAUS_85
           - KFW_EFFIZIENZHAUS_100
@@ -5507,7 +5528,7 @@ components:
           minimum: 0
           maximum: 100000
           description: |
-            DE: Primärenergiebedarf aktuell (in kWh/m2 pro Jahr)<br/> EN: current primary energy demand (kWh/m2 per year)
+            DE: Primärenergiebedarf (in kWh/m2 pro Jahr)<br/> EN: Primary energy demand (kWh/m2 per year)
     EntryMarking:
       type: object
       description: |
@@ -7769,13 +7790,13 @@ components:
     LandValueEvaluation:
       type: object
       description: |
-        DE: Information über den Marktwert des Grundstücks. <br/> EN: Information about land value evaluation.
+        DE: Information über den Land Wert des Grundstücks. <br/> EN: Information about land value evaluation.
       required:
       - groundValue
       properties:
         groundValue:
           description: |
-            DE: Marktwert des Grundstücks. <br/>
+            DE: Land Wert. <br/>
             EN: Land value.
           $ref: '#/components/schemas/EuroAmount'
         evaluationInformation:
@@ -9711,6 +9732,8 @@ components:
       properties:
         rating:
           $ref: '#/components/schemas/LandValueEvaluation'
+        marketValue:
+          $ref: '#/components/schemas/MarketValueEvaluation'
         landSize:
           description: |
             DE: Grundstücksgröße. <br/>
@@ -11345,6 +11368,21 @@ components:
           format: double
           minimum: 0
           maximum: 100
+    ShortTimeWork:
+      type: object
+      description: "DE: Kurzarbeit<br/> \nEN: Short time work.\n"
+      required: []
+      properties:
+        from:
+          description: |
+            DE: Beginndatum der Kurzarbeit<br/>
+            EN: Startdate of short time work
+          $ref: '#/components/schemas/ISODate'
+        to:
+          description: |
+            DE: Endenndatum der Kurzarbeit<br/>
+            EN: End date of short time work
+          $ref: '#/components/schemas/ISODate'
     SignContractSubmissionCommand:
       type: object
       description: command to sign the contract after successful credit decision.
@@ -11429,6 +11467,8 @@ components:
             DE: Periodische Rate (z.B. monatliche Rate). <br/>
             EN: Periodical payment amount (e.g. rate per month).
           $ref: '#/components/schemas/PeriodicalEuroAmount'
+        debitor:
+          $ref: '#/components/schemas/Debitor'
     SpecialHouseCharacteristics:
       description: |
         DE: Spezielle Nutzung des Hauses. <br/> EN: Special use of the house.
@@ -11625,6 +11665,7 @@ components:
       required:
       - components
       - offerDate
+      - remark
       properties:
         components:
           description: |
