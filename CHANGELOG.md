@@ -5,6 +5,7 @@
 * added new property marketValue to Plot
 * added new property retirementResidence to BaseSpecialRealEstateCharacteristics
 * added new property debitor to SolvencyCreditDebt
+* added new property notaryDate to BuyNewEstateFinancing
 * changed description for LandValueEvaluation
 * changed description for property groundValue in LandValueEvaluation
 * changed description for primaryEnergDemand in EnergyEfficency
