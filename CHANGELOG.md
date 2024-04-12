@@ -1,4 +1,8 @@
 # Submission Data API
+## v6.7.2
+* changed remark in RejectSubmissionCounterOfferCommand to required
+* added mainEmployment flag to occupation
+
 ## v6.7.0
 * changed remark in SubmissionCounterOfferCommandData to required
 * added new Employment property - ShortTimeWork 
