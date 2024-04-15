@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.0
+  version: 6.7.2
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3216,6 +3216,11 @@ components:
           nullable: true
           description: |
             DE: WAHR, wenn der Antragsteller Grenzgänger ist. <br/> EN: TRUE, if applicant is cross-border commuter.
+        mainEmployment:
+          type: boolean
+          nullable: true
+          description: |
+            DE: WAHR, wenn es sich bei der Tätigkeit um eine Hauptbeschäftigung handelt. <br/> EN: TRUE, if occupation is main employment
         retirementDate:
           description: |
             DE: Voraussichtlicher Renteneintritt. <br/> EN: Expected retirement date.
@@ -10639,6 +10644,7 @@ components:
       required:
       - counterOfferId
       - reason
+      - remark
       allOf:
       - $ref: '#/components/schemas/BaseSubmissionCommand'
       properties:
