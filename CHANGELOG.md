@@ -1,4 +1,8 @@
 # Submission Data API
+## v6.7.3
+* removed redundant required: [] property from ShortTimeWork
+* added status to PreSubmissionCheck
+
 ## v6.7.2
 * changed remark in RejectSubmissionCounterOfferCommand to required
 * added mainEmployment flag to occupation

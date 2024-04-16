@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.2
+  version: 6.7.3
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3274,6 +3274,17 @@ components:
           - ANSWER_PRE_SUBMISSION_CHECK
       discriminator:
         propertyName: operation
+    BasePreSubmissionCheckStatus:
+      type: object
+      required:
+      - status
+      properties:
+        changedOn:
+          $ref: '#/components/schemas/ISODateTime'
+        status:
+          $ref: '#/components/schemas/Status'
+      discriminator:
+        propertyName: status
     BaseProductCalculation:
       type: object
       required:
@@ -9759,6 +9770,21 @@ components:
           $ref: '#/components/schemas/PreSubmissionCheckOverview'
         originInfo:
           $ref: '#/components/schemas/OriginInfo'
+        status:
+          $ref: '#/components/schemas/PreSubmissionCheckStatus'
+    PreSubmissionCheckAnsweredStatus:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BasePreSubmissionCheckStatus'
+      properties:
+        remarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreSubmissionCheckRemark'
+        score:
+          $ref: '#/components/schemas/PreSubmissionCheckScore'
+        externalIdentifier:
+          type: string
     PreSubmissionCheckConsultation:
       writeOnly: true
       type: object
@@ -9768,6 +9794,10 @@ components:
       properties:
         advisory:
           $ref: '#/components/schemas/AdvisoryDetails'
+    PreSubmissionCheckCreatedStatus:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BasePreSubmissionCheckStatus'
     PreSubmissionCheckFinancialStandings:
       type: object
       required:
@@ -9846,6 +9876,8 @@ components:
           type: string
         description:
           type: string
+        value:
+          type: string
     PreSubmissionCheckScore:
       type: object
       required:
@@ -9853,12 +9885,26 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/PreSubmissionCheckScoreKey'
+      x-extensible-enum:
+      - GREEN
+      - YELLOW
+      - RED
+      - UNKNOWN
     PreSubmissionCheckScoreKey:
       type: string
       x-extensible-enum:
       - GREEN
       - YELLOW
       - RED
+    PreSubmissionCheckStatus:
+      oneOf:
+      - $ref: '#/components/schemas/PreSubmissionCheckAnsweredStatus'
+      - $ref: '#/components/schemas/PreSubmissionCheckCreatedStatus'
+      discriminator:
+        propertyName: status
+        mapping:
+          CREATED: '#/components/schemas/PreSubmissionCheckCreatedStatus'
+          ANSWERED: '#/components/schemas/PreSubmissionCheckAnsweredStatus'
     PreSubmissionCheckTimeline:
       type: object
       description: |
@@ -11377,7 +11423,6 @@ components:
     ShortTimeWork:
       type: object
       description: "DE: Kurzarbeit<br/> \nEN: Short time work.\n"
-      required: []
       properties:
         from:
           description: |
@@ -11593,6 +11638,11 @@ components:
       - RDM_SPIEGEL
       - ON_GEO
       - VDP_RESEARCH
+    Status:
+      type: string
+      x-extensible-enum:
+      - CREATED
+      - ANSWERED
     Submission:
       type: object
       description: |
