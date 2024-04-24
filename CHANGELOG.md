@@ -1,4 +1,9 @@
 # Submission Data API
+## v6.7.4
+* added new rateCorrection property to the AnswerPreSubmissionCheckCommand and PreSubmissionCheckAnsweredStatus
+* added new expectedFutureBurden property to the BaseExistingLoanDebt
+* added new debitInterestCommitment, expectedEndOfTheTerm, and rankingInTheLandRegister properties to the ExistingRealEstateDebt and ExistingMortgageDebt
+
 ## v6.7.3
 * removed redundant required: [] property from ShortTimeWork
 * added status to PreSubmissionCheck
