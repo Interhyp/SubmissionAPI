@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.3
+  version: 6.7.4
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2241,6 +2241,8 @@ components:
           $ref: '#/components/schemas/PreSubmissionCheckScore'
         externalIdentifier:
           type: string
+        rateCorrection:
+          $ref: '#/components/schemas/PreSubmissionCheckRateCorrection'
     Apartment:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "APARTMENT" (Wohnung). <br/>
@@ -2926,6 +2928,8 @@ components:
             DE: Vertragsnummer. <br/> EN: Contract number.
         type:
           $ref: '#/components/schemas/ExistingDebtType'
+        expectedFutureBurden:
+          $ref: '#/components/schemas/DebtExpense'
       discriminator:
         propertyName: type
     BaseFinancialStanding:
@@ -5979,6 +5983,12 @@ components:
           description: |
             DE: Nominalzins (Sollzins) <br/> EN: Nominal interest rate
           $ref: '#/components/schemas/PeriodicalPercentage'
+        debitInterestCommitment:
+          $ref: '#/components/schemas/Duration'
+        expectedEndOfTheTerm:
+          $ref: '#/components/schemas/ISODate'
+        rankingInTheLandRegister:
+          type: string
     ExistingMortgageRef:
       type: object
       description: |
@@ -6029,6 +6039,12 @@ components:
           $ref: '#/components/schemas/PeriodicalPercentage'
         debitor:
           $ref: '#/components/schemas/Debitor'
+        debitInterestCommitment:
+          $ref: '#/components/schemas/Duration'
+        expectedEndOfTheTerm:
+          $ref: '#/components/schemas/ISODate'
+        rankingInTheLandRegister:
+          type: string
     Expense:
       type: object
       required:
@@ -9785,6 +9801,8 @@ components:
           $ref: '#/components/schemas/PreSubmissionCheckScore'
         externalIdentifier:
           type: string
+        rateCorrection:
+          $ref: '#/components/schemas/PreSubmissionCheckRateCorrection'
     PreSubmissionCheckConsultation:
       writeOnly: true
       type: object
@@ -9866,6 +9884,15 @@ components:
           $ref: '#/components/schemas/PreSubmissionCheckTimeline'
         loanPartnerDetails:
           $ref: '#/components/schemas/PreSubmissionCheckLoanPartnerDetails'
+    PreSubmissionCheckRateCorrection:
+      description: |
+        DE: Konditionsauf-bzw. Abschlag. <br/> EN: Condition surcharge or discount.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: number
     PreSubmissionCheckRemark:
       description: a specific pre submission check remark
       type: object
