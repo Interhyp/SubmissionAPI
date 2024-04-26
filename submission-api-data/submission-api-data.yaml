@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.4
+  version: 6.7.5
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2544,6 +2544,11 @@ components:
       properties:
         remark:
           type: string
+    ApproveSubmissionCommissionChangeCommand:
+      description: Approve modified commission
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionCommand'
     ArchiveSubmissionCommand:
       description: Mark a submission as archived.
       type: object
@@ -3550,6 +3555,7 @@ components:
           - CHANGE_LOAN_PARTNER_PROCESSING_UNIT
           - CLOSE_REJECTED_SUBMISSION
           - ADD_SUBMISSION_LOGBOOK_NOTE
+          - APPROVE_SUBMISSION_COMMISSION_CHANGE
       discriminator:
         propertyName: operation
     BaseSubmissionStatus:
@@ -8785,6 +8791,7 @@ components:
       - $ref: '#/components/schemas/CloseRejectedSubmissionCommand'
       - $ref: '#/components/schemas/UpdateSubmissionContactUserCommand'
       - $ref: '#/components/schemas/AddSubmissionLogbookNoteCommand'
+      - $ref: '#/components/schemas/ApproveSubmissionCommissionChangeCommand'
       discriminator:
         propertyName: operation
         mapping:
@@ -8815,6 +8822,7 @@ components:
           CLOSE_REJECTED_SUBMISSION: '#/components/schemas/CloseRejectedSubmissionCommand'
           UPDATE_CONTACT_USER: '#/components/schemas/UpdateSubmissionContactUserCommand'
           ADD_SUBMISSION_LOGBOOK_NOTE: '#/components/schemas/AddSubmissionLogbookNoteCommand'
+          APPROVE_SUBMISSION_COMMISSION_CHANGE: '#/components/schemas/ApproveSubmissionCommissionChangeCommand'
     Nationality:
       type: object
       required:

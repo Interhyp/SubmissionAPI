@@ -1,4 +1,7 @@
 # Submission Data API
+## v6.7.5
+* Added command to approve submission commission change
+
 ## v6.7.4
 * added new rateCorrection property to the AnswerPreSubmissionCheckCommand and PreSubmissionCheckAnsweredStatus
 * added new expectedFutureBurden property to the BaseExistingLoanDebt
