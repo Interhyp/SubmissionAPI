@@ -1,17 +1,21 @@
 # Submission Data API
-## v6.7.5
+
+### v6.7.6
+* adopt new release process. no changes are required from api clients
+* 
+### v6.7.5
 * Added command to approve submission commission change
 
-## v6.7.4
+### v6.7.4
 * added new rateCorrection property to the AnswerPreSubmissionCheckCommand and PreSubmissionCheckAnsweredStatus
 * added new expectedFutureBurden property to the BaseExistingLoanDebt
 * added new debitInterestCommitment, expectedEndOfTheTerm, and rankingInTheLandRegister properties to the ExistingRealEstateDebt and ExistingMortgageDebt
 
-## v6.7.3
+### v6.7.3
 * removed redundant required: [] property from ShortTimeWork
 * added status to PreSubmissionCheck
 
-## v6.7.2
+### v6.7.2
 * changed remark in RejectSubmissionCounterOfferCommand to required
 * added mainEmployment flag to occupation
 
