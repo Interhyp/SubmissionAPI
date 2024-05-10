@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.5
+  version: 6.7.6
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -133,11 +133,11 @@ info:
     By using the [OpenAPI-Spec generator](https://github.com/OpenAPITools/openapi-generator), you can easily generate an API client stub.
     > **Tip:** This API could be also viewed in [swagger editor](https://editor.swagger.io/) by copy/paste the content of this document in the editor.
 servers:
-- url: https://api-dev.ehyphome.de/submission
+- url: https://api-dev.ehyphome.de/submission/v2
   description: Test-Staging
-- url: https://api-acc.ehyphome.de/submission
+- url: https://api-acc.ehyphome.de/submission/v2
   description: Acceptance-Staging
-- url: https://api.interhyp.de/submission
+- url: https://api.interhyp.de/submission/v2
   description: Production
 tags:
 - name: submissions
@@ -157,7 +157,7 @@ tags:
   description: provides basic info about service status and version of the submission
     API specs used
 paths:
-  /v2/commands/{commandId}:
+  /commands/{commandId}:
     get:
       summary: Get an existing command
       description: |
@@ -200,7 +200,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}:
+  /financing-applications/{financingApplicationId}:
     get:
       summary: Get a exisiting financing application
       description: |
@@ -243,7 +243,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/applicant-relationships:
+  /financing-applications/{financingApplicationId}/applicant-relationships:
     get:
       summary: Get a list of applicant-relationships
       description: |
@@ -285,7 +285,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/applicants:
+  /financing-applications/{financingApplicationId}/applicants:
     get:
       summary: Get applicants for a specific submission package.
       description: Delivers detailed information for applicants associated with this
@@ -328,7 +328,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/applicants/{applicantId}:
+  /financing-applications/{financingApplicationId}/applicants/{applicantId}:
     get:
       summary: Get a specific mortgage applicant
       description: Delivers detailed information for mortgage applicant by his id.
@@ -370,7 +370,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/applicants/{applicantId}/financial-standings:
+  /financing-applications/{financingApplicationId}/applicants/{applicantId}/financial-standings:
     get:
       summary: Get applicant financial standings
       description: |-
@@ -417,7 +417,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/consultation:
+  /financing-applications/{financingApplicationId}/consultation:
     get:
       summary: Get financing consultation
       description: Delivers detailed information about the consultation associated
@@ -459,7 +459,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/estates:
+  /financing-applications/{financingApplicationId}/estates:
     get:
       summary: Get estates for a specific financing application.
       description: Delivers detailed information for the estates associated with this
@@ -503,7 +503,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/estates/{estateId}:
+  /financing-applications/{financingApplicationId}/estates/{estateId}:
     get:
       summary: Get a specific estate.
       description: Delivers detailed information for an estate by it's id.
@@ -545,7 +545,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/financial-standings:
+  /financing-applications/{financingApplicationId}/financial-standings:
     get:
       summary: Get applicants financial standings
       description: |-
@@ -592,7 +592,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/financial-standings/existing-loans/{debtId}:
+  /financing-applications/{financingApplicationId}/financial-standings/existing-loans/{debtId}:
     get:
       summary: Get a specific existing loan.
       description: Delivers detailed information for existing loan by it's id.
@@ -634,7 +634,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/financial-standings/{financialStandingId}:
+  /financing-applications/{financingApplicationId}/financial-standings/{financialStandingId}:
     get:
       summary: Get a specific financial standing
       description: |-
@@ -679,7 +679,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/households:
+  /financing-applications/{financingApplicationId}/households:
     get:
       summary: Get applicants household
       description: Delivers detailed information about the applicants households associated
@@ -721,7 +721,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/informers:
+  /financing-applications/{financingApplicationId}/informers:
     get:
       summary: Get consultation informers
       description: |-
@@ -772,7 +772,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/informers/{informerId}:
+  /financing-applications/{financingApplicationId}/informers/{informerId}:
     get:
       summary: Get a specific mortgage informer
       description: Delivers detailed information for mortgage informer by his id.
@@ -814,7 +814,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/offer:
+  /financing-applications/{financingApplicationId}/offer:
     get:
       summary: Get financing offer
       description: Delivers detailed information about the financing offer associated
@@ -856,7 +856,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/submissions:
+  /financing-applications/{financingApplicationId}/submissions:
     get:
       summary: Get financing application's submission
       description: Delivers detailed information about the submission belong to specific
@@ -898,7 +898,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/financing-applications/{financingApplicationId}/venture:
+  /financing-applications/{financingApplicationId}/venture:
     get:
       summary: Get financing venture
       description: Delivers detailed information about the financing venture associated
@@ -940,7 +940,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/info:
+  /info:
     get:
       summary: Get Submission API service status and info
       description: Delivers information about Submission API service status and basic
@@ -973,7 +973,7 @@ paths:
               example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
                 Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
                 "instance": "/v2/info" }'
-  /v2/pre-submission-checks/{preSubmissionCheckId}:
+  /pre-submission-checks/{preSubmissionCheckId}:
     get:
       summary: Get a specific pre submission check
       description: |-
@@ -1016,7 +1016,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/pre-submission-checks/{preSubmissionCheckId}/commands:
+  /pre-submission-checks/{preSubmissionCheckId}/commands:
     post:
       summary: Modify an existing pre submission check.
       description: |
@@ -1066,7 +1066,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions:
+  /submissions:
     get:
       summary: Delivers all active submissions for a specific financing partner.
       description: |
@@ -1117,7 +1117,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}:
+  /submissions/{submissionId}:
     get:
       summary: Get a specific submission
       description: |-
@@ -1169,7 +1169,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/calculations/{calculationType}:
+  /submissions/{submissionId}/calculations/{calculationType}:
     get:
       summary: Get calculation data
       description: |-
@@ -1218,7 +1218,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/commands:
+  /submissions/{submissionId}/commands:
     post:
       summary: Modify an existing submission.
       description: |
@@ -1268,7 +1268,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/credit-loans/{creditLoanId}:
+  /submissions/{submissionId}/credit-loans/{creditLoanId}:
     get:
       summary: Get a specific credit loan
       description: |-
@@ -1313,7 +1313,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/financing-application:
+  /submissions/{submissionId}/financing-application:
     get:
       summary: Get a submitted financing application
       description: |
@@ -1378,7 +1378,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/handover-documents:
+  /submissions/{submissionId}/handover-documents:
     get:
       summary: Get handover documents
       description: |-
@@ -1446,7 +1446,7 @@ paths:
               example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
                 Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
                 "instance": "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
-  /v2/submissions/{submissionId}/handover/reports:
+  /submissions/{submissionId}/handover/reports:
     get:
       summary: Get handover reports
       deprecated: true
@@ -1510,7 +1510,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/handover/reports/{name}:
+  /submissions/{submissionId}/handover/reports/{name}:
     get:
       summary: Get a specific handover report as `PDF`
       description: Delivers detailed information about a specific handover report
@@ -1553,7 +1553,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/logbook:
+  /submissions/{submissionId}/logbook:
     get:
       summary: Get submission logbook entries
       description: Delivers detailed information about logbook entries associated
@@ -1595,7 +1595,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/overview:
+  /submissions/{submissionId}/overview:
     get:
       summary: Get the overview for a submission
       description: Delivers an overview for the requested submission.
@@ -1636,7 +1636,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RFC7807Problem'
-  /v2/submissions/{submissionId}/status:
+  /submissions/{submissionId}/status:
     get:
       summary: Get current status of specified submission
       description: Delivers information about current status of a specific submission
@@ -1690,7 +1690,7 @@ paths:
               example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
                 Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
                 "instance": "/v2/submissions/de-20230314-0rztcss-55vcy/status" }'
-  /v2/submissions/{submissionId}/uploaded-documents/{documentId}/content:
+  /submissions/{submissionId}/uploaded-documents/{documentId}/content:
     get:
       summary: Get a specific submission document as `PDF`
       description: Delivers detailed information about a specific submission document
