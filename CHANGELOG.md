@@ -2,7 +2,7 @@
 
 ### v6.7.6
 * adopt new release process. no changes are required from api clients
-* 
+
 ### v6.7.5
 * Added command to approve submission commission change
 
