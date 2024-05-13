@@ -1,5 +1,10 @@
 # Submission Data API
 
+### v6.7.7
+* add shortTimeWork boolean to ShortTimeWork
+* add new enum value - FARMER to FreeLancerJobTYpe
+* add eHypCent amount to Loans
+
 ### v6.7.6
 * adopt new release process. no changes are required from api clients
 
