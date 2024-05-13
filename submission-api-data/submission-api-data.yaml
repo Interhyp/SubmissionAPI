@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.6
+  version: 6.7.7
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3165,6 +3165,11 @@ components:
           description: |
             DE: Bereitstellungszins. <br/> EN: Periodical commitment interest rate.
           $ref: '#/components/schemas/PeriodicalPercentage'
+        eHypCent:
+          description: |
+            DE: Platformnutzungsgebühr . <br/>
+            EN: Platform usage fees.
+          $ref: '#/components/schemas/EuroAmount'
       discriminator:
         propertyName: type
     BaseLogbookEntry:
@@ -6845,7 +6850,7 @@ components:
     FreeLancerJobTypeKey:
       type: string
       description: |
-        DE: Freiberufliche Tätigkeit des Antragstellers (nicht abschließende Aufzählung). <br/> EN: open ended enum contains alues for the freelancer job types, possible values are CARER, AMBORDERLY, ADVOCATE, APOTHECARY, ARCHITECT, PHYSICIAN, UNDERTAKER, ACCOUNTANT, REVISOR, FED_DP_COMMISSIONER, DECORATOR, DIETICIAN, INTERPRET, ERGOTHERAPIST, NUTRITIONIST, GEOGRAPHER, CONSULTANT, IT_CONSULT, FINANCSERV, PHOTOGRAPH, DESIGNER, MIDWIFE, HEALERMASSEUR, HEALER, HISTORIAN, COMPUTER_SPEC, ENGINEER, INSOLVENCY_ADMIN, JOURNALIST, PHYSIOTHER, ORDERLY, NURSE, MUSICIAN, CONSTRUCTOR, THERAPIST, MASSEUR, PARAMEDIC, NOTARY, OPTICIAN, OPERA_SINGER, HR_ADVISR, PSYCHOLOG, PSYCHOTHER, PHYSTHERAP, INTER_DECORATOR, RADIO_ANNOUNCER, EXPERT, TOWN_PLANER, STRUCT_ENG, TAX_ADVISR, TAX_AGENT, VETERINARY, TRANSLATOR, UNDER_ADVISR, AUDITOR, DENTAL_TECH, DENTIST, OTHER.
+        DE: Freiberufliche Tätigkeit des Antragstellers (nicht abschließende Aufzählung). <br/> EN: open ended enum contains alues for the freelancer job types, possible values are CARER, AMBORDERLY, ADVOCATE, APOTHECARY, ARCHITECT, PHYSICIAN, UNDERTAKER, ACCOUNTANT, REVISOR, FED_DP_COMMISSIONER, DECORATOR, DIETICIAN, INTERPRET, ERGOTHERAPIST, NUTRITIONIST, GEOGRAPHER, CONSULTANT, IT_CONSULT, FINANCSERV, PHOTOGRAPH, DESIGNER, MIDWIFE, HEALERMASSEUR, HEALER, HISTORIAN, COMPUTER_SPEC, ENGINEER, INSOLVENCY_ADMIN, JOURNALIST, PHYSIOTHER, ORDERLY, NURSE, MUSICIAN, CONSTRUCTOR, THERAPIST, MASSEUR, PARAMEDIC, NOTARY, OPTICIAN, OPERA_SINGER, HR_ADVISR, PSYCHOLOG, PSYCHOTHER, PHYSTHERAP, INTER_DECORATOR, RADIO_ANNOUNCER, EXPERT, TOWN_PLANER, STRUCT_ENG, TAX_ADVISR, TAX_AGENT, VETERINARY, TRANSLATOR, UNDER_ADVISR, AUDITOR, DENTAL_TECH, DENTIST, FARMER, OTHER.
       example: ARCHITECT
       x-extensible-enum:
       - CARER
@@ -6908,6 +6913,7 @@ components:
       - DENTAL_TECH
       - DENTIST
       - BROKER
+      - FARMER
       - OTHER
     Furnishing:
       type: object
@@ -11459,6 +11465,9 @@ components:
       type: object
       description: "DE: Kurzarbeit<br/> \nEN: Short time work.\n"
       properties:
+        shortTimeWork:
+          type: boolean
+          default: true
         from:
           description: |
             DE: Beginndatum der Kurzarbeit<br/>
