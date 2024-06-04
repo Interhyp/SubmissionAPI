@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.7
+  version: 6.7.8
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -5560,6 +5560,18 @@ components:
           maximum: 100000
           description: |
             DE: Primärenergiebedarf (in kWh/m2 pro Jahr)<br/> EN: Primary energy demand (kWh/m2 per year)
+        primaryEnergyConsumption:
+          type: integer
+          minimum: 0
+          maximum: 100000
+          description: |
+            DE: Primärenergieverbrauch nach Modernisierung (in kWh/m2 pro Jahr) - nicht relevant bei Grundstücken, sowie bei den Finanzierungsgründen Bau, Kauf Neubau<br/> EN: primary energy consumption after modernisation (kWh/m2 per year) - not relevant for plots of land and financing reasons build, buy new building
+        carbondioxideEmissions:
+          type: integer
+          minimum: 0
+          maximum: 100000
+          description: |
+            DE: CO2 Emissionen (in kg/m2 pro Jahr) nach Modernisierung - nicht relevant bei Grundstücken, sowie bei den Finanzierungsgründen Bau, Kauf Neubau<br> EN: Carbondioxide emissions (in kg/m2 per year) after modernisation - not relevant for plots of land and financing reasons build, buy new building
     EntryMarking:
       type: object
       description: |
@@ -9785,6 +9797,51 @@ components:
             DE: Grundstücksgröße. <br/>
             EN: Property space.
           $ref: '#/components/schemas/SquareMeter'
+    PreInquires:
+      type: object
+      required:
+      - preInquires
+      properties:
+        preInquires:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreInquiry'
+    PreInquiry:
+      type: object
+      properties:
+        preInquiryId:
+          $ref: '#/components/schemas/PreInquiryId'
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        status:
+          $ref: '#/components/schemas/PreInquiryStatus'
+    PreInquiryId:
+      type: object
+      description: |
+        DE: ID des Voranfrage. <br/> EN: PreInquiry identifier.
+      properties:
+        value:
+          type: string
+    PreInquiryStatus:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/PreInquiryStatusKey'
+    PreInquiryStatusKey:
+      type: string
+      description: |
+        DE: Status des Voranfrage. <br/> EN: Status of the preInquiry.
+      x-extensible-enum:
+      - CREATED
+      - INWORK
+      - SUBMITTED
+      - ACCEPTED
+      - ACCEPTED_WITH_PROPOSAL
+      - REJECTED
+      - ABORTED
+      - TERMINATED
     PreSubmissionCheck:
       type: object
       description: |
@@ -11707,6 +11764,8 @@ components:
           $ref: '#/components/schemas/ResidualDebtProtections'
         originInfo:
           $ref: '#/components/schemas/OriginInfo'
+        preInquires:
+          $ref: '#/components/schemas/PreInquires'
     SubmissionAwaitExternalProcessingStatus:
       type: object
       description: |
