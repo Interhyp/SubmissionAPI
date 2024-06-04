@@ -1,5 +1,9 @@
 # Submission Data API
 
+### v6.7.8
+* Add PreInquires to Submission
+* Extend green deal fields
+  
 ### v6.7.7
 * add shortTimeWork boolean to ShortTimeWork
 * add new enum value - FARMER to FreeLancerJobTYpe
