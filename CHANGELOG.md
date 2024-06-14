@@ -1,6 +1,10 @@
 # Submission Data API
 
 ### v6.7.8
+* remove duplicated PreSubmissionCheckRemark and PreSubmissionCheckScore
+* rename field description to value in PreSubmissionCheckRemark 
+
+### v6.7.8
 * Add PreInquires to Submission
 * Extend green deal fields
   
