@@ -1,7 +1,6 @@
 # Submission Data API
 
 ### v6.7.9
-* remove duplicated PreSubmissionCheckRemark and PreSubmissionCheckScore
 * rename field description to value in PreSubmissionCheckRemark 
 
 ### v6.7.8
