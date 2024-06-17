@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.9
+* rename field description to value in PreSubmissionCheckRemark 
+
 ### v6.7.8
 * Add PreInquires to Submission
 * Extend green deal fields

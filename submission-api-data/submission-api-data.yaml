@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.8
+  version: 6.7.9
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -9968,11 +9968,9 @@ components:
       description: a specific pre submission check remark
       type: object
       required:
-      - description
+      - value
       properties:
         code:
-          type: string
-        description:
           type: string
         value:
           type: string
@@ -9983,11 +9981,6 @@ components:
       properties:
         key:
           $ref: '#/components/schemas/PreSubmissionCheckScoreKey'
-      x-extensible-enum:
-      - GREEN
-      - YELLOW
-      - RED
-      - UNKNOWN
     PreSubmissionCheckScoreKey:
       type: string
       x-extensible-enum:
