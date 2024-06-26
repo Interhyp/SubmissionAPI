@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.10
+* Extend savings phase with currentBalance
+
 ### v6.7.9
 * rename field description to value in PreSubmissionCheckRemark 
 
