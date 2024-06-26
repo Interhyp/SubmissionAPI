@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.9
+  version: 6.7.10
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -11249,6 +11249,11 @@ components:
           description: |
             DE: Bausparguthaben bei Zuteilung. <br/> EN: The account balance at the moment of allocation.
           $ref: '#/components/schemas/EuroAmount'
+        currentBalance:
+          description: |
+            DE: Aktuelles Bausparguthaben.
+          allOf:
+          - $ref: '#/components/schemas/EuroAmount'
     SavingsPlanBurden:
       type: object
       properties:
