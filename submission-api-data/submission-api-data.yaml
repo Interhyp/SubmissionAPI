@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.10
+  version: 6.7.12
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -9852,7 +9852,7 @@ components:
         preSubmissionCheckId:
           $ref: '#/components/schemas/PreSubmissionCheckId'
         financingApplication:
-          $ref: '#/components/schemas/PreSubmissionCheckFinancingApplication'
+          $ref: '#/components/schemas/FinancingApplicationItem'
         overview:
           $ref: '#/components/schemas/PreSubmissionCheckOverview'
         originInfo:
@@ -9874,68 +9874,10 @@ components:
           type: string
         rateCorrection:
           $ref: '#/components/schemas/PreSubmissionCheckRateCorrection'
-    PreSubmissionCheckConsultation:
-      writeOnly: true
-      type: object
-      required:
-      - advisory
-      - originInfo
-      properties:
-        advisory:
-          $ref: '#/components/schemas/AdvisoryDetails'
     PreSubmissionCheckCreatedStatus:
       type: object
       allOf:
       - $ref: '#/components/schemas/BasePreSubmissionCheckStatus'
-    PreSubmissionCheckFinancialStandings:
-      type: object
-      required:
-      - details
-      properties:
-        details:
-          type: array
-          items:
-            $ref: '#/components/schemas/FinancialStanding'
-          minItems: 1
-        summary:
-          $ref: '#/components/schemas/FinancialStandingSummary'
-    PreSubmissionCheckFinancingApplication:
-      type: object
-      required:
-      - applicants
-      - households
-      - estates
-      - financialStandings
-      - venture
-      - consultation
-      - offer
-      properties:
-        applicants:
-          type: array
-          items:
-            $ref: '#/components/schemas/Applicant'
-        applicantRelationships:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApplicantRelationship'
-        households:
-          type: array
-          items:
-            $ref: '#/components/schemas/Household'
-          minItems: 1
-        estates:
-          type: array
-          items:
-            $ref: '#/components/schemas/Estate'
-          minItems: 1
-        financialStandings:
-          $ref: '#/components/schemas/PreSubmissionCheckFinancialStandings'
-        venture:
-          $ref: '#/components/schemas/FinancingVenture'
-        consultation:
-          $ref: '#/components/schemas/PreSubmissionCheckConsultation'
-        offer:
-          $ref: '#/components/schemas/FinancingOffer'
     PreSubmissionCheckId:
       type: object
       description: |
