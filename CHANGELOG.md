@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.12
+* Introduce embedded structure to pre submission check
+
 ### v6.7.10
 * Extend savings phase with currentBalance
 
