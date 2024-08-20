@@ -2,6 +2,7 @@
 
 ### v6.7.14
 * Introduce considerForCount to pre submission check response and answered status
+* Type examples fixes
 
 ### v6.7.12
 * Introduce embedded structure to pre submission check
