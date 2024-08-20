@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.14
+* Introduce considerForCount to pre submission check response and answered status
+
 ### v6.7.12
 * Introduce embedded structure to pre submission check
 
