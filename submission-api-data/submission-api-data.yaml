@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.12
+  version: 6.7.14
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2243,6 +2243,11 @@ components:
           type: string
         rateCorrection:
           $ref: '#/components/schemas/PreSubmissionCheckRateCorrection'
+        considerForCount:
+          description: a flag indicates whether the answered pre submission check
+            should be considered to increase the allowed call counter
+          type: boolean
+          nullable: true
     Apartment:
       description: |
         DE: Zusätzliche Information zu der Immobilie von Typ "APARTMENT" (Wohnung). <br/>
@@ -7383,7 +7388,7 @@ components:
       type: string
       format: date
       nullable: true
-      example: 2019-12-29T00:00:00Z
+      example: '2019-12-29'
     ISODateTime:
       description: |
         DE: Datum, Syntax nach <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a><br/> EN: Date according to <a href="https://tools.ietf.org/html/rfc3339#section-5.6">RFC 3339</a>
@@ -9874,6 +9879,11 @@ components:
           type: string
         rateCorrection:
           $ref: '#/components/schemas/PreSubmissionCheckRateCorrection'
+        considerForCount:
+          description: a flag indicates whether the answered pre submission check
+            should be considered to increase the allowed call counter
+          type: boolean
+          nullable: true
     PreSubmissionCheckCreatedStatus:
       type: object
       allOf:
@@ -10327,8 +10337,7 @@ components:
           description: HTTP status code following standared error codes (https://tools.ietf.org/html/rfc2616#section-10)
           example: 400
           minimum: 100
-          maximum: 600
-          exclusiveMaximum: true
+          maximum: 599
         detail:
           type: string
           description: Detailed description for the returned error
@@ -12881,4 +12890,4 @@ components:
           type: string
           description: The actual value of the year.
           pattern: ^\d{4}$
-          example: 2019
+          example: '2019'
