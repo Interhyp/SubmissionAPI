@@ -1,5 +1,9 @@
 # Submission Data API
 
+### v6.7.15
+* Added new KfwProgram value `WEP_JKA_308`
+* Added originalPurchase property to BaseRealEstate
+
 ### v6.7.14
 * Introduce considerForCount to pre submission check response and answered status
 * Type examples fixes
