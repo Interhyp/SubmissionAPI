@@ -1,7 +1,7 @@
 # Submission Data API
 
 ### v6.7.17
-* Fix: move originalPurchase property into Plot Estate type to fix an issue with the generated stubs
+* Fix: move recently added originalPurchase property into Plot Estate type to fix an issue with the generated stubs
 * small documentation changes
 
 ### v6.7.15
