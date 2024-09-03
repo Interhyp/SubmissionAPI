@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.15
+  version: 6.7.17
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -2044,17 +2044,17 @@ components:
             DE: Straßenname (Teil der Adresse). <br/> EN: Street name of the address
         houseNumber:
           type: string
-          example: 42
+          example: '42'
           description: |
             DE: Hausnummer (Teil der Adresse). <br/> EN: House number of the address.
         apartmentNumber:
           type: string
-          example: 3
+          example: '3'
           description: |
             DE: Wohnungsnummer. <br/> EN: Apartment number within the building.
         postalCode:
           type: string
-          example: 80807
+          example: '80807'
           description: |
             DE: Postleitzahl (Teil der Adresse). <br/> EN: Postal code of the address.
         city:
@@ -3428,8 +3428,6 @@ components:
           type: string
         externalEstateId:
           $ref: '#/components/schemas/ExternalEstateId'
-        originalPurchase:
-          $ref: '#/components/schemas/OriginalPurchase'
       discriminator:
         propertyName: type
     BaseRealEstateRating:
@@ -9806,6 +9804,8 @@ components:
             DE: Grundstücksgröße. <br/>
             EN: Property space.
           $ref: '#/components/schemas/SquareMeter'
+        originalPurchase:
+          $ref: '#/components/schemas/OriginalPurchase'
     PreInquires:
       type: object
       required:
