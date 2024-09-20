@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.18
+* Add useNewUploadVersion flag to submission overview
+  
 ### v6.7.17
 * Fix: move recently added originalPurchase property into Plot Estate type to fix an issue with the generated stubs
 * small documentation changes
