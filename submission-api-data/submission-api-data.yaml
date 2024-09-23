@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.17
+  version: 6.7.18
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -12021,6 +12021,10 @@ components:
           $ref: '#/components/schemas/AdditionalFields'
         useNewModifyCommandVersion:
           description: Flag indicates whether the usage of the new status interface
+            is required for this submission.
+          type: boolean
+        useNewUploadVersion:
+          description: Flag indicates whether the usage of new upload for documents
             is required for this submission.
           type: boolean
     SubmissionOverviewItem:
