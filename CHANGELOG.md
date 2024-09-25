@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.7.19
+* Add new kfw program - KNN_296
+  
 ### v6.7.18
 * Add useNewUploadVersion flag to submission overview
   

@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.18
+  version: 6.7.19
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -7784,6 +7784,7 @@ components:
       - WEPFamilienJKA308
       - EMKreditPlus
       - EMKredit
+      - KNN296WOHN
     KfwProgramType:
       type: string
       description: |
@@ -7807,6 +7808,7 @@ components:
       - WEP_JKA_308
       - KFW_358
       - KFW_359
+      - KNN_296
       - UNKNOWN
     KfwPromotionLoan:
       description: |
