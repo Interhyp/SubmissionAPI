@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.21
+  version: 6.7.22
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3005,7 +3005,7 @@ components:
           type: integer
           format: int32
           description: |
-            DE: Anzahl an Gehaltszahlungen. <br/> EN: Number of payments
+            DE: Anzahl Auszahlungen <br/> EN: Number of payments
       discriminator:
         propertyName: type
     BaseFinancingNeed:
@@ -11113,7 +11113,7 @@ components:
           type: number
           format: double
           description: |
-            DE: Anzahl Auszahlungen <br/> EN: Number of payments
+            DE: Anzahl an Gehaltszahlungen. <br/> EN: Number of payments
         assuredNumber:
           type: number
           format: double
