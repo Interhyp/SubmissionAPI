@@ -1,6 +1,6 @@
 # Submission Data API
 
-### v6.7.21
+### v6.7.22
 * Add numberOfRooms to RealEstate
 * Add depositValue to BuildingSavingPlanEquity
 * Add isForwardLoan to BaseLoan
