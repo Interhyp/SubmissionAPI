@@ -1,5 +1,12 @@
 # Submission Data API
 
+### v6.7.22
+* Add numberOfRooms to RealEstate
+* Add depositValue to BuildingSavingPlanEquity
+* Add isForwardLoan to BaseLoan
+* Add isRestricted to PropertyRegisterRestriction
+* Add numberOfPayments BaseFinancingDetails
+
 ### v6.7.19
 * Add new kfw program - KNN_296
   
