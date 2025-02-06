@@ -1,5 +1,9 @@
 # Submission Data API
 
+### v6.7.23
+* Add modify submission command with additional products
+* Improve description
+
 ### v6.7.22
 * Add numberOfRooms to RealEstate
 * Add depositValue to BuildingSavingPlanEquity

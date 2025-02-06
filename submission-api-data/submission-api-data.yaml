@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.22
+  version: 6.7.23
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -3573,6 +3573,7 @@ components:
           - CLOSE_REJECTED_SUBMISSION
           - ADD_SUBMISSION_LOGBOOK_NOTE
           - APPROVE_SUBMISSION_COMMISSION_CHANGE
+          - UPDATE_ADDITIONAL_PRODUCTS
       discriminator:
         propertyName: operation
     BaseSubmissionStatus:
@@ -5496,7 +5497,7 @@ components:
           type: integer
           format: int32
           description: |
-            DE: Die Menge der gewählten Zeiteinheit. </br> EN: The amount of the selected temporal unit.
+            DE: Die Menge der gewaehlten Zeiteinheit. </br> EN: The amount of the selected temporal unit.
         unit:
           type: string
           enum:
@@ -8828,6 +8829,7 @@ components:
       - $ref: '#/components/schemas/UpdateSubmissionContactUserCommand'
       - $ref: '#/components/schemas/AddSubmissionLogbookNoteCommand'
       - $ref: '#/components/schemas/ApproveSubmissionCommissionChangeCommand'
+      - $ref: '#/components/schemas/UpdateAdditionalProductsCommand'
       discriminator:
         propertyName: operation
         mapping:
@@ -8859,6 +8861,7 @@ components:
           UPDATE_CONTACT_USER: '#/components/schemas/UpdateSubmissionContactUserCommand'
           ADD_SUBMISSION_LOGBOOK_NOTE: '#/components/schemas/AddSubmissionLogbookNoteCommand'
           APPROVE_SUBMISSION_COMMISSION_CHANGE: '#/components/schemas/ApproveSubmissionCommissionChangeCommand'
+          UPDATE_ADDITIONAL_PRODUCTS: '#/components/schemas/UpdateAdditionalProductsCommand'
     Nationality:
       type: object
       required:
@@ -10085,6 +10088,59 @@ components:
           LENDING_VALUE: '#/components/schemas/LoanToValueRatioProductCalculation'
           HOUSEHOLD: '#/components/schemas/HouseholdProductCalculation'
           CONDITION: '#/components/schemas/ConditionProductCalculation'
+    ProductType:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          $ref: '#/components/schemas/ProductTypeKey'
+    ProductTypeKey:
+      type: string
+      description: |
+        DE: Art des Zusatzprodukten. <br/> EN: Enum contains type of the  additional product.
+      example: BAU_SPAR
+      x-extensible-enum:
+      - A_FONDS
+      - AU_AL
+      - BH_HAFTPF
+      - BAU_SPAR
+      - BU
+      - CONTAINER
+      - DREAD_DIS
+      - FONDS_HYP
+      - FONDS_LV
+      - FONDS_RV
+      - FONDS_SPAR
+      - GES_FOND
+      - GIRO
+      - GFV
+      - GRUND
+      - HAFTPFL
+      - HAUSRAT
+      - HYPO
+      - BSCHUTZ
+      - INVEST
+      - VERK_LVRV
+      - KAPITAL_LV
+      - PENSIONK
+      - PRIV_KRANK
+      - CREDIT
+      - RECHT
+      - RENTEN
+      - RES_DEB_INS
+      - RISIKO_LV
+      - RURUP_RIEST
+      - SOLAR
+      - TEDDY
+      - UNFALL
+      - WERT
+      - BUI
+      - PREPAY_HARD
+      - PREPAY_RELO
+      - PREPAY_DIV
+      - MSP
+      - OTHER
     PropertiesRegisterInventory:
       oneOf:
       - $ref: '#/components/schemas/OwnershipInventory'
@@ -10329,7 +10385,8 @@ components:
     RFC7807Problem:
       type: object
       title: RFC7807Problem
-      description: Holds information regarding the returned error
+      description: |
+        DE: Angaben zum zurueckgegebenen Fehler. EN: Holds information on the returned error.
       required:
       - timestamp
       - traceId
@@ -10340,38 +10397,48 @@ components:
         timestamp:
           type: string
           format: date-time
-          description: A UTC date-time indicates the error timestamp (https://en.wikipedia.org/wiki/Coordinated_Universal_Time)
+          description: |
+            DE: Ein UTC-Zeitstempel, der den Fehlerzeitpunkt angibt (https://de.wikipedia.org/wiki/Koordinierte_Weltzeit). EN: A UTC date-time indicating the error timestamp (https://en.wikipedia.org/wiki/Coordinated_Universal_Time).
+          example: 2024-06-29T19:22:50Z
         type:
           type: string
           format: uri
-          description: URL refers to more information about the error.
+          description: |
+            DE: Verknuepfung zum Abruf von mehr Informationen zu dem Fehler. EN: URL referring to more information about the error.
           default: about:blank
         title:
           type: string
-          description: Error short description
+          description: |
+            DE: Kurzbeschreibung des Fehlers. EN: Error short description.
           example: Bad Request
         status:
           type: integer
           format: int32
-          description: HTTP status code following standared error codes (https://tools.ietf.org/html/rfc2616#section-10)
+          description: |
+            DE: HTTP-Status-Code gemaess Konvention (https://tools.ietf.org/html/rfc2616#section-10). EN: HTTP status code following standared error codes (https://tools.ietf.org/html/rfc2616#section-10).
           example: 400
           minimum: 100
           maximum: 599
         detail:
           type: string
-          description: Detailed description for the returned error
+          description: |
+            DE: Detaillierte Beschreibung des Fehlers. EN: Detailed description for the returned error.
           example: JSON parse error
         traceId:
           type: string
-          description: Unique trace id for problematic request
+          description: |
+            DE: Eindeutige Kennung zur Verfolgung der Anfrage. EN: Unique trace id for problematic request.
           example: avx1234asd
         instance:
           type: string
           format: uri
-          description: Path of requested resource
+          description: |
+            DE: Pfad zur betreffenden Resource. EN: Path of requested resource.
+          example: http://localhost/resources/123
         violations:
           type: array
-          description: Collection of the invalid content of the request
+          description: |
+            DE: Abfolge der Verstoesse in der Anfrage. EN: Collection of the invalid content of the request.
           items:
             $ref: '#/components/schemas/Violation'
     RateDetails:
@@ -11739,6 +11806,35 @@ components:
           $ref: '#/components/schemas/OriginInfo'
         preInquires:
           $ref: '#/components/schemas/PreInquires'
+    SubmissionAdditionalProduct:
+      description: a specific submission additional product
+      type: object
+      required:
+      - provider
+      - product
+      - totalRating
+      properties:
+        additionalProductId:
+          type: string
+        provider:
+          $ref: '#/components/schemas/CompanyId'
+        product:
+          $ref: '#/components/schemas/ProductType'
+        applicants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicantId'
+          minItems: 1
+        policyNumber:
+          type: string
+        netAmount:
+          $ref: '#/components/schemas/EuroAmount'
+        duration:
+          $ref: '#/components/schemas/Duration'
+        totalRating:
+          $ref: '#/components/schemas/EuroAmount'
+        commission:
+          $ref: '#/components/schemas/Percentage'
     SubmissionAwaitExternalProcessingStatus:
       type: object
       description: |
@@ -12687,6 +12783,17 @@ components:
             DE: Laufzeit des Tilgungssurrogats. <br/>
             EN: Duration of the repayment surrogate product.
           $ref: '#/components/schemas/Duration'
+    UpdateAdditionalProductsCommand:
+      description: Modify additional products
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseSubmissionCommand'
+      properties:
+        additionalProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionAdditionalProduct'
+          minItems: 0
     UpdateLoanPartnerDecisionDateCommand:
       description: Update the predicted decision date of a submission.
       type: object
@@ -12895,27 +13002,33 @@ components:
       - PUBLIC
       - OTHER
     Violation:
-      description: Description of the invalid field value
+      description: |
+        DE: Ein Verstoss gegen die Schnittstellenspezifikation. EN: A violation against the API schema.
       type: object
       title: Violation
       properties:
         field:
           type: string
-          description: Invalid field name
+          description: |
+            DE: Bezeichner des problematischen Felds. EN: Name of the problematic field.
+          example: address.city.numberOfInhabitants
         message:
           type: string
-          description: Description of the invalid field value
-          example: must be greater than or equal to 0
+          description: |
+            DE: Beschreibung des Verstosses. EN: Description of the violation.
+          example: Must be greater than or equal to 0.
     Year:
       type: object
       title: Year
+      nullable: true
       description: |
-        DE: Jahr nach ISO-8601-Kalendersystem, z.B. 2007. EN: A year in the ISO-8601 calendar system, such as 2007.
+        DE: Ein Jahr nach ISO-8601-Kalendersystem. EN: A year in the ISO-8601 calendar system.
       required:
       - value
       properties:
         value:
           type: string
-          description: The actual value of the year.
+          description: |
+            DE: Das Jahr. EN: The year.
           pattern: ^\d{4}$
           example: '2019'
