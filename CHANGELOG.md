@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.8.0
+* Remove products marked with showcondition in modify submission additional products command
+
 ### v6.7.23
 * Add modify submission command with additional products
 * Improve description
