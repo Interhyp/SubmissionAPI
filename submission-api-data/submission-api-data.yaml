@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.7.23
+  version: 6.8.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -10134,12 +10134,10 @@ components:
       - SOLAR
       - TEDDY
       - UNFALL
-      - WERT
       - BUI
       - PREPAY_HARD
       - PREPAY_RELO
       - PREPAY_DIV
-      - MSP
       - OTHER
     PropertiesRegisterInventory:
       oneOf:
