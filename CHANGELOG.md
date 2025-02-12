@@ -1,5 +1,8 @@
 # Submission Data API
 
+### v6.8.0
+* remove obsolete submission additional products
+
 ### v6.7.23
 * Add modify submission command with additional products
 * Improve description
