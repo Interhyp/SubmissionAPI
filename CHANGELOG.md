@@ -1,5 +1,21 @@
 # Submission Data API
 
+### v6.10.0
+* Add new endpoint to retrieve presubmission checks using intent ID and loan partner ID
+
+### v6.9.2
+* Add approved flag to submission additional products
+
+### v6.9.1
+* Add collection of performed pre-submission checks to submission
+
+### v6.9.0
+* Change name of totalRating to commissionBase
+* Change netAmount to netBurden and its type from MonetaryAmount to PeriodicalAmount
+
+### v6.8.1
+* Add additional products SubmissionLogbookEntry
+
 ### v6.8.0
 * remove obsolete submission additional products
 
