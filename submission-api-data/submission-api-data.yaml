@@ -2,7 +2,7 @@ openapi: 3.0.2
 x-guideline-version: v1
 info:
   title: Interhyp Submission API
-  version: 6.8.0
+  version: 6.10.0
   contact:
     name: Interhyp AG (Team Provider Excellence)
     email: support_submission_api@interhyp.de
@@ -973,6 +973,52 @@ paths:
               example: '{ "timestamp": "2023-03-14T10:00:00.995Z", "title": "Internal
                 Server Error", "status": 500, "traceId": "64077933c36912de13fb3cd7ae0c00c8",
                 "instance": "/v2/info" }'
+  /pre-submission-checks:
+    get:
+      summary: Get a collection of pre submission checks for intent ID and loan partner
+        ID
+      description: |-
+        This endpoint gives a possibility to retrieve collection of pre-submission checks using intent ID and loan partner ID.
+        A pre-submission check provided a way of pre-scoring to allows financial advisors to get an early indication whether a submission can be created
+      operationId: getPreSubmissionChecksByIntentIdAndLoanPartnerId
+      tags:
+      - pre-submission-checks
+      parameters:
+      - $ref: '#/components/parameters/intent-id'
+      - $ref: '#/components/parameters/loanpartner-id'
+      - $ref: '#/components/parameters/pre-submission-check-status'
+      responses:
+        '200':
+          description: Requested pre submission check is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreSubmissionChecks'
+        '400':
+          description: Error indicates missing or wrong request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '401':
+          description: Error indicates no access to the required resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProblem'
+        '404':
+          description: Error indicates that a requested submission resource was not
+            found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFC7807Problem'
   /pre-submission-checks/{preSubmissionCheckId}:
     get:
       summary: Get a specific pre submission check
@@ -1882,6 +1928,20 @@ components:
       schema:
         type: string
       description: Id of the requested informer
+    intent-id:
+      name: intentId
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Intent ID of the requested pre-submission check
+    loanpartner-id:
+      name: loanPartnerId
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Loan partner ID of the requested pre-submission check
     pre-submission-check-id:
       name: preSubmissionCheckId
       in: path
@@ -1889,6 +1949,18 @@ components:
       schema:
         type: string
       description: Id for the requested pre submission check id.
+    pre-submission-check-status:
+      name: preSubmissionCheckStatus
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - ALL
+        - ANSWERED
+        - OPEN
+        default: ANSWERED
+      description: Status of the PSCs to be returned
     sbms-limit:
       name: limit
       in: query
@@ -9913,6 +9985,26 @@ components:
       properties:
         value:
           type: string
+    PreSubmissionCheckItem:
+      description: Performed pre-submission check information
+      type: object
+      required:
+      - preSubmissionCheckId
+      properties:
+        preSubmissionCheckId:
+          $ref: '#/components/schemas/PreSubmissionCheckId'
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+    PreSubmissionCheckItems:
+      description: Collection of performed pre-submission checks
+      type: object
+      required:
+      - preSubmissionChecks
+      properties:
+        preSubmissionChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreSubmissionCheckItem'
     PreSubmissionCheckLoanPartnerDetails:
       type: object
       properties:
@@ -9975,6 +10067,13 @@ components:
           $ref: '#/components/schemas/ISODateTime'
         answeredAt:
           $ref: '#/components/schemas/ISODateTime'
+    PreSubmissionChecks:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreSubmissionCheck'
     PredictedLoanPartnerDecisionDate:
       description: |
         DE: Voraussichtliches Entscheidungsdatum des Kreditgebers. <br/> EN: Predicted decision date of the loan partner.
@@ -11804,13 +11903,15 @@ components:
           $ref: '#/components/schemas/OriginInfo'
         preInquires:
           $ref: '#/components/schemas/PreInquires'
+        preSubmissionChecks:
+          $ref: '#/components/schemas/PreSubmissionCheckItems'
     SubmissionAdditionalProduct:
       description: a specific submission additional product
       type: object
       required:
       - provider
       - product
-      - totalRating
+      - commissionBase
       properties:
         additionalProductId:
           type: string
@@ -11825,14 +11926,39 @@ components:
           minItems: 1
         policyNumber:
           type: string
-        netAmount:
-          $ref: '#/components/schemas/EuroAmount'
+        netBurden:
+          $ref: '#/components/schemas/PeriodicalEuroAmount'
         duration:
           $ref: '#/components/schemas/Duration'
-        totalRating:
+        commissionBase:
           $ref: '#/components/schemas/EuroAmount'
         commission:
           $ref: '#/components/schemas/Percentage'
+        approved:
+          description: a flag indicates whether the provided additional product has
+            been approved and hence not changeable anymore.
+          type: boolean
+          nullable: true
+    SubmissionAdditionalProductsUpdatedLogbookEntry:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseLogbookEntry'
+      properties:
+        details:
+          $ref: '#/components/schemas/SubmissionAdditionalProductsUpdatedLogbookEntryDetails'
+    SubmissionAdditionalProductsUpdatedLogbookEntryDetails:
+      type: object
+      properties:
+        updatedProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionAdditionalProduct'
+          minItems: 0
+        originalProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmissionAdditionalProduct'
+          minItems: 0
     SubmissionAwaitExternalProcessingStatus:
       type: object
       description: |
@@ -12061,6 +12187,7 @@ components:
       - $ref: '#/components/schemas/RevokedSubmissionLogbookEntry'
       - $ref: '#/components/schemas/SubmissionLoanPartnerDocumentLogbookEntry'
       - $ref: '#/components/schemas/LoanPartnerProcessingUnitChangedLogbookEntry'
+      - $ref: '#/components/schemas/SubmissionAdditionalProductsUpdatedLogbookEntry'
       discriminator:
         propertyName: type
         mapping:
@@ -12082,6 +12209,7 @@ components:
           SUBMISSION_LOAN_PARTNER_DOCUMENT_UPDATED: '#/components/schemas/SubmissionLoanPartnerDocumentLogbookEntry'
           SUBMISSION_LOAN_PARTNER_DOCUMENT_DELETED: '#/components/schemas/SubmissionLoanPartnerDocumentLogbookEntry'
           LOAN_PARTNER_PROCESSING_UNIT_CHANGED: '#/components/schemas/LoanPartnerProcessingUnitChangedLogbookEntry'
+          ADDITIONAL_PRODUCTS_UPDATED: '#/components/schemas/SubmissionAdditionalProductsUpdatedLogbookEntry'
     SubmissionOverview:
       readOnly: true
       type: object
